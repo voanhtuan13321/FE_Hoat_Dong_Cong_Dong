@@ -13,14 +13,14 @@ export default function InputPassword({ label, name, value, onChange }) {
 
   return (
     <div className='flex flex-col'>
-      <label htmlFor={id} className='py-2'>
+      <label htmlFor={id} className='py-2 text-main text-normal'>
         {label}
       </label>
       <input
         id={id}
         type='text'
         name={name}
-        className='p-2 rounded-md outline-none border'
+        className='p-2 rounded-md outline-none border border-normal text-main'
         value={value}
         onChange={onChange}
       />
