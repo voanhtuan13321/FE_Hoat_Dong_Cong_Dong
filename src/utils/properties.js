@@ -18,20 +18,6 @@ export const routers = [
     onClick: navigator => navigator(this.path),
   },
   {
-    path: '/home',
-    label: 'trang chủ',
-    element: <Home />,
-    roles: [
-      'client',
-      'sinh-vien',
-      'lop-truong',
-      'giao-vien',
-      'truong-khoa',
-      'admin',
-    ],
-    onClick: navigator => navigator(this.path),
-  },
-  {
     path: '/login',
     label: 'đăng nhập',
     element: <Login />,
@@ -41,8 +27,9 @@ export const routers = [
   {
     label: 'đăng xuất',
     roles: ['sinh-vien', 'lop-truong', 'giao-vien', 'truong-khoa', 'admin'],
-    onClick: () => {
+    onClick: navigator => {
       // handle logout here
+      navigator(this.path)
     },
   },
   {
