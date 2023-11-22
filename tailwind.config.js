@@ -18,6 +18,7 @@ module.exports = {
       },
       fontSize: {
         main: '12px',
+        big: '22px',
       },
     },
   },
