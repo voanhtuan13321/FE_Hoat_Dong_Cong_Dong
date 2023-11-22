@@ -1,13 +1,26 @@
 import React from 'react'
 
-export default function Button({ type, text, onClick }) {
+/**
+ * <Button type='primary' label='Tìm kiếm' onClick={event => alert('click')} />
+ *
+ * @param type loại button (primary, outline)
+ * @param label chữ bên trong button
+ * @param onClick function xử lí khi click vào button
+ */
+export default function Button({ type, label, onClick }) {
   const renClassName = () => {
-    return ''
+    if (type === 'outline') {
+      return 'bg-second-color border border-normal'
+    }
+    return 'bg-primary text-white'
   }
 
   return (
-    <button className={`${renClassName()}`} onClick={onClick}>
-      {text}
+    <button
+      className={`${renClassName()} px-4 py-2 rounded-md hover:opacity-80`}
+      onClick={onClick}
+    >
+      {label}
     </button>
   )
 }
