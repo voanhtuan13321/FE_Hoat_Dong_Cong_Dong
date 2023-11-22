@@ -16,6 +16,9 @@ module.exports = {
         normal: '#333333',
         'red-text': '#FF0000',
       },
+      fontSize: {
+        main: '12px',
+      },
     },
   },
   safelist: [{ pattern: /(bg|text|border)-(primary|second)/ }],
