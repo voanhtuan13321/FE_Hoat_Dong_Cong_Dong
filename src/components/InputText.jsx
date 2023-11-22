@@ -8,7 +8,7 @@ import React, { useId } from 'react'
  * @param value
  * @param onChange
  */
-export default function InputPassword({ label, name, value, onChange }) {
+export default function InputText({ label, name, value, onChange }) {
   const id = useId()
 
   return (
