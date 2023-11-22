@@ -17,7 +17,7 @@ export default function Button({ type, label, onClick }) {
 
   return (
     <button
-      className={`${renClassName()} px-4 py-2 rounded-md hover:opacity-80 uppercase`}
+      className={`${renClassName()} px-4 py-2 rounded-md hover:opacity-80 uppercase text-main`}
       onClick={onClick}
     >
       {label}
