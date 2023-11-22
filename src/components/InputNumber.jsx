@@ -1,12 +1,29 @@
 import React, { useId } from 'react'
 
-export default function InputPassword({ value, onChange }) {
+/**
+ * <InputNumber label='label' name='name' value={text} onChange={event => setText(event.target.value)} />
+ *
+ * @param label
+ * @param name
+ * @param value
+ * @param onChange
+ */
+export default function InputNumber({ label, name, value, onChange }) {
   const id = useId()
 
   return (
-    <div>
-      <label htmlFor={id}></label>
-      <input id={id} type='number' value={value} onChange={onChange} />
+    <div className='flex flex-col'>
+      <label htmlFor={id} className='py-2 text-main text-normal'>
+        {label}
+      </label>
+      <input
+        id={id}
+        type='number'
+        name={name}
+        className='p-2 rounded-md outline-none border border-normal text-main'
+        value={value}
+        onChange={onChange}
+      />
     </div>
   )
 }
