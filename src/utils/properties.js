@@ -1,8 +1,22 @@
-import Home from '../pages/Home'
-import Login from '../pages/Login'
-import NotFound from '../pages/NotFound'
+import Home from '../pages/home'
+import Login from '../pages/login'
+import NotFound from '../pages/not_found'
 
 export const routers = [
+  {
+    path: '/',
+    label: 'trang chủ',
+    element: <Home />,
+    roles: [
+      'client',
+      'sinh-vien',
+      'lop-truong',
+      'giao-vien',
+      'truong-khoa',
+      'admin',
+    ],
+    onClick: navigator => navigator(this.path),
+  },
   {
     path: '/home',
     label: 'trang chủ',
