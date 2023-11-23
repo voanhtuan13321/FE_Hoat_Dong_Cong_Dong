@@ -18,7 +18,7 @@ export default function InputPassword({ label, name, value, onChange }) {
   }
 
   const PropsIcons = {
-    className: 'absolute top-2 right-2 cursor-pointer',
+    className: 'cursor-pointer',
     onClick: onClickIconShowPassword,
   }
 
@@ -37,12 +37,13 @@ export default function InputPassword({ label, name, value, onChange }) {
           value={value}
           onChange={onChange}
         />
-
-        {isShowPassword ? (
-          <FaRegEye {...PropsIcons} />
-        ) : (
-          <FaRegEyeSlash {...PropsIcons} />
-        )}
+        <div className='absolute top-0 bottom-0 right-2 flex items-center'>
+          {isShowPassword ? (
+            <FaRegEye {...PropsIcons} />
+          ) : (
+            <FaRegEyeSlash {...PropsIcons} />
+          )}
+        </div>
       </div>
     </div>
   )
