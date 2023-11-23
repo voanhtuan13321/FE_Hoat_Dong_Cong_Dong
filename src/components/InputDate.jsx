@@ -37,10 +37,9 @@ export default function InputDate({ label, name, value, onChange }) {
           dateFormat='dd/MM/yyyy'
           className='w-full outline-none border border-normal rounded-md p-2 text-main'
         />
-        <MdDateRange
-          className='absolute top-2 right-2 cursor-pointer'
-          onClick={onClickIcon}
-        />
+        <div className='absolute top-0 bottom-0 right-2 flex items-center'>
+          <MdDateRange className='cursor-pointer' onClick={onClickIcon} />
+        </div>
       </div>
     </div>
   )
