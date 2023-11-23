@@ -20,6 +20,12 @@ module.exports = {
         main: '12px',
         big: '22px',
       },
+      width: {
+        '150px': '150px',
+      },
+      height: {
+        '200px': '200px',
+      },
     },
   },
   safelist: [{ pattern: /(bg|text|border)-(primary|second)/ }],

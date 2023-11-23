@@ -1,15 +1,6 @@
 import React, { useId } from 'react'
 
-/**
- * <InputNumber label='label' name='name' value={text} onChange={event => setText(event.target.value)} />
- *
- * @param label
- * @param name
- * @param value
- * @param onChange
- * @param disabled
- */
-export default function InputNumber({
+export default function InputTextArea({
   label,
   name,
   value,
@@ -25,10 +16,10 @@ export default function InputNumber({
           {label}
         </label>
       )}
-      <input
-        id={id}
-        type='number'
+      <textarea
         name={name}
+        id={id}
+        rows='3'
         className='p-2 rounded-md outline-none border border-normal text-main'
         value={value}
         onChange={onChange}

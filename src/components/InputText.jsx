@@ -7,8 +7,9 @@ import React, { useId } from 'react'
  * @param name
  * @param value
  * @param onChange
+ * @param disabled
  */
-export default function InputText({ label, name, value, onChange }) {
+export default function InputText({ label, name, value, onChange, disabled }) {
   const id = useId()
 
   return (
@@ -22,6 +23,7 @@ export default function InputText({ label, name, value, onChange }) {
         id={id}
         type='text'
         name={name}
+        disabled={disabled}
         className='p-2 rounded-md outline-none border border-normal text-main'
         value={value}
         onChange={onChange}

@@ -22,8 +22,16 @@ import { FaCheck, FaChevronDown } from 'react-icons/fa'
  * @param value
  * @param onChange
  * @param options
+ * @param disabled
  */
-export default function InputSelect({ label, name, value, onChange, options }) {
+export default function InputSelect({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+  disabled,
+}) {
   const id = useId()
 
   const renderOptions = () => {
@@ -64,7 +72,7 @@ export default function InputSelect({ label, name, value, onChange, options }) {
         </label>
       )}
       <div>
-        <Listbox value={value} onChange={onChange}>
+        <Listbox value={value} onChange={onChange} disabled={disabled}>
           <Listbox.Button className='relative w-full cursor-default rounded-md bg-white p-2 text-left border border-normal outline-none text-main'>
             <span className='block truncate'>{value.name}</span>
             <span className='pointer-events-none absolute inset-y-0 right-2 flex items-center'>

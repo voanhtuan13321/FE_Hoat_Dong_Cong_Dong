@@ -34,7 +34,7 @@ export default function Button({ type, label, onClick }) {
 
   return (
     <button
-      className={`px-4 py-2 rounded-md hover:opacity-80 uppercase text-main relative
+      className={`px-4 py-2 rounded-md hover:opacity-80 uppercase text-main relative font-bold
         ${renClassName()} ${isShowIcon() && 'pl-8'}`}
       onClick={onClick}
     >

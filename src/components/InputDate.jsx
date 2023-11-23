@@ -11,8 +11,9 @@ import 'react-datepicker/dist/react-datepicker.css'
  * @param name
  * @param value
  * @param onChange
+ * @param disabled
  */
-export default function InputDate({ label, name, value, onChange }) {
+export default function InputDate({ label, name, value, onChange, disabled }) {
   const id = useId()
   const datepickerRef = useRef(null)
 
@@ -37,6 +38,7 @@ export default function InputDate({ label, name, value, onChange }) {
           withPortal='100%'
           dateFormat='dd/MM/yyyy'
           className='w-full outline-none border border-normal rounded-md p-2 text-main'
+          disabled={disabled}
         />
         <div className='absolute top-0 bottom-0 right-2 flex items-center'>
           <MdDateRange className='cursor-pointer' onClick={onClickIcon} />
