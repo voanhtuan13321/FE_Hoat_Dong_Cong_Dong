@@ -22,10 +22,11 @@ export default function InputDate({ label, name, value, onChange }) {
 
   return (
     <div className='flex flex-col'>
-      <label htmlFor={id} className='py-2 text-main text-normal'>
-        {label}
-      </label>
-
+      {label && (
+        <label htmlFor={id} className='py-2 text-main text-normal'>
+          {label}
+        </label>
+      )}
       <div className='relative'>
         <DatePicker
           id={id}

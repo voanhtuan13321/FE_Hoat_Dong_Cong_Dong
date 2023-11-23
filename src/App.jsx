@@ -14,7 +14,9 @@ export default function App() {
   return (
     <>
       <Header />
-      <Routes>{renderRoutes()}</Routes>
+      <div className='min-h-[600px]'>
+        <Routes>{renderRoutes()}</Routes>
+      </div>
       <Footer />
     </>
   )

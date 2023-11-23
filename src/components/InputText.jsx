@@ -13,9 +13,11 @@ export default function InputText({ label, name, value, onChange }) {
 
   return (
     <div className='flex flex-col'>
-      <label htmlFor={id} className='py-2 text-main text-normal'>
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={id} className='py-2 text-main text-normal'>
+          {label}
+        </label>
+      )}
       <input
         id={id}
         type='text'

@@ -30,10 +30,11 @@ export default function InputSelect({ label, name, value, onChange, options }) {
     return options.map((option, index) => (
       <Listbox.Option
         key={index}
-        className={({ active }) => {
-          return `relative cursor-pointer select-none p-2 pl-10
-            ${active ? 'bg-primary text-white' : 'text-gray-900'}`
-        }}
+        className={({ active }) =>
+          `relative cursor-pointer select-none p-2 pl-10 ${
+            active ? 'bg-primary text-white' : 'text-gray-900'
+          }`
+        }
         value={option}
       >
         {({ selected }) => (
@@ -57,9 +58,11 @@ export default function InputSelect({ label, name, value, onChange, options }) {
 
   return (
     <div className='flex flex-col'>
-      <label htmlFor={id} className='py-2 text-main text-normal'>
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={id} className='py-2 text-main text-normal'>
+          {label}
+        </label>
+      )}
       <div>
         <Listbox value={value} onChange={onChange}>
           <Listbox.Button className='relative w-full cursor-default rounded-md bg-white p-2 text-left border border-normal outline-none text-main'>
