@@ -1,3 +1,4 @@
+import { setRole } from '../redux/storeSlice'
 import Home from '../pages/home'
 import Login from '../pages/login'
 import NotFound from '../pages/not_found'
@@ -166,8 +167,9 @@ export const routers = [
       ROLES.truongKhoa,
       ROLES.admin,
     ],
-    onClick: function (navigator) {
+    onClick: function (navigator, dispatch) {
       // handle logout here
+      dispatch(setRole(ROLES.client))
       navigator('')
     },
   },

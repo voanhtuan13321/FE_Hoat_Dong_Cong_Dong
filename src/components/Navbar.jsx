@@ -1,10 +1,11 @@
 import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { routers, checkRoles } from '../utils'
 
 export default function Navbar() {
   const role = useSelector(state => state.role)
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -24,7 +25,7 @@ export default function Navbar() {
           <div
             key={index}
             className={generateClassNameByPath(router.path)}
-            onClick={() => router.onClick(navigate)}
+            onClick={() => router.onClick(navigate, dispatch)}
           >
             {router.label}
           </div>
