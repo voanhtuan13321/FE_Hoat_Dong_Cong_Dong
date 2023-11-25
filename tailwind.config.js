@@ -1,14 +1,19 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./public/index.html', './src/**/*.{js,jsx,ts,tsx}'],
+  content: [
+    './public/index.html',
+    './src/**/*.{js,jsx,ts,tsx}',
+    './node_modules/tailwind-datepicker-react/dist/**/*.js',
+  ],
   theme: {
     extend: {
       backgroundColor: {
         primary: '#4D90FE',
-        'primary-hover': '#0850C7',
+        footer: '#0850C7',
         'second-color': '#E9E9E9',
       },
       borderColor: {
+        primary: '#4D90FE',
         normal: '#333333',
       },
       colors: {
