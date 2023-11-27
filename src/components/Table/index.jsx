@@ -25,14 +25,14 @@ import TableHeader from './TableHeader'
  *
  * <Table data={dataTable}>{renderBodyTable()}</Table>
  *
- * @param data
+ * @param header
  * @param children
  * @returns
  */
-export default function Table({ data, children }) {
+export default function Table({ header, children }) {
   return (
     <table className='w-full'>
-      <TableHeader data={data.header} />
+      <TableHeader data={header} />
       <tbody>{children}</tbody>
     </table>
   )
