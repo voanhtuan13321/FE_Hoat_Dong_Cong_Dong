@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 import InputSelect from '../components/InputSelect'
 import Button from '../components/Button'
 import Table from '../components/Table'
 import ItemRowTableTuDanhGia from '../components/ItemRowTableTuDanhGia'
 import Title from '../components/Title'
+import { ROLES, checkRoles } from '../utils'
 
 const optionsDotDanhGia = [
   { name: '2022-2023', value: 1 },
@@ -37,6 +39,7 @@ const dataTable = {
 }
 
 export default function TuDanhGia() {
+  const role = useSelector(state => state.role)
   const [selected, setSelected] = useState(optionsDotDanhGia[0])
   const [listTuDanhGia, setListTuDanhGia] = useState(dataTable.value)
 
@@ -44,7 +47,7 @@ export default function TuDanhGia() {
     setListTuDanhGia([
       ...listTuDanhGia,
       {
-        loaiHoatDong: 0,
+        loaiHoatDong: 2,
         diemTuDanhGia: 0,
         diemBanCanSuDanhGia: 0,
         linkMinhChung: '',
@@ -71,6 +74,22 @@ export default function TuDanhGia() {
 
   const onClickXacNhanThamGia = () => {
     alert('Xac Nhan tham gia')
+  }
+
+  const genHeaderByRole = () => {
+    const header = [
+      { className: 'w-5%', title: 'stt' },
+      { className: 'w-20%', title: 'loại hoạt động' },
+      { className: 'w-10%', title: 'khung điểm' },
+      { className: 'w-10%', title: 'điểm tự đánh giá' },
+      { className: 'w-10%', title: 'điểm ban cán sự đánh giá' },
+      { className: '', title: 'link minh chứng' },
+    ]
+
+    if (checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role)) {
+      return [...header, { className: 'w-5%', title: 'xác nhận' }]
+    }
+    return [...header, { className: 'w-5%', title: '' }]
   }
 
   const renderBodyTable = () => {
@@ -111,16 +130,20 @@ export default function TuDanhGia() {
         <div className='flex justify-between items-center'>
           <h3 className='uppercase font-bold'>nội dung tự đánh giá</h3>
           <div>
-            <Button label='thêm' type='add' onClick={onClickThem} />
+            {!checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role) && (
+              <Button label='thêm' type='add' onClick={onClickThem} />
+            )}
           </div>
         </div>
         <div className='my-2'>
-          <Table header={dataTable.header}>{renderBodyTable()}</Table>
+          <Table header={genHeaderByRole()}>{renderBodyTable()}</Table>
         </div>
-        <div className='flex justify-end gap-2'>
-          <Button label='xác nhận' onClick={onClickXacNhan} />
-          <Button label='xác nhận tham gia' onClick={onClickXacNhanThamGia} />
-        </div>
+        {!checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role) && (
+          <div className='flex justify-end gap-2'>
+            <Button label='lưu' onClick={onClickXacNhan} />
+            <Button label='xác nhận tham gia' onClick={onClickXacNhanThamGia} />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import InputSelect from './InputSelect'
 import InputNumber from './InputNumber'
 import InputText from './InputText'
+import InputCheckbox from './InputCheckbox'
 import Button from './Button'
+import { ROLES, checkRoles } from '../utils'
 
 const loaiHoatDong = [
   { name: 'Hiến máu', value: 1, khungDiem: { min: 200, max: 300 } },
@@ -15,6 +18,7 @@ export default function ItemRowTableTuDanhGia({
   onChangeStateItemRowTable,
   onClickDeleteItem,
 }) {
+  const role = useSelector(state => state.role)
   const [listLoaiHoatDong, setListLoaiHoatDong] = useState([])
   const [selected, setSelected] = useState({})
   const [rowData, setRowData] = useState({
@@ -96,13 +100,20 @@ export default function ItemRowTableTuDanhGia({
           onChange={onChangeValue}
         />
       </td>
-      <td className='border border-primary p-1 text-center'>
-        <Button
-          type='delete'
-          label='xoá'
-          onClick={() => onClickDeleteItem(index)}
-        />
-      </td>
+      {!checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role) && (
+        <td className='border border-primary p-1 text-center'>
+          <Button
+            type='delete'
+            label='xoá'
+            onClick={() => onClickDeleteItem(index)}
+          />
+        </td>
+      )}
+      {checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role) && (
+        <td className='border border-primary p-1 text-center'>
+          <InputCheckbox />
+        </td>
+      )}
     </tr>
   )
 }
