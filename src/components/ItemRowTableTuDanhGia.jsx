@@ -15,19 +15,34 @@ export default function ItemRowTableTuDanhGia({
   onChangeStateItemRowTable,
   onClickDeleteItem,
 }) {
-  const renInitSelected = () => {
-    return !data.loaiHoatDong
-      ? loaiHoatDong[0]
-      : loaiHoatDong.filter(hd => hd.value === data.loaiHoatDong)[0]
-  }
-
-  const [selected, setSelected] = useState(renInitSelected())
+  const [listLoaiHoatDong, setListLoaiHoatDong] = useState([])
+  const [selected, setSelected] = useState({})
   const [rowData, setRowData] = useState({
-    loaiHoatDong: renInitSelected().value,
+    loaiHoatDong: 0,
     diemTuDanhGia: data.diemTuDanhGia,
     diemBanCanSuDanhGia: data.diemBanCanSuDanhGia,
     linkMinhChung: data.linkMinhChung,
   })
+
+  useEffect(() => {
+    fetchListLoaiHoatDong()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const fetchListLoaiHoatDong = () => {
+    setListLoaiHoatDong(loaiHoatDong)
+    setSelected(getLoaiHoatDong(data.loaiHoatDong))
+    setRowData({
+      ...rowData,
+      loaiHoatDong: getLoaiHoatDong(data.loaiHoatDong).value,
+    })
+  }
+
+  const getLoaiHoatDong = loaiHD => {
+    return !loaiHD
+      ? loaiHoatDong[0]
+      : loaiHoatDong.filter(hd => hd.value === loaiHD)[0]
+  }
 
   const onSelectOption = selected => {
     setSelected(selected)
@@ -36,8 +51,7 @@ export default function ItemRowTableTuDanhGia({
 
   const onChangeValue = event => {
     const { name, value } = event.target
-    let newValue
-    newValue = Number(value)
+    let newValue = Number(value)
     setRowData({ ...rowData, [name]: newValue || value })
   }
 
@@ -51,13 +65,13 @@ export default function ItemRowTableTuDanhGia({
       <td className='border border-primary p-1 text-center'>{index + 1}</td>
       <td className='border border-primary p-1'>
         <InputSelect
-          options={loaiHoatDong}
+          options={listLoaiHoatDong}
           value={selected}
           onChange={onSelectOption}
         />
       </td>
       <td className='border border-primary p-1 text-center'>
-        {`${selected.khungDiem.min} - ${selected.khungDiem.max}`}
+        {`${selected.khungDiem?.min} - ${selected.khungDiem?.max}`}
       </td>
       <td className='border border-primary p-1'>
         <InputNumber

@@ -53,8 +53,9 @@ export default function TuDanhGia() {
 
   const onClickDeleteItem = index => {
     console.log(index)
-    const filteredStates = listTuDanhGia.filter((_, i) => i !== index)
-    setListTuDanhGia(filteredStates)
+    const cloneStates = [...listTuDanhGia]
+    cloneStates.splice(index, 1)
+    setListTuDanhGia(cloneStates)
   }
 
   const onChangeStateItemRowTable = (index, rowData) => {
@@ -65,6 +66,10 @@ export default function TuDanhGia() {
 
   const onClickXacNhan = () => {
     console.log(listTuDanhGia)
+  }
+
+  const onClickXacNhanThamGia = () => {
+    alert('Xac Nhan tham gia')
   }
 
   const renderBodyTable = () => {
@@ -113,7 +118,7 @@ export default function TuDanhGia() {
         </div>
         <div className='flex justify-end gap-2'>
           <Button label='xác nhận' onClick={onClickXacNhan} />
-          <Button label='xác nhận tham gia' />
+          <Button label='xác nhận tham gia' onClick={onClickXacNhanThamGia} />
         </div>
       </div>
     </div>
