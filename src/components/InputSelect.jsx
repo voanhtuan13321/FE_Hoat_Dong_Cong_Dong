@@ -85,7 +85,7 @@ export default function InputSelect({
             leaveFrom='opacity-100'
             leaveTo='opacity-0'
           >
-            <Listbox.Options className='absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white text-base border border-normal ring-1 ring-black/5 outline-none text-main'>
+            <Listbox.Options className='absolute mt-1 max-h-60 overflow-auto rounded-md bg-white text-base border border-normal ring-1 ring-black/5 outline-none text-main z-50'>
               {renderOptions()}
             </Listbox.Options>
           </Transition>
