@@ -3,6 +3,7 @@ import InputSelect from '../components/InputSelect'
 import Button from '../components/Button'
 import Table from '../components/Table'
 import ItemRowTableTuDanhGia from '../components/ItemRowTableTuDanhGia'
+import Title from '../components/Title'
 
 const optionsDotDanhGia = [
   { name: '2022-2023', value: 1 },
@@ -88,8 +89,8 @@ export default function TuDanhGia() {
 
   return (
     <div className='container mx-auto'>
-      <div>title</div>
-      <div>
+      <Title title='tự đánh giá' />
+      <div className='mt-3'>
         <div className='flex items-center gap-2 '>
           <span className='font-bold text-primary text-main'>
             Năm đánh giá:
