@@ -7,11 +7,11 @@ import Swal from 'sweetalert2'
 
 const dataTable = {
   header: [
-    { className: 'w-1/12', title: 'stt' },
-    { className: 'w-2/12', title: 'Mã sinh viên' },
-    { className: 'w-5/12', title: 'Họ tên' },
-    { className: 'w-2/12', title: 'Đổi mật khẩu' },
-    { className: 'w-2/12', title: 'Khoá tài khoản' },
+    { className: 'w-5%', title: 'stt' },
+    { className: 'w-15%', title: 'Mã sinh viên' },
+    { className: '', title: 'Họ tên' },
+    { className: 'w-15%', title: 'Đổi mật khẩu' },
+    { className: 'w-15%', title: 'Khoá tài khoản' },
   ],
   value: [
     {
@@ -78,12 +78,12 @@ export default function AdminDanhSachSinhVien() {
         autocapitalize: 'off',
       },
       showCancelButton: true,
-      cancelButtonText: "huỷ",
+      cancelButtonText: 'huỷ',
       confirmButtonText: 'Xác nhận',
       showLoaderOnConfirm: true,
-      preConfirm: async login => {
+      preConfirm: async valuePassword => {
         // check validate
-        if (!login) {
+        if (!valuePassword) {
           return Swal.showValidationMessage('bạn chưa nhập mật khẩu')
         }
       },
@@ -93,7 +93,7 @@ export default function AdminDanhSachSinhVien() {
         //call api
         Swal.fire({
           icon: 'success',
-          title: `Thay đổi mật khẩu thành công! `,
+          title: `Thay đổi mật khẩu thành công!`,
           showConfirmButton: false,
           timer: 1500,
         })
@@ -135,7 +135,7 @@ export default function AdminDanhSachSinhVien() {
           <Title title={'danh sách sinh viên'}></Title>
         </div>
         <div className='my-2'>
-          <Table data={dataTable}>{renderBodyTable()}</Table>
+          <Table header={dataTable.header}>{renderBodyTable()}</Table>
         </div>
       </div>
     </>
