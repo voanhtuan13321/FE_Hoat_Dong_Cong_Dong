@@ -25,7 +25,7 @@ import TableHeader from './TableHeader'
  *
  * <Table header={dataTable.header}>{renderBodyTable()}</Table>
  *
- * @param data
+ * @param header
  * @param children
  * @returns
  */
