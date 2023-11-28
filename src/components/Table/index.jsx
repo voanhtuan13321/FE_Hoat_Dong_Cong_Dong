@@ -23,7 +23,7 @@ import TableHeader from './TableHeader'
     })
   }
  *
- * <Table data={dataTable}>{renderBodyTable()}</Table>
+ * <Table header={dataTable.header}>{renderBodyTable()}</Table>
  *
  * @param header
  * @param children
