@@ -2,7 +2,7 @@ import Logo from '../assets/images/Logo.png'
 
 export default function Header() {
   return (
-    <div className='w-full px-40 py-3 flex flex-row items-center gap-4'>
+    <div className='container mx-auto py-3 flex flex-row items-center gap-4'>
       <img src={Logo} alt='Logo' />
       <p className='text-primary font-bold font-big uppercase'>
         HỆ THỐNG THÔNG TIN SINH VIÊN
