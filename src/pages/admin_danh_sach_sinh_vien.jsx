@@ -107,7 +107,7 @@ export default function AdminDanhSachSinhVien() {
         <tr key={index}>
           <td className='border border-primary p-1 text-center'>{dt.stt}</td>
           <td className='border border-primary p-1 text-center'>{dt.svid}</td>
-          <td className='border border-primary p-1 text-center'>{dt.name}</td>
+          <td className='border border-primary px-3'>{dt.name}</td>
           <td className='border border-primary p-1 text-center'>
             <Button
               type={'edit'}
