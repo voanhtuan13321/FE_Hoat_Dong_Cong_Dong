@@ -1,5 +1,5 @@
 import React from 'react'
 
 export default function Footer() {
-  return <div>Footer</div>
+  return <div className='p-36 bg-footer'></div>
 }

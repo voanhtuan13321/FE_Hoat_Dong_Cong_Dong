@@ -13,6 +13,8 @@ export default function InputNumber({
   label,
   name,
   value,
+  min,
+  max,
   onChange,
   disabled,
 }) {
@@ -29,6 +31,8 @@ export default function InputNumber({
         id={id}
         type='number'
         name={name}
+        min={min}
+        max={max}
         className='p-2 rounded-md outline-none border border-normal text-main'
         value={value}
         onChange={onChange}
