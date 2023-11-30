@@ -1,6 +1,7 @@
 import React, { useId, useRef } from 'react'
 import DatePicker from 'react-datepicker'
 import { MdDateRange } from 'react-icons/md'
+import vi from 'date-fns/locale/vi'
 import 'react-datepicker/dist/react-datepicker.css'
 
 /**
@@ -39,9 +40,13 @@ export default function InputDate({ label, name, value, onChange, disabled }) {
           dateFormat='dd/MM/yyyy'
           className='w-full outline-none border border-normal rounded-md p-2 text-main'
           disabled={disabled}
-          locale='vi'
+          locale={vi}
         />
-        <div className='absolute top-0 bottom-0 right-2 flex items-center'>
+        <div
+          className={`absolute top-0 bottom-0 right-2 flex items-center ${
+            disabled && 'pointer-events-none'
+          }`}
+        >
           <MdDateRange className='cursor-pointer' onClick={onClickIcon} />
         </div>
       </div>
