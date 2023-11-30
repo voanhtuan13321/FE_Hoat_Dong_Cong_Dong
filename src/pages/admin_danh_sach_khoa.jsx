@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
 import Title from '../components/Title'
 import Table from '../components/Table/index'
@@ -157,18 +157,15 @@ export default function AdminDanhSachKhoa() {
     <>
       <div className='container mx-auto my-3'>
         <Title title={'Danh sách khoa'} />
-        <div className='my-3 border-2'>
-          <div className='flex justify-end my-2 mx-8'>
-            <Button
-              label={'Thêm'}
-              type={'add'}
-              onClick={() =>
-                handleButtonClick(dataTable.value.length - 1, 'add')
-              }
-            />
-          </div>
-          <Table header={dataTable.header}>{renderBodyTable()}</Table>
+
+        <div className='flex justify-end my-2'>
+          <Button
+            label={'Thêm'}
+            type={'add'}
+            onClick={() => handleButtonClick(dataTable.value.length - 1, 'add')}
+          />
         </div>
+        <Table header={dataTable.header}>{renderBodyTable()}</Table>
       </div>
     </>
   )
