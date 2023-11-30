@@ -73,7 +73,7 @@ export default function AdminHoatDongCongDongCuaTruong() {
   const renderBodyTable = () => {
     return data.map((dt, index) => {
       return (
-        <tr>
+        <tr key={index}>
           <td className='border border-primary p-1 text-center text-main'>
             {index + 1}
           </td>
@@ -100,7 +100,7 @@ export default function AdminHoatDongCongDongCuaTruong() {
         </div>
         <div className='p-2'>
           <div className='text-end pb-2'>
-            <Button type={''} label={'Xuất file'} />
+            <Button label={'Xuất file'} />
           </div>
           <Table header={dataTable.header}>{renderBodyTable()}</Table>
         </div>
