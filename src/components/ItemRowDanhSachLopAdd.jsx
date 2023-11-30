@@ -26,27 +26,64 @@ export default function ItemRowDanhSachLopAdd({
   dt,
   index,
   onClickDeleteItem,
+  setIsAddNew,
 }) {
-    const [selectKhoa,setSelectKhoa] = useState({})
-    const [selectTeacher, setSelectTeacher] = useState({})
-    const [selectClass, setSelectClass] = useState({})
-    const [selectYear, setSelectYear] = useState({})
+  const [selectKhoa, setSelectKhoa] = useState(khoaList[0])
+  const [selectTeacher, setSelectTeacher] = useState(teacherList[0])
+  const [selectClass, setSelectClass] = useState(classList[0])
+  const [selectYear, setSelectYear] = useState(namHocList[0])
+
+  const handleSave = () => {
+    const savedData = {
+      khoa: selectKhoa.value,
+      lop: selectClass.value,
+      giaoVien: selectTeacher.value,
+      namHoc: selectYear.value,
+    }
+    console.log('savedData:', savedData)
+  }
   return (
-    <tr className='text-center'>
-      <td className='border border-primary'>{index + 1}</td>
+    <tr className='text-center' key={index}>
+      <td className='border border-primary'></td>
       <td className='border border-primary'>
-        <InputSelect options={khoaList} value={}/>
+        <InputSelect
+          name='selectKhoa'
+          options={khoaList}
+          value={selectKhoa}
+          onChange={setSelectKhoa}
+        />
       </td>
-      <td className='border border-primary'>{dt.lop}</td>
-      <td className='border border-primary'>{dt.giaoVienChuNhiem}</td>
-      <td className='border border-primary'>{dt.khoa}</td>
+      <td className='border border-primary'>
+        <InputSelect
+          name='selectClass'
+          options={classList}
+          value={selectClass}
+          onChange={setSelectClass}
+        />
+      </td>
+      <td className='border border-primary'>
+        <InputSelect
+          name='selectTeacher'
+          options={teacherList}
+          value={selectTeacher}
+          onChange={setSelectTeacher}
+        />
+      </td>
+      <td className='border border-primary'>
+        <InputSelect
+          name='selectYear'
+          options={namHocList}
+          value={selectYear}
+          onChange={setSelectYear}
+        />
+      </td>
       <td className='border border-primary flex gap-2 justify-center'>
-        <Button label='Sửa' type='edit' onClick={() => {}} />
+        <Button label='Lưu' type='add' onClick={handleSave} />
         <Button
-          label='Xóa'
-          type='delete'
+          label='Hủy'
+          type='outline'
           onClick={() => {
-            onClickDeleteItem(index)
+            setIsAddNew(false)
           }}
         />
       </td>

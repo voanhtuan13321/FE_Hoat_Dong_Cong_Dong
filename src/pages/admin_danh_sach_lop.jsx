@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Title from '../components/Title'
 import InputSelect from '../components/InputSelect'
 import Button from '../components/Button'
 import Table from '../components/Table'
 import InputText from '../components/InputText'
 import ItemRowDanhSachLop from '../components/ItemRowDanhSachLop'
+import ItemRowDanhSachLopAdd from '../components/ItemRowDanhSachLopAdd'
 
 const optionsNamHoc = [
   { name: '2022-2023', value: 1 },
@@ -34,27 +35,27 @@ const dataTable = {
 }
 
 export default function AdminDanhSachLop() {
-  const [listClass, setListClass] = useState(dataTable.value)
+  const [listClass, setListClass] = useState([])
   const [selectedKhoa, setSelectedKhoa] = useState(optionsKhoa[0])
   const [selectedNamHoc, setSelectedNamHoc] = useState(optionsNamHoc[0])
+  const [isAddNew, setIsAddNew] = useState(false)
   const onClickThem = () => {
-    setListClass([
-      ...listClass,
-      {
-        khoaQuanLy: <InputText />,
-        lop: '20C1A',
-        giaoVienChuNhiem: 'Nguyễn Văn B',
-        khoa: '2020',
-      },
-    ])
+    setIsAddNew(true)
   }
   const onClickDeleteItem = index => {
     const cloneStates = [...listClass]
     cloneStates.splice(index, 1)
     setListClass(cloneStates)
   }
+  useEffect(() => {
+    fetchListClass()
+  }, [])
+
+  const fetchListClass = () => {
+    setListClass(dataTable.value)
+  }
   const renderBodyTable = () => {
-    return listClass.map((dt, index) => {
+    let arrJsx = listClass.map((dt, index) => {
       return (
         <ItemRowDanhSachLop
           dt={dt}
@@ -63,6 +64,12 @@ export default function AdminDanhSachLop() {
         />
       )
     })
+    isAddNew &&
+      (arrJsx = [
+        ...arrJsx,
+        <ItemRowDanhSachLopAdd key={-1} setIsAddNew={setIsAddNew} />,
+      ])
+    return arrJsx
   }
 
   return (
@@ -90,9 +97,11 @@ export default function AdminDanhSachLop() {
             </div>
             <Button label='Tìm Kiếm' onClick={() => {}} />
           </div>
-          <div className=''>
-            <Button label='thêm' type='add' onClick={onClickThem} />
-          </div>
+          {!isAddNew && (
+            <div className=''>
+              <Button label='thêm' type='add' onClick={onClickThem} />
+            </div>
+          )}
         </div>
       </div>
       <div className='my-2'>
