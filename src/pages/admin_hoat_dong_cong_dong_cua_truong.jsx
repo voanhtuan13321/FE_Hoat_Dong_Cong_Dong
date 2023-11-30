@@ -71,7 +71,7 @@ export default function AdminHoatDongCongDongCuaTruong() {
   }, [])
 
   const renderBodyTable = () => {
-    let arrJsx = data.map((dt, index) => {
+    return data.map((dt, index) => {
       return (
         <tr>
           <td className='border border-primary p-1 text-center text-main'>
@@ -80,9 +80,7 @@ export default function AdminHoatDongCongDongCuaTruong() {
           <td className='border border-primary p-1 text-center text-main'>
             {dt.maSinhVien}
           </td>
-          <td className='border border-primary p-1 text-center text-main'>
-            {dt.hoVaTen}
-          </td>
+          <td className='border border-primary p-1  text-main'>{dt.hoVaTen}</td>
           <td className='border border-primary p-1 text-center text-main'>
             {dt.lop}
           </td>
@@ -92,7 +90,6 @@ export default function AdminHoatDongCongDongCuaTruong() {
         </tr>
       )
     })
-    return arrJsx
   }
 
   return (
