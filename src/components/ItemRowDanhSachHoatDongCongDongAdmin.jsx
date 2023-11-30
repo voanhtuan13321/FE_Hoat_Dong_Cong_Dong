@@ -45,10 +45,10 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
           dataHDCD.loaiHDCD
         ) : (
           <InputText
-            name={'loaiHDCD'}
+            name='loaiHDCD'
             value={dataHDCD.loaiHDCD}
             onChange={e => onChangeInput(e)}
-          ></InputText>
+          />
         )}
       </td>
       <td className='border border-primary p-1 text-center'>
@@ -56,10 +56,10 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
           dataHDCD.minPoint
         ) : (
           <InputText
-            name={'minPoint'}
+            name='minPoint'
             value={dataHDCD.minPoint}
             onChange={e => onChangeInput(e)}
-          ></InputText>
+          />
         )}
       </td>
       <td className='border border-primary p-1 text-center'>
@@ -67,39 +67,27 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
           dataHDCD.maxPoint
         ) : (
           <InputText
-            name={'maxPoint'}
+            name='maxPoint'
             value={dataHDCD.maxPoint}
             disabled={!isEditing}
             onChange={e => onChangeInput(e)}
-          ></InputText>
+          />
         )}
       </td>
       <td className='border border-primary p-1 flex gap-3 justify-center'>
         {isEditing ? (
-          <Button
-            type={'add'}
-            label={'lưu'}
-            onClick={() => handleSaveClick()}
-          ></Button>
+          <Button type='add' label='lưu' onClick={() => handleSaveClick()} />
         ) : (
-          <Button
-            type={'edit'}
-            label={'sửa'}
-            onClick={() => handleEditClick()}
-          ></Button>
+          <Button type='edit' label='sửa' onClick={() => handleEditClick()} />
         )}
         {isEditing ? (
           <Button
-            type={'outline'}
-            label={'Huỷ'}
+            type='outline'
+            label='Huỷ'
             onClick={e => handleCancelButton()}
-          ></Button>
+          />
         ) : (
-          <Button
-            type={'delete'}
-            label={'Xoá'}
-            onClick={e => handleDeleteRow()}
-          ></Button>
+          <Button type='delete' label='Xoá' onClick={e => handleDeleteRow()} />
         )}
       </td>
     </tr>

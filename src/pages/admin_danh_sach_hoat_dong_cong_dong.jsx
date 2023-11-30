@@ -71,7 +71,7 @@ export default function AdminDanhSachHoatDongCongDong() {
   return (
     <>
       <div className='container p-2 justify-center m-auto'>
-        <Title title={'Danh sách các hoạt động cộng đồng'}></Title>
+        <Title title={'Danh sách các hoạt động cộng đồng'} />
 
         <div className='py-2'>
           <div className='text-end py-2'>
@@ -80,7 +80,7 @@ export default function AdminDanhSachHoatDongCongDong() {
               label={'Thêm'}
               disabled={addButtonDisabled}
               onClick={e => handleAddRow()}
-            ></Button>
+            />
           </div>
           <Table header={dataTable.header}>{renderBodyTable()}</Table>
         </div>
