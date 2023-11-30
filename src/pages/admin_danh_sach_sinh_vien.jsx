@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Table from '../components/Table'
 import Title from '../components/Title'
+import ItemRowDanhSachSinhVienAdmin from '../components/ItemRowDanhSachSinhVienAdmin'
+import ItemAddRowDanhSachSinhVienAdmin from '../components/ItemAddRowDanhSachSinhVienAdmin'
 import Button from '../components/Button'
-import InputCheckbox from '../components/InputCheckbox'
-import Swal from 'sweetalert2'
 
 const dataTable = {
   header: [
@@ -60,79 +60,44 @@ const dataTable = {
 }
 
 export default function AdminDanhSachSinhVien() {
-  const [data, setData] = useState(dataTable.value)
-  const changeCheckbox = index => {
-    const newData = [...data]
-    newData[index] = {
-      ...newData[index],
-      isDeleted: !newData[index].isDeleted,
-    }
-    setData(newData)
-  }
+  const [data, setData] = useState([])
+  const [isShowAddNew, setShowAddNew] = useState(false)
 
-  const handleButtonEdit = () => {
-    Swal.fire({
-      title: 'Nhập mật khẩu mới',
-      input: 'text',
-      inputAttributes: {
-        autocapitalize: 'off',
-      },
-      showCancelButton: true,
-      cancelButtonText: 'huỷ',
-      confirmButtonText: 'Xác nhận',
-      showLoaderOnConfirm: true,
-      preConfirm: async valuePassword => {
-        // check validate
-        if (!valuePassword) {
-          return Swal.showValidationMessage('bạn chưa nhập mật khẩu')
-        }
-      },
-    }).then(result => {
-      if (result.isConfirmed) {
-        // ${result.value}
-        //call api
-        Swal.fire({
-          icon: 'success',
-          title: `Thay đổi mật khẩu thành công!`,
-          showConfirmButton: false,
-          timer: 1500,
-        })
-      }
-    })
+  useEffect(() => {
+    setData(dataTable.value)
+  }, [])
+
+  const onClickThem = () => {
+    setShowAddNew(true)
   }
 
   const renderBodyTable = () => {
-    return data?.map((dt, index) => {
-      return (
-        <tr key={index}>
-          <td className='border border-primary p-1 text-center'>{dt.stt}</td>
-          <td className='border border-primary p-1 text-center'>{dt.svid}</td>
-          <td className='border border-primary px-3'>{dt.name}</td>
-          <td className='border border-primary p-1 text-center'>
-            <Button
-              type={'edit'}
-              label={'sửa'}
-              onClick={e => handleButtonEdit()}
-            ></Button>
-          </td>
-          <td className='border border-primary p-1'>
-            <InputCheckbox
-              label={''}
-              name={''}
-              value={dt.isDeleted}
-              onChange={() => changeCheckbox(index)}
-            ></InputCheckbox>
-          </td>
-        </tr>
-      )
+    let arrJsx = data?.map((dt, index) => {
+      return <ItemRowDanhSachSinhVienAdmin data={dt} index={index} />
     })
+
+    isShowAddNew &&
+      (arrJsx = [
+        ...arrJsx,
+        <ItemAddRowDanhSachSinhVienAdmin
+          key={-1}
+          setShowAddNew={setShowAddNew}
+        />,
+      ])
+
+    return arrJsx
   }
 
   return (
     <>
       <div className='container p-2 justify-center m-auto'>
         <div>
-          <Title title={'danh sách sinh viên'}></Title>
+          <Title title='danh sách sinh viên' />
+        </div>
+        <div className='py-2 text-end'>
+          {!isShowAddNew && (
+            <Button type='add' label='thêm' onClick={onClickThem} />
+          )}
         </div>
         <div className='my-2'>
           <Table header={dataTable.header}>{renderBodyTable()}</Table>
