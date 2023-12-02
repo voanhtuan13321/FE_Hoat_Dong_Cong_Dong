@@ -3,7 +3,6 @@ import Title from '../components/Title'
 import InputSelect from '../components/InputSelect'
 import Button from '../components/Button'
 import Table from '../components/Table'
-import InputText from '../components/InputText'
 import ItemRowDanhSachLop from '../components/ItemRowDanhSachLop'
 import ItemRowDanhSachLopAdd from '../components/ItemRowDanhSachLopAdd'
 
@@ -11,10 +10,12 @@ const optionsNamHoc = [
   { name: '2022-2023', value: 1 },
   { name: '2021-2022', value: 2 },
 ]
+
 const optionsKhoa = [
   { name: 'K.Cơ Khí', value: 1 },
   { name: 'K.Công nghệ thông tin', value: 2 },
 ]
+
 const dataTable = {
   header: [
     { className: 'w-5%', title: 'stt' },
@@ -26,10 +27,16 @@ const dataTable = {
   ],
   value: [
     {
-      khoaQuanLy: 'K.Cơ Khí',
+      khoaQuanLy: 1,
       lop: '20C1A',
       giaoVienChuNhiem: 'Nguyễn Văn A',
-      khoa: '2020',
+      khoa: '2021-2022',
+    },
+    {
+      khoaQuanLy: 2,
+      lop: '20C1A',
+      giaoVienChuNhiem: 'Nguyễn Văn B',
+      khoa: '2021-2022',
     },
   ],
 }
@@ -39,14 +46,7 @@ export default function AdminDanhSachLop() {
   const [selectedKhoa, setSelectedKhoa] = useState(optionsKhoa[0])
   const [selectedNamHoc, setSelectedNamHoc] = useState(optionsNamHoc[0])
   const [isAddNew, setIsAddNew] = useState(false)
-  const onClickThem = () => {
-    setIsAddNew(true)
-  }
-  const onClickDeleteItem = index => {
-    const cloneStates = [...listClass]
-    cloneStates.splice(index, 1)
-    setListClass(cloneStates)
-  }
+
   useEffect(() => {
     fetchListClass()
   }, [])
@@ -54,10 +54,22 @@ export default function AdminDanhSachLop() {
   const fetchListClass = () => {
     setListClass(dataTable.value)
   }
+
+  const onClickThem = () => {
+    setIsAddNew(true)
+  }
+
+  const onClickDeleteItem = index => {
+    const cloneStates = [...listClass]
+    cloneStates.splice(index, 1)
+    setListClass(cloneStates)
+  }
+
   const renderBodyTable = () => {
     let arrJsx = listClass.map((dt, index) => {
       return (
         <ItemRowDanhSachLop
+          key={index}
           dt={dt}
           index={index}
           onClickDeleteItem={onClickDeleteItem}
@@ -88,6 +100,7 @@ export default function AdminDanhSachLop() {
                 onChange={setSelectedKhoa}
               />
             </div>
+            <span className='font-bold text-primary text-main'>Khoá:</span>
             <div className='w-48'>
               <InputSelect
                 options={optionsNamHoc}
@@ -95,7 +108,6 @@ export default function AdminDanhSachLop() {
                 onChange={setSelectedNamHoc}
               />
             </div>
-            <Button label='Tìm Kiếm' onClick={() => {}} />
           </div>
           {!isAddNew && (
             <div className=''>

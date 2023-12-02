@@ -42,6 +42,7 @@ export default function ItemRowDanhSachLopAdd({
     }
     console.log('savedData:', savedData)
   }
+
   return (
     <tr className='text-center' key={index}>
       <td className='border border-primary'></td>

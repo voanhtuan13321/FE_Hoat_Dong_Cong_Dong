@@ -1,60 +1,97 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from './Button'
 import InputSelect from './InputSelect'
 
-const classList = [
+const apiClassList = [
   { name: '18CA1', value: 1 },
   { name: '18CA2', value: 2 },
   { name: '18CA3', value: 3 },
 ]
-const teacherList = [
+
+const apiTeacherList = [
   { name: 'Nguyễn Văn A', value: 1 },
   { name: 'Nguyễn Văn B', value: 2 },
   { name: 'Nguyễn Văn C', value: 3 },
 ]
-const khoaList = [
+
+const apiKhoaList = [
   { name: 'K.Cơ Khí', value: 1 },
   { name: 'K.Vật lý', value: 2 },
   { name: 'K.CNTT', value: 3 },
 ]
-const namHocList = [
+
+const apiNamHocList = [
   { name: '2021', value: 1 },
   { name: '2022', value: 2 },
   { name: '2023', value: 3 },
 ]
+
 export default function ItemRowDanhSachLop({ dt, index, onClickDeleteItem }) {
-  const [selectKhoa, setSelectKhoa] = useState(dt.khoaQuanLy)
-  const [selectTeacher, setSelectTeacher] = useState(dt.giaoVienChuNhiem)
-  const [selectClass, setSelectClass] = useState(dt.lop)
-  const [selectYear, setSelectYear] = useState(dt.khoa)
-  const [isEdit, setIsEdit] = useState(false)
-  const [dataEdit, setDataEdit] = useState({ ...dt })
-  const handleSave = () => {
-    const savedData = {
-      khoa: selectKhoa.value,
-      lop: selectClass.value,
-      giaoVien: selectTeacher.value,
-      namHoc: selectYear.value,
-    }
-    console.log('savedData:', savedData)
+  const [isShowEdit, setShowEdit] = useState(false)
+  const [classes, setClasses] = useState([])
+  const [teachers, setTeachers] = useState([])
+  const [faculties, setFaculties] = useState([])
+  const [years, setYears] = useState([])
+  const [selectFaculty, setSelectFaculty] = useState(null)
+  const [selectClass, setSelectClass] = useState(null)
+  const [selectTeacher, setSelectTeacher] = useState(null)
+  const [selectYear, setSelectYear] = useState(null)
+
+  useEffect(() => {
+    fetchDanhSachLop()
+    fetchDanhSachGiaoVien()
+    fetchDanhSachKhoa()
+    fetchDanhSachNamHoc()
+  }, [])
+
+  const fetchDanhSachLop = () => {
+    setClasses(apiClassList)
+    setSelectClass(apiClassList[0])
   }
+
+  const fetchDanhSachGiaoVien = () => {
+    setTeachers(apiTeacherList)
+    setSelectTeacher(apiTeacherList[0])
+  }
+
+  const fetchDanhSachKhoa = () => {
+    setFaculties(apiKhoaList)
+    setSelectFaculty(apiKhoaList[0])
+  }
+
+  const fetchDanhSachNamHoc = () => {
+    setYears(apiNamHocList)
+    setSelectYear(apiNamHocList[0])
+  }
+
+  const getFacultyName = value => {
+    return faculties.filter(faculty => faculty.value === value)[0]?.name
+  }
+
+  const handleSave = () => {}
+
   const handleEdit = () => {
-    setIsEdit(true)
+    setShowEdit(true)
   }
+
   const onClickHuy = () => {
-    setIsEdit(false)
-    setDataEdit({ ...dt })
+    setShowEdit(false)
   }
+
   return (
     <>
-      {!isEdit ? (
-        <tr className='text-center' key={index}>
-          <td className='border border-primary'>{index + 1}</td>
-          <td className='border border-primary'>{dt.khoaQuanLy}</td>
-          <td className='border border-primary'>{dt.lop}</td>
-          <td className='border border-primary'>{dt.giaoVienChuNhiem}</td>
-          <td className='border border-primary'>{dt.khoa}</td>
-          <td className='border border-primary flex gap-2 justify-center'>
+      {!isShowEdit ? (
+        <tr className='text-center'>
+          <td className='border border-primary text-main'>{index + 1}</td>
+          <td className='border border-primary text-main'>
+            {getFacultyName(dt.khoaQuanLy)}
+          </td>
+          <td className='border border-primary text-main'>{dt.lop}</td>
+          <td className='border border-primary text-main'>
+            {dt.giaoVienChuNhiem}
+          </td>
+          <td className='border border-primary text-main'>{dt.khoa}</td>
+          <td className='border border-primary text-main flex gap-2 justify-center'>
             <Button label='Sửa' type='edit' onClick={handleEdit} />
             <Button
               label='Xóa'
@@ -70,16 +107,15 @@ export default function ItemRowDanhSachLop({ dt, index, onClickDeleteItem }) {
           <td className='border border-primary'>{index + 1}</td>
           <td className='border border-primary'>
             <InputSelect
-              name='selectKhoa'
-              options={khoaList}
-              value={selectKhoa}
-              onChange={setSelectKhoa}
+              options={faculties}
+              value={selectFaculty}
+              onChange={setSelectFaculty}
             />
           </td>
           <td className='border border-primary'>
             <InputSelect
               name='selectClass'
-              options={classList}
+              options={classes}
               value={selectClass}
               onChange={setSelectClass}
             />
@@ -87,7 +123,7 @@ export default function ItemRowDanhSachLop({ dt, index, onClickDeleteItem }) {
           <td className='border border-primary'>
             <InputSelect
               name='selectTeacher'
-              options={teacherList}
+              options={teachers}
               value={selectTeacher}
               onChange={setSelectTeacher}
             />
@@ -95,7 +131,7 @@ export default function ItemRowDanhSachLop({ dt, index, onClickDeleteItem }) {
           <td className='border border-primary'>
             <InputSelect
               name='selectYear'
-              options={namHocList}
+              options={years}
               value={selectYear}
               onChange={setSelectYear}
             />
