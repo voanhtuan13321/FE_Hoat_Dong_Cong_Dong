@@ -38,8 +38,6 @@ export default function ItemRowDanhSachLop({ dt, index, onClickDeleteItem }) {
   const [selectTeacher, setSelectTeacher] = useState(null)
   const [selectYear, setSelectYear] = useState(null)
 
-  console.log(dt)
-
   useEffect(() => {
     fetchDanhSachLop()
     fetchDanhSachGiaoVien()
