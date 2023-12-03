@@ -13,7 +13,7 @@ export default function InputText({ label, name, value, onChange, disabled }) {
   const id = useId()
 
   return (
-    <div className='flex flex-col w-full'>
+    <div className='flex flex-col'>
       {label && (
         <label htmlFor={id} className='py-2 text-main text-normal'>
           {label}

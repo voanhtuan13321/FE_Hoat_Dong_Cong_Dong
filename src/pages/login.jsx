@@ -8,10 +8,10 @@ export default function Login() {
     <div className='flex justify-center items-center h-screen'>
       <div className='w-600px h-250px rounded-lg border border-gray-300'>
         <div className='flex p-5 items-start gap-4'>
-          <div className='flex-none mt-3'>
+          <div className='w-30% mt-3'>
             <img src={User_login} alt='' />
           </div>
-          <div className='flex-1 w-full flex flex-col justify-center items-start gap-5'>
+          <div className='w-70% flex flex-col justify-center items-start gap-5'>
             <InputText label='Tài khoản' />
             <InputText label='Mật khẩu' />
           </div>
