@@ -6,6 +6,7 @@ const apiClassList = [
   { name: '18CA1', value: 1 },
   { name: '18CA2', value: 2 },
   { name: '18CA3', value: 3 },
+  { name: '20C1A', value: 4 },
 ]
 
 const apiTeacherList = [
@@ -37,26 +38,34 @@ export default function ItemRowDanhSachLop({ dt, index, onClickDeleteItem }) {
   const [selectTeacher, setSelectTeacher] = useState(null)
   const [selectYear, setSelectYear] = useState(null)
 
+  console.log(dt)
+
   useEffect(() => {
     fetchDanhSachLop()
     fetchDanhSachGiaoVien()
     fetchDanhSachKhoa()
     fetchDanhSachNamHoc()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchDanhSachLop = () => {
     setClasses(apiClassList)
-    setSelectClass(apiClassList[0])
+    const lop = apiClassList.filter(l => l.name === dt.lop)[0]
+    setSelectClass(lop)
   }
 
   const fetchDanhSachGiaoVien = () => {
     setTeachers(apiTeacherList)
-    setSelectTeacher(apiTeacherList[0])
+    const giaoVienChuNhiem = apiTeacherList.filter(
+      g => g.name === dt.giaoVienChuNhiem,
+    )[0]
+    setSelectTeacher(giaoVienChuNhiem)
   }
 
   const fetchDanhSachKhoa = () => {
     setFaculties(apiKhoaList)
-    setSelectFaculty(apiKhoaList[0])
+    const khoaQuanLy = apiKhoaList.filter(k => k.value === dt.khoaQuanLy)[0]
+    setSelectFaculty(khoaQuanLy)
   }
 
   const fetchDanhSachNamHoc = () => {
@@ -104,7 +113,7 @@ export default function ItemRowDanhSachLop({ dt, index, onClickDeleteItem }) {
         </tr>
       ) : (
         <tr className='text-center' key={index}>
-          <td className='border border-primary'>{index + 1}</td>
+          <td className='border border-primary text-main'>{index + 1}</td>
           <td className='border border-primary'>
             <InputSelect
               options={faculties}

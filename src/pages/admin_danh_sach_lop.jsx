@@ -3,8 +3,8 @@ import Title from '../components/Title'
 import InputSelect from '../components/InputSelect'
 import Button from '../components/Button'
 import Table from '../components/Table'
-import ItemRowDanhSachLop from '../components/ItemRowDanhSachLop'
-import ItemRowDanhSachLopAdd from '../components/ItemRowDanhSachLopAdd'
+import ItemRowDanhSachLop from '../components/ItemRowDanhSachLopAdmin'
+import ItemRowDanhSachLopAdd from '../components/ItemRowDanhSachLopAdminAdd'
 
 const optionsNamHoc = [
   { name: '2022-2023', value: 1 },
