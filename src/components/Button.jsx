@@ -14,7 +14,7 @@ const icon = {
  * @param label chữ bên trong button
  * @param onClick function xử lí khi click vào button
  */
-export default function Button({ type, label, onClick }) {
+export default function Button({ type, label, onClick, submit }) {
   const renClassName = () => {
     switch (type) {
       case 'outline':
@@ -37,6 +37,7 @@ export default function Button({ type, label, onClick }) {
       className={`px-4 py-2 rounded-md hover:opacity-80 uppercase text-main relative font-bold
         ${renClassName()} ${isShowIcon() && 'pl-8'}`}
       onClick={onClick}
+      type={submit ? 'submit' : 'button'}
     >
       {label}
       <div className='absolute top-0 bottom-0 left-3 flex items-center'>

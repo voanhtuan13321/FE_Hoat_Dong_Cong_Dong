@@ -32,7 +32,7 @@ export default function Home() {
       return (
         <div key={index} className='flex flex-col text-main border-b-2 px-3 pb-2 my-4 gap-2'>
           <div className='flex flex-row gap-8'>
-            <p className='w-10% text-red-text font-bold'>{dt.date}</p>
+            <p className='text-red-text font-bold'>{dt.date}</p>
             <p className='text-primary font-bold'>{dt.content}</p>
           </div>
 
