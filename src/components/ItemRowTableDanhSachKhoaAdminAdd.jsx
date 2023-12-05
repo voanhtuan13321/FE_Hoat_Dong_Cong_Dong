@@ -1,35 +1,55 @@
 import React, { useState } from 'react'
 import Button from './Button'
-import InputText from './InputText'
+import InputSelect from './InputSelect'
 
 const initState = {
-  khoa: '',
-  ten: '',
+  khoa: [
+    { name: 'Khoa A', value: 1 },
+    { name: 'Khoa B', value: 2 },
+    { name: 'Khoa C', value: 3 },
+    { name: 'Khoa D', value: 4 },
+  ],
+  ten: [
+    { name: 'Nguyễn Văn A', value: 1 },
+    { name: 'Nguyễn Văn B', value: 2 },
+    { name: 'Nguyễn Văn C', value: 3 },
+    { name: 'Nguyễn Văn D', value: 4 },
+  ],
 }
 
 export default function ItemRowTableDanhSachKhoaAdminAdd({ setShowAddNew }) {
-  const [dataKhoa, setDataKhoa] = useState(initState)
+  const [dataKhoa, setDataKhoa] = useState({
+    khoa: initState.khoa[0],
+    ten: initState.ten[0],
+  })
 
-  const onChangeInput = event => {
-    const { name, value } = event.target
-    setDataKhoa({
-      ...dataKhoa,
-      [name]: value,
-    })
+  const onSelectChange = (name, selectedOption) => {
+    setDataKhoa({ ...dataKhoa, [name]: selectedOption })
   }
 
   const onClickLuu = () => {
     console.log(dataKhoa)
   }
 
+  const renderContent = (selectedOption, name) => {
+    return (
+      <InputSelect
+        name={name}
+        value={selectedOption}
+        onChange={selected => onSelectChange(name, selected)}
+        options={initState[name]}
+      />
+    )
+  }
+
   return (
     <tr>
       <td className='border border-primary p-1 text-center'></td>
       <td className='border border-primary p-1 text-center'>
-        <InputText name='khoa' value={dataKhoa.khoa} onChange={onChangeInput} />
+        {renderContent(dataKhoa.khoa, 'khoa')}
       </td>
       <td className='border border-primary p-1'>
-        <InputText name='ten' value={dataKhoa.ten} onChange={onChangeInput} />
+        {renderContent(dataKhoa.ten, 'ten')}
       </td>
       <td className='border border-primary p-1 flex'>
         <div className='w-50% flex justify-center'>
