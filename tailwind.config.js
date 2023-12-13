@@ -51,7 +51,8 @@ module.exports = {
       },
       height: {
         '200px': '200px',
-        '250px': '250px'
+        '250px': '250px',
+        '80vh' : '80vh'
       },
     },
   },
