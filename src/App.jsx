@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import Navbar from './components/Navbar'
 import { routers } from './utils'
+import { Toaster } from 'react-hot-toast'
 
 export default function App() {
   const renderRoutes = () => {
@@ -20,6 +21,7 @@ export default function App() {
         <Routes>{renderRoutes()}</Routes>
       </div>
       <Footer />
+      <Toaster position='top-right' reverseOrder={false} />
     </>
   )
 }

@@ -37,6 +37,7 @@ export default function InputPassword({ label, name, value, onChange }) {
           className='w-full p-2 rounded-md outline-none border border-normal text-main'
           value={value}
           onChange={onChange}
+          autoComplete='true'
         />
         <div className='absolute top-0 bottom-0 right-2 flex items-center'>
           {isShowPassword ? (

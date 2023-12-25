@@ -169,7 +169,7 @@ export const routers = [
     ],
     onClick: function (navigator, dispatch) {
       // handle logout here
-      dispatch(setRole(ROLES.client))
+      dispatch(setRole([ROLES.client]))
       navigator('')
     },
   },
