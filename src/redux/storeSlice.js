@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit'
 import { ROLES } from '../utils'
 
 const initialState = {
-  role: ROLES.sinhVien,
+  role: ROLES.client,
+  userId: undefined,
 }
 
 export const storeSlice = createSlice({
@@ -13,7 +14,7 @@ export const storeSlice = createSlice({
       const roles = actions.payload || []
 
       const condition = {
-        NGUOIDUNGANDANH: 1,
+        DEFAULT: 1,
         SINHVIEN: 2,
         LOPTRUONG: 3,
         GIAOVIEN: 4,
@@ -21,19 +22,19 @@ export const storeSlice = createSlice({
         ADMIN: 6,
       }
 
-      let mainIdRole = condition.NGUOIDUNGANDANH
-
-      roles.forEach(role => {
-        const temptIdRole = condition[role]
-        mainIdRole < temptIdRole && (mainIdRole = temptIdRole)
-      })
-
-      state.role = mainIdRole
+      state.role = roles.reduce((mainIdRole, role) => {
+        const temptIdRole = condition[role] || 0
+        return Math.max(mainIdRole, temptIdRole)
+      }, condition.DEFAULT)
+    },
+    setUserId: (state, actions) => {
+      const userId = actions.payload || undefined
+      state.userId = userId
     },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setRole } = storeSlice.actions
+export const { setRole, setUserId } = storeSlice.actions
 
 export default storeSlice.reducer
