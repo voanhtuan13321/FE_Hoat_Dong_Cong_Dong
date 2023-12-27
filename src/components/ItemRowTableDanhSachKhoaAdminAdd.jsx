@@ -1,43 +1,77 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from './Button'
 import InputSelect from './InputSelect'
+import axios from 'axios'
+import { requestHandler } from '../utils'
+import InputText from './InputText'
 
-const initState = {
-  khoa: [
-    { name: 'Khoa A', value: 1 },
-    { name: 'Khoa B', value: 2 },
-    { name: 'Khoa C', value: 3 },
-    { name: 'Khoa D', value: 4 },
-  ],
-  ten: [
-    { name: 'Nguyễn Văn A', value: 1 },
-    { name: 'Nguyễn Văn B', value: 2 },
-    { name: 'Nguyễn Văn C', value: 3 },
-    { name: 'Nguyễn Văn D', value: 4 },
-  ],
-}
+// const initState = {
+//   khoa: [
+//     { name: 'Khoa A', value: 1 },
+//     { name: 'Khoa B', value: 2 },
+//     { name: 'Khoa C', value: 3 },
+//     { name: 'Khoa D', value: 4 },
+//   ],
+//   ten: [
+//     { name: 'Nguyễn Văn A', value: 1 },
+//     { name: 'Nguyễn Văn B', value: 2 },
+//     { name: 'Nguyễn Văn C', value: 3 },
+//     { name: 'Nguyễn Văn D', value: 4 },
+//   ],
+// }
 
 export default function ItemRowTableDanhSachKhoaAdminAdd({ setShowAddNew }) {
+  const [listGiaoVien, setListGiaoVien] = useState([])
   const [dataKhoa, setDataKhoa] = useState({
-    khoa: initState.khoa[0],
-    ten: initState.ten[0],
+    tenKhoa: '',
+    giaoVien: '',
   })
-
+  useEffect(() => {
+    getListGiaoVien()
+  }, [])
+  const [selectedGiaoVien, setSelectedGiaoVien] = useState({})
   const onSelectChange = (name, selectedOption) => {
     setDataKhoa({ ...dataKhoa, [name]: selectedOption })
+    setSelectedGiaoVien(selectedOption)
   }
-
+  const getListGiaoVien = () => {
+    requestHandler.get('/api/User/GetTeachersList').then(response => {
+      const mapTen = response.data
+      const listTenGiaoVien = mapTen.map((teacher, index) => ({
+        name: teacher.firstName + ' ' + teacher.lastName,
+        value: teacher.id,
+      }))
+      setListGiaoVien(listTenGiaoVien)
+    })
+  }
   const onClickLuu = () => {
+    const selectedData = {}
+
+    Object.assign(selectedData, {
+      majorHeadId: dataKhoa.giaoVien.value,
+      name: dataKhoa.tenKhoa,
+    })
+    console.log(selectedData)
+    requestHandler
+      .post('/api/Major/CreateMajor', selectedData)
+      .then(res => console.log(res.data))
+      .catch(er => console.log(er))
     console.log(dataKhoa)
   }
-
+  const onChangeInput = event => {
+    const { name, value } = event.target
+    setDataKhoa({
+      ...dataKhoa,
+      [name]: value,
+    })
+  }
   const renderContent = (selectedOption, name) => {
     return (
       <InputSelect
         name={name}
-        value={selectedOption}
+        value={selectedGiaoVien}
         onChange={selected => onSelectChange(name, selected)}
-        options={initState[name]}
+        options={selectedOption}
       />
     )
   }
@@ -46,10 +80,14 @@ export default function ItemRowTableDanhSachKhoaAdminAdd({ setShowAddNew }) {
     <tr>
       <td className='border border-primary p-1 text-center'></td>
       <td className='border border-primary p-1 text-center'>
-        {renderContent(dataKhoa.khoa, 'khoa')}
+        <InputText
+          name='tenKhoa'
+          value={dataKhoa.tenKhoa}
+          onChange={onChangeInput}
+        />
       </td>
       <td className='border border-primary p-1'>
-        {renderContent(dataKhoa.ten, 'ten')}
+        {renderContent(listGiaoVien, 'giaoVien')}
       </td>
       <td className='border border-primary p-1 flex'>
         <div className='w-50% flex justify-center'>

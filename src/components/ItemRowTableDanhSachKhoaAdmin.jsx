@@ -77,7 +77,7 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
   }
 
   const onClickLuu = () => {
-    console.log(rowData)
+    
   }
 
   const handleDeleteButtonClick = () => {
