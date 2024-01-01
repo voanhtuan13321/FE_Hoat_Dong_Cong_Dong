@@ -14,7 +14,7 @@ const dataTable = {
     { className: 'w-20%', title: '' },
   ],
   value: [
-    { tieuDe: 'gv001', thoiGian: 'vo anh tuan 1', noiDung: 'noidung' },
+    { tieuDe: 'z', thoiGian: 'vo anh tuan 1', noiDung: 'noidung' },
     { tieuDe: 'gv002', thoiGian: 'vo anh tuan 2', noiDung: 'noidung' },
     { tieuDe: 'gv003', thoiGian: 'vo anh tuan 3', noiDung: 'noidung' },
     { tieuDe: 'gv004', thoiGian: 'vo anh tuan 4', noiDung: 'noidung' },

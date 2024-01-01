@@ -35,12 +35,10 @@ export default function AdminDanhSachKhoa() {
   const onClickThem = () => {
     setShowAddNew(true)
   }
-  
+
   const renderBodyTable = () => {
     let arrJsx = listKhoa.map((dt, index) => {
-      return (
-        <ItemRowTableDanhSachKhoaAdmin key={index} stt={index} data={dt} />
-      )
+      return <ItemRowTableDanhSachKhoaAdmin key={index} stt={index} data={dt} />
     })
 
     isShowAddNew &&
