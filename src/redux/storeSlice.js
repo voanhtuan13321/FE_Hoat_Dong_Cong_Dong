@@ -3,7 +3,7 @@ import { ROLES } from '../utils'
 
 const initialState = {
   role: ROLES.client,
-  userId: undefined,
+  isLoading: false,
 }
 
 export const storeSlice = createSlice({
@@ -27,14 +27,14 @@ export const storeSlice = createSlice({
         return Math.max(mainIdRole, temptIdRole)
       }, condition.DEFAULT)
     },
-    setUserId: (state, actions) => {
-      const userId = actions.payload || undefined
-      state.userId = userId
+    setLoading: (state, actions) => {
+      const isLoading = actions.payload || false
+      state.isLoading = isLoading
     },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setRole, setUserId } = storeSlice.actions
+export const { setRole, setLoading } = storeSlice.actions
 
 export default storeSlice.reducer

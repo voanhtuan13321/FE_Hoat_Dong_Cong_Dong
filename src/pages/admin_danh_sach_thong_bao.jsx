@@ -4,6 +4,10 @@ import Button from '../components/Button'
 import Table from '../components/Table'
 import ItemRowTableDanhSachThongBaoAdmin from '../components/ItemRowTableDanhSachThongBaoAdmin'
 import ItemRowTableDanhSachThongBaoAdminAdd from '../components/ItemRowTableDanhSachThongBaoAdminAdd'
+import { requestHandler } from '../utils'
+import Pagination from '../components/Pagination'
+import { useDispatch } from 'react-redux'
+import { setLoading } from '../redux/storeSlice'
 
 const dataTable = {
   header: [
@@ -13,24 +17,37 @@ const dataTable = {
     { className: '', title: 'nội dung' },
     { className: 'w-20%', title: '' },
   ],
-  value: [
-    { tieuDe: 'z', thoiGian: 'vo anh tuan 1', noiDung: 'noidung' },
-    { tieuDe: 'gv002', thoiGian: 'vo anh tuan 2', noiDung: 'noidung' },
-    { tieuDe: 'gv003', thoiGian: 'vo anh tuan 3', noiDung: 'noidung' },
-    { tieuDe: 'gv004', thoiGian: 'vo anh tuan 4', noiDung: 'noidung' },
-  ],
+  // value: [
+  //   { tieuDe: 'z', thoiGian: 'vo anh tuan 1', noiDung: 'noidung' },
+  //   { tieuDe: 'gv002', thoiGian: 'vo anh tuan 2', noiDung: 'noidung' },
+  //   { tieuDe: 'gv003', thoiGian: 'vo anh tuan 3', noiDung: 'noidung' },
+  //   { tieuDe: 'gv004', thoiGian: 'vo anh tuan 4', noiDung: 'noidung' },
+  // ],
 }
 
 export default function AdminDanhSachThongBao() {
-  const [listThongBao, setListThongBao] = useState([])
+  const [listThongBao, setListThongBao] = useState({})
   const [isShowAddNew, setShowAddNew] = useState(false)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     fetchListThongBao()
   }, [])
 
-  const fetchListThongBao = () => {
-    setListThongBao(dataTable.value)
+  const fetchListThongBao = async (page = 0) => {
+    try {
+      dispatch(setLoading(true))
+      const url = `api/Announcement/GetAnnouncementsPaginationList`
+      const config = { params: { ItemPerPage: 5, Page: page } }
+      const response = await requestHandler.get(url, config)
+      const data = await response.data
+      // console.log(data)
+      setListThongBao(data)
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
   const onClickThem = () => {
@@ -38,11 +55,14 @@ export default function AdminDanhSachThongBao() {
   }
 
   const renderBodyTable = () => {
-    let arrJsx = listThongBao.map((dt, index) => {
-      return (
-        <ItemRowTableDanhSachThongBaoAdmin key={index} stt={index} data={dt} />
-      )
-    })
+    let arrJsx = listThongBao.data?.map((dt, index) => (
+      <ItemRowTableDanhSachThongBaoAdmin
+        key={index}
+        stt={index}
+        data={dt}
+        refresh={fetchListThongBao}
+      />
+    ))
 
     isShowAddNew &&
       (arrJsx = [
@@ -50,6 +70,7 @@ export default function AdminDanhSachThongBao() {
         <ItemRowTableDanhSachThongBaoAdminAdd
           key={-1}
           setShowAddNew={setShowAddNew}
+          refresh={fetchListThongBao}
         />,
       ])
 
@@ -67,6 +88,15 @@ export default function AdminDanhSachThongBao() {
         <div>
           <Table header={dataTable.header}>{renderBodyTable()}</Table>
         </div>
+        <Pagination
+          totalItems={listThongBao.totalItems}
+          totalPages={listThongBao.totalPages}
+          itemPerPage={listThongBao.itemPerPage}
+          currentPage={listThongBao.currentPage}
+          isNextPage={listThongBao.isNextPage}
+          isPreviousPage={listThongBao.isPreviousPage}
+          onPageChange={fetchListThongBao}
+        />
       </div>
     </div>
   )
