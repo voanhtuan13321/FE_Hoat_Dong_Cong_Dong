@@ -31,6 +31,12 @@ export const ROLES = {
   admin: 6,
 }
 
+export const REGEX = {
+  textOnly: /^[^\d]*$/,
+  phoneNum: /^(?:\+84|0)(\d{9,10})$/,
+  link: /^(http|https):\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/,
+}
+
 export const routers = [
   {
     path: '/',

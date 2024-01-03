@@ -45,6 +45,11 @@ export const handleError = (error, navigate) => {
       localStorages.removeToken()
       navigate('/login')
       break
+    case 403:
+      alert('Forbidden')
+      localStorages.removeToken()
+      navigate('/login')
+      break
     default:
       alert('Failed to all api', error.message)
   }
@@ -53,7 +58,9 @@ export const handleError = (error, navigate) => {
 export const convertToObjectFormFormik = async data => ({
   id: data.id ?? '',
   classId: data.classId ?? '',
-  avatar: `${requestHandler.defaults.baseURL}api/User/GetAvatar?userId=${data.id}`,
+  avatar: `${requestHandler.defaults.baseURL}api/User/GetAvatar?userId=${
+    data.id
+  }&time=${new Date().getTime()}`,
   firstName: data.firstName ?? '',
   lastName: data.lastName ?? '',
   dateOfBirth: new Date(data.dateOfBirth),
@@ -74,3 +81,11 @@ export const convertToObjectFormFormik = async data => ({
   ward: data.ward ?? '',
   street: data.street ?? '',
 })
+
+export const generateNamHocOptions = (length = 5) => {
+  const currentYear = new Date().getFullYear()
+  return Array.from({ length }, (_, i) => ({
+    name: currentYear - i,
+    value: currentYear - i,
+  }))
+}

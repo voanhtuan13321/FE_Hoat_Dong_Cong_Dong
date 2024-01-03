@@ -18,7 +18,7 @@ import User_login from '../assets/images/User_login.png'
 
 // function
 import { KEY_ROLE_TOKEN, localStorages, requestHandler } from '../utils'
-import { setRole, setUserId } from '../redux/storeSlice'
+import { setLoading, setRole } from '../redux/storeSlice'
 
 const initialFormLogin = { accountId: '', password: '' }
 
@@ -35,6 +35,7 @@ export default function Login() {
   const onSubmit = async values => {
     // Thực hiện xử lý submit ở đây
     try {
+      dispatch(setLoading(true))
       const response = await requestHandler.post('/api/Auth/Login', values)
       const { token } = await response.data
       toast.success('Đăng nhập thành công')
@@ -42,10 +43,12 @@ export default function Login() {
 
       const decoded = jwtDecode(token)
       dispatch(setRole(decoded[KEY_ROLE_TOKEN]))
-      dispatch(setUserId(decoded['UserId']))
       navigate('/')
     } catch (error) {
       handleLoginError(error)
+      alert(error.message)
+    } finally {
+      dispatch(setLoading(false))
     }
   }
 

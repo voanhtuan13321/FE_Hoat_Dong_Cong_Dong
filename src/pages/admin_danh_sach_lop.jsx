@@ -5,16 +5,11 @@ import Button from '../components/Button'
 import Table from '../components/Table'
 import ItemRowDanhSachLop from '../components/ItemRowDanhSachLopAdmin'
 import ItemRowDanhSachLopAdd from '../components/ItemRowDanhSachLopAdminAdd'
-
-const optionsNamHoc = [
-  { name: '2022-2023', value: 1 },
-  { name: '2021-2022', value: 2 },
-]
-
-const optionsKhoa = [
-  { name: 'K.Cơ Khí', value: 1 },
-  { name: 'K.Công nghệ thông tin', value: 2 },
-]
+import { generateNamHocOptions, handleError, requestHandler } from '../utils'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { setLoading } from '../redux/storeSlice'
+import Pagination from '../components/Pagination'
 
 const dataTable = {
   header: [
@@ -30,56 +25,103 @@ const dataTable = {
       khoaQuanLy: 1,
       lop: '20C1A',
       giaoVienChuNhiem: 'Nguyễn Văn A',
-      khoa: '2021-2022',
+      khoa: 2022,
     },
     {
       khoaQuanLy: 2,
       lop: '20C1A',
       giaoVienChuNhiem: 'Nguyễn Văn B',
-      khoa: '2021-2022',
+      khoa: 2024,
     },
   ],
 }
 
 export default function AdminDanhSachLop() {
-  const [listClass, setListClass] = useState([])
-  const [selectedKhoa, setSelectedKhoa] = useState(optionsKhoa[0])
+  const optionsNamHoc = generateNamHocOptions(5)
+
+  const [optionsKhoa, setOptionsKhoa] = useState([])
+  const [listClass, setListClass] = useState({})
+  const [selectedKhoa, setSelectedKhoa] = useState({})
   const [selectedNamHoc, setSelectedNamHoc] = useState(optionsNamHoc[0])
   const [isAddNew, setIsAddNew] = useState(false)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    fetchListKhoa()
+  }, [])
 
   useEffect(() => {
     fetchListClass()
-  }, [])
+  }, [selectedNamHoc, selectedKhoa])
 
-  const fetchListClass = () => {
-    setListClass(dataTable.value)
+  const fetchListClass = async (page = 0) => {
+    try {
+      dispatch(setLoading(true))
+      const url = `api/Class/GetClassesPaginationList`
+      const config = {
+        params: {
+          ItemPerPage: 5,
+          Page: page,
+          AcademyYear: selectedNamHoc.value,
+          MajorName: selectedKhoa.name,
+        },
+      }
+      const response = await requestHandler.get(url, config)
+      const data = await response.data
+      // console.log(data)
+      setListClass(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
-  const onClickThem = () => {
-    setIsAddNew(true)
+  const fetchListKhoa = async () => {
+    try {
+      dispatch(setLoading(true))
+      const url = `api/Major/GetMajorsList`
+      const response = await requestHandler.get(url)
+      const data = await response.data.map(item => ({
+        ...item,
+        name: item.name,
+        value: item.id,
+      }))
+      // console.log(data)
+      setOptionsKhoa(data)
+      setSelectedKhoa(data[0])
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
-  const onClickDeleteItem = index => {
-    const cloneStates = [...listClass]
-    cloneStates.splice(index, 1)
-    setListClass(cloneStates)
-  }
+  const onClickThem = () => setIsAddNew(true)
 
   const renderBodyTable = () => {
-    let arrJsx = listClass.map((dt, index) => {
-      return (
-        <ItemRowDanhSachLop
-          key={index}
-          dt={dt}
-          index={index}
-          onClickDeleteItem={onClickDeleteItem}
-        />
-      )
-    })
+    let arrJsx = listClass.data?.map((dt, index) => (
+      <ItemRowDanhSachLop
+        key={index}
+        dt={dt}
+        index={index}
+        major={selectedKhoa}
+        refresh={fetchListClass}
+      />
+    ))
     isAddNew &&
       (arrJsx = [
         ...arrJsx,
-        <ItemRowDanhSachLopAdd key={-1} setIsAddNew={setIsAddNew} />,
+        <ItemRowDanhSachLopAdd
+          key={-1}
+          setIsAddNew={setIsAddNew}
+          majorId={selectedKhoa.id}
+          academicYear={selectedNamHoc.value}
+          refresh={fetchListClass}
+        />,
       ])
     return arrJsx
   }
@@ -119,6 +161,15 @@ export default function AdminDanhSachLop() {
       <div className='my-2'>
         <Table header={dataTable.header}>{renderBodyTable()}</Table>
       </div>
+      <Pagination
+        totalItems={listClass.totalItems}
+        totalPages={listClass.totalPages}
+        itemPerPage={listClass.itemPerPage}
+        currentPage={listClass.currentPage}
+        isNextPage={listClass.isNextPage}
+        isPreviousPage={listClass.isPreviousPage}
+        onPageChange={fetchListClass}
+      />
     </div>
   )
 }
