@@ -13,7 +13,7 @@ export const storeSlice = createSlice({
       const roles = actions.payload || []
 
       const condition = {
-        NGUOIDUNGANDANH: 1,
+        DEFAULT: 1,
         SINHVIEN: 2,
         LOPTRUONG: 3,
         GIAOVIEN: 4,
@@ -21,19 +21,19 @@ export const storeSlice = createSlice({
         ADMIN: 6,
       }
 
-      let mainIdRole = condition.NGUOIDUNGANDANH
-
-      roles.forEach(role => {
-        const temptIdRole = condition[role]
-        mainIdRole < temptIdRole && (mainIdRole = temptIdRole)
-      })
-
-      state.role = mainIdRole
+      state.role = roles.reduce((mainIdRole, role) => {
+        const temptIdRole = condition[role] || 0
+        return Math.max(mainIdRole, temptIdRole)
+      }, condition.DEFAULT)
+    },
+    setLoading: (state, actions) => {
+      const isLoading = actions.payload || false
+      state.isLoading = isLoading
     },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setRole } = storeSlice.actions
+export const { setRole, setLoading } = storeSlice.actions
 
 export default storeSlice.reducer

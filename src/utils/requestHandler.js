@@ -2,14 +2,9 @@ import axios from 'axios'
 import { localStorages } from './localStorage'
 
 const requestHandler = axios.create({
-  baseURL:
-    'https://e139-2401-d800-7130-1fdd-f19c-f42c-283a-d00b.ngrok-free.app',
-  timeout: 0,
-  headers: {
-    // 'Content-Type': 'application/json',
-    // Accept: 'application/json',
-    'ngrok-skip-browser-warning': 'true',
-  },
+  baseURL: 'https://c2f1-115-72-73-122.ngrok-free.app/',
+  timeout: 10000,
+  headers: { 'ngrok-skip-browser-warning': 'true' },
 })
 
 requestHandler.interceptors.request.use(

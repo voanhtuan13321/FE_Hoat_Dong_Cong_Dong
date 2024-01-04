@@ -1,92 +1,96 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import toast from 'react-hot-toast'
+
 import Button from './Button'
 import InputSelect from './InputSelect'
+import InputText from './InputText'
 
-const classList = [
-  { name: '18CA1', value: 1 },
-  { name: '18CA2', value: 2 },
-  { name: '18CA3', value: 3 },
-]
-const teacherList = [
-  { name: 'Nguyễn Văn A', value: 1 },
-  { name: 'Nguyễn Văn B', value: 2 },
-  { name: 'Nguyễn Văn C', value: 3 },
-]
-const khoaList = [
-  { name: 'K.Cơ Khí', value: 1 },
-  { name: 'K.Vật lý', value: 2 },
-  { name: 'K.CNTT', value: 3 },
-]
-const namHocList = [
-  { name: '2021', value: 1 },
-  { name: '2022', value: 2 },
-  { name: '2023', value: 3 },
-]
+import {
+  callApiCreateClass,
+  callApiGetTeachersList,
+  handleError,
+} from '../utils'
+import { setLoading } from '../redux/storeSlice'
+
 export default function ItemRowDanhSachLopAdd({
-  dt,
-  index,
-  onClickDeleteItem,
   setIsAddNew,
+  majorId,
+  academicYear,
+  refresh,
 }) {
-  const [selectKhoa, setSelectKhoa] = useState(khoaList[0])
-  const [selectTeacher, setSelectTeacher] = useState(teacherList[0])
-  const [selectClass, setSelectClass] = useState(classList[0])
-  const [selectYear, setSelectYear] = useState(namHocList[0])
+  const [optionTeachers, setOptionTeachers] = useState([])
+  const [selectTeacher, setSelectTeacher] = useState({})
+  const [name, setName] = useState('')
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
-  const handleSave = () => {
-    const savedData = {
-      khoa: selectKhoa.value,
-      lop: selectClass.value,
-      giaoVien: selectTeacher.value,
-      namHoc: selectYear.value,
+  useEffect(() => {
+    fetchListGiaoVien()
+  }, [])
+
+  const fetchListGiaoVien = async () => {
+    try {
+      dispatch(setLoading(true))
+      const data = await callApiGetTeachersList()
+      const result = data.map(item => ({
+        ...item,
+        name: item.firstName + ' ' + item.lastName,
+        value: item.id,
+      }))
+      // console.log(data)
+      setOptionTeachers(result)
+      setSelectTeacher(result[0])
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    } finally {
+      dispatch(setLoading(false))
     }
-    console.log('savedData:', savedData)
+  }
+
+  const handleSave = async () => {
+    try {
+      dispatch(setLoading(true))
+      const savedData = {
+        majorId,
+        headTeacherId: selectTeacher.value,
+        name,
+        academicYear,
+      }
+      const data = await callApiCreateClass(savedData)
+      // console.log(data)
+      toast.success('Thêm mới thành công')
+      setIsAddNew(false)
+      refresh()
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
   return (
-    <tr className='text-center' key={index}>
+    <tr className='text-center'>
+      <td className='border border-primary'></td>
       <td className='border border-primary'></td>
       <td className='border border-primary'>
-        <InputSelect
-          name='selectKhoa'
-          options={khoaList}
-          value={selectKhoa}
-          onChange={setSelectKhoa}
-        />
-      </td>
-      <td className='border border-primary'>
-        <InputSelect
-          name='selectClass'
-          options={classList}
-          value={selectClass}
-          onChange={setSelectClass}
-        />
+        <InputText value={name} onChange={e => setName(e.target.value)} />
       </td>
       <td className='border border-primary'>
         <InputSelect
           name='selectTeacher'
-          options={teacherList}
+          options={optionTeachers}
           value={selectTeacher}
           onChange={setSelectTeacher}
         />
       </td>
-      <td className='border border-primary'>
-        <InputSelect
-          name='selectYear'
-          options={namHocList}
-          value={selectYear}
-          onChange={setSelectYear}
-        />
-      </td>
+      <td className='border border-primary'></td>
       <td className='border border-primary flex gap-2 justify-center'>
         <Button label='Lưu' type='add' onClick={handleSave} />
-        <Button
-          label='Hủy'
-          type='outline'
-          onClick={() => {
-            setIsAddNew(false)
-          }}
-        />
+        <Button label='Hủy' type='outline' onClick={() => setIsAddNew(false)} />
       </td>
     </tr>
   )

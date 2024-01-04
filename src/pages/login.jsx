@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import toast from 'react-hot-toast'
@@ -6,46 +6,64 @@ import { jwtDecode } from 'jwt-decode'
 import Swal from 'sweetalert2'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+
+// component
 import InputText from '../components/InputText'
 import InputPassword from '../components/InputPassword'
 import Button from '../components/Button'
-import User_login from '../assets/images/User_login.png'
-import { requestHandler } from '../utils/requestHandler'
-import { localStorages } from '../utils'
-import { setRole } from '../redux/storeSlice'
+import ErrorLabel from '../components/ErrorLabel'
 
-const initialFormLogin = {
-  accountId: '',
-  password: '',
-}
+// image
+import User_login from '../assets/images/User_login.png'
+
+// function
+import { KEY_ROLE_TOKEN, callApiLogin, localStorages } from '../utils'
+import { setLoading, setRole } from '../redux/storeSlice'
+
+const initialFormLogin = { accountId: '', password: '' }
 
 export default function Login() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const onSubmit = async (values, { resetForm }) => {
+  useEffect(() => {
+    const token = localStorages.getToken()
+    token && navigate('/')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const onSubmit = async values => {
     // Thực hiện xử lý submit ở đây
     try {
-      const response = await requestHandler.post('/api/Auth/Login', values)
-      const { token } = await response.data
-      toast.success('Successfully toasted!')
+      dispatch(setLoading(true))
+      const { token } = await callApiLogin(values)
+      toast.success('Đăng nhập thành công')
       localStorages.setToken(token)
 
       const decoded = jwtDecode(token)
-      dispatch(setRole(decoded.roles))
+      dispatch(setRole(decoded[KEY_ROLE_TOKEN]))
       navigate('/')
     } catch (error) {
-      const { response } = error
-      switch (response.status) {
-        case 400:
-          Swal.fire('Tài khoản hoặc mật khẩu không đúng', '', 'error')
-          break
-        case 403:
-          Swal.fire('Tài khoản của bạn đã bị khoá', '', 'error')
-          break
-        default:
-          alert(error.message)
-      }
+      handleLoginError(error)
+      alert(error.message)
+    } finally {
+      dispatch(setLoading(false))
+    }
+  }
+
+  const handleLoginError = error => {
+    switch (error.response.status) {
+      case 400:
+        Swal.fire('Tài khoản hoặc mật khẩu đang có ký tự đặc biệt', '', 'error')
+        break
+      case 401:
+        Swal.fire('Tài khoản hoặc mật khẩu không đúng', '', 'error')
+        break
+      case 403:
+        Swal.fire('Tài khoản của bạn đã bị khoá', '', 'error')
+        break
+      default:
+        alert(error.message)
     }
   }
 
@@ -75,22 +93,14 @@ export default function Login() {
               value={formik.values.accountId}
               onChange={formik.handleChange}
             />
-            {formik.touched.accountId && (
-              <span className='text-red-500 text-main'>
-                {formik.errors.accountId}
-              </span>
-            )}
+            <ErrorLabel formik={formik} keyFormik='accountId' />
             <InputPassword
               label='Mật khẩu'
               name='password'
               value={formik.values.password}
               onChange={formik.handleChange}
             />
-            {formik.touched.password && (
-              <span className='text-red-500 text-main'>
-                {formik.errors.password}
-              </span>
-            )}
+            <ErrorLabel formik={formik} keyFormik='password' />
           </div>
         </div>
         <div className='flex justify-center'>

@@ -1,7 +1,4 @@
-import React, { useId, useRef } from 'react'
-import DatePicker from 'react-datepicker'
-import { MdDateRange } from 'react-icons/md'
-import vi from 'date-fns/locale/vi'
+import React, { useId } from 'react'
 import 'react-datepicker/dist/react-datepicker.css'
 
 /**
@@ -16,11 +13,6 @@ import 'react-datepicker/dist/react-datepicker.css'
  */
 export default function InputDate({ label, name, value, onChange, disabled }) {
   const id = useId()
-  const datepickerRef = useRef(null)
-
-  const onClickIcon = () => {
-    datepickerRef.current.handleFocus()
-  }
 
   return (
     <div className='flex flex-col'>
@@ -30,25 +22,14 @@ export default function InputDate({ label, name, value, onChange, disabled }) {
         </label>
       )}
       <div className='relative'>
-        <DatePicker
-          id={id}
-          ref={datepickerRef}
-          name={name}
-          selected={value}
+        <input
+          className='w-full p-2 rounded-md outline-none border border-normal text-main'
+          type='date'
+          value={new Date(value).toISOString().split('T')[0]}
           onChange={onChange}
-          withPortal='100%'
-          dateFormat='dd/MM/yyyy'
-          className='w-full outline-none border border-normal rounded-md p-2 text-main'
           disabled={disabled}
-          locale={vi}
+          name={name}
         />
-        <div
-          className={`absolute top-0 bottom-0 right-2 flex items-center ${
-            disabled && 'pointer-events-none'
-          }`}
-        >
-          <MdDateRange className='cursor-pointer' onClick={onClickIcon} />
-        </div>
       </div>
     </div>
   )

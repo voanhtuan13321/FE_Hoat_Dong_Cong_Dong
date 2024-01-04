@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Button from './Button'
 
 /**
@@ -19,9 +19,11 @@ export default function InputAvatar({ isEdit, name, value, onChange }) {
   const inputFileRef = useRef(null)
   const [srcImg, setSrcImg] = useState(value)
 
-  const onClickThem = () => {
-    inputFileRef.current.click()
-  }
+  useEffect(() => {
+    value && typeof value === 'string' && setSrcImg(value)
+  }, [value])
+
+  const onClickThem = () => inputFileRef.current.click()
 
   const onChangeFile = event => {
     const file = event.target.files[0]

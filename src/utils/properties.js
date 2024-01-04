@@ -1,4 +1,4 @@
-import { setRole } from '../redux/storeSlice'
+// component
 import Home from '../pages/home'
 import Login from '../pages/login'
 import NotFound from '../pages/not_found'
@@ -15,6 +15,13 @@ import AdminDanhSachSinhVien from '../pages/admin_danh_sach_sinh_vien'
 import AdminDanhSachHoatDongCongDong from '../pages/admin_danh_sach_hoat_dong_cong_dong'
 import AdminHoatDongCongDongCuaTruong from '../pages/admin_hoat_dong_cong_dong_cua_truong'
 
+// functions
+import { setRole } from '../redux/storeSlice'
+import { localStorages } from './localStorage'
+
+export const ITEM_PER_PAGE = 10
+export const KEY_ROLE_TOKEN =
+  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
 export const ROLES = {
   client: 1,
   sinhVien: 2,
@@ -22,6 +29,11 @@ export const ROLES = {
   giaoVien: 4,
   truongKhoa: 5,
   admin: 6,
+}
+export const REGEX = {
+  textOnly: /^[^\d]*$/,
+  phoneNum: /^(?:\+84|0)(\d{9,10})$/,
+  link: /^(http|https):\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/,
 }
 
 export const routers = [
@@ -170,7 +182,8 @@ export const routers = [
     onClick: function (navigator, dispatch) {
       // handle logout here
       dispatch(setRole([ROLES.client]))
-      navigator('')
+      localStorages.removeToken()
+      navigator('/login')
     },
   },
   {

@@ -1,88 +1,141 @@
 import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
+
 import Button from './Button'
+import InputText from './InputText'
 import InputSelect from './InputSelect'
 
-const apiClassList = [
-  { name: '18CA1', value: 1 },
-  { name: '18CA2', value: 2 },
-  { name: '18CA3', value: 3 },
-  { name: '20C1A', value: 4 },
-]
+import { setLoading } from '../redux/storeSlice'
+import {
+  callApiDeleteClass,
+  callApiGetMajorsList,
+  callApiGetTeachersList,
+  callApiUpdateClass,
+  generateAcademyYearOptions,
+  handleError,
+} from '../utils'
 
-const apiTeacherList = [
-  { name: 'Nguyễn Văn A', value: 1 },
-  { name: 'Nguyễn Văn B', value: 2 },
-  { name: 'Nguyễn Văn C', value: 3 },
-]
+export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
+  const academyYearOptions = generateAcademyYearOptions()
 
-const apiKhoaList = [
-  { name: 'K.Cơ Khí', value: 1 },
-  { name: 'K.Vật lý', value: 2 },
-  { name: 'K.CNTT', value: 3 },
-]
-
-const apiNamHocList = [
-  { name: '2021', value: 1 },
-  { name: '2022', value: 2 },
-  { name: '2023', value: 3 },
-]
-
-export default function ItemRowDanhSachLop({ dt, index, onClickDeleteItem }) {
   const [isShowEdit, setShowEdit] = useState(false)
-  const [classes, setClasses] = useState([])
-  const [teachers, setTeachers] = useState([])
-  const [faculties, setFaculties] = useState([])
-  const [years, setYears] = useState([])
-  const [selectFaculty, setSelectFaculty] = useState(null)
-  const [selectClass, setSelectClass] = useState(null)
-  const [selectTeacher, setSelectTeacher] = useState(null)
-  const [selectYear, setSelectYear] = useState(null)
+  const [teacherOptions, setTeacherOptions] = useState([])
+  const [name, setName] = useState(dt.name)
+  const [selectTeacher, setSelectTeacher] = useState({})
+  const [selectedNamHoc, setSelectedNamHoc] = useState(academyYearOptions[0])
+  const [optionsKhoa, setOptionsKhoa] = useState([])
+  const [selectedKhoa, setSelectedKhoa] = useState({})
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    fetchDanhSachLop()
     fetchDanhSachGiaoVien()
-    fetchDanhSachKhoa()
-    fetchDanhSachNamHoc()
+    fetchListKhoa()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchDanhSachLop = () => {
-    setClasses(apiClassList)
-    const lop = apiClassList.filter(l => l.name === dt.lop)[0]
-    setSelectClass(lop)
+  useEffect(() => {
+    setName(dt.name)
+    setSelectedNamHoc(
+      academyYearOptions.find(item => item.value === dt.academicYear),
+    )
+    setSelectedKhoa(optionsKhoa.find(item => item.name === major.name))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isShowEdit])
+
+  const fetchDanhSachGiaoVien = async () => {
+    try {
+      dispatch(setLoading(true))
+      const data = await callApiGetTeachersList()
+      const result = data.map(item => ({
+        ...item,
+        name: item.firstName + ' ' + item.lastName,
+        value: item.id,
+      }))
+      setTeacherOptions(result)
+      setSelectTeacher(result[0])
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
-  const fetchDanhSachGiaoVien = () => {
-    setTeachers(apiTeacherList)
-    const giaoVienChuNhiem = apiTeacherList.filter(
-      g => g.name === dt.giaoVienChuNhiem,
-    )[0]
-    setSelectTeacher(giaoVienChuNhiem)
+  const fetchListKhoa = async () => {
+    try {
+      dispatch(setLoading(true))
+      const data = await callApiGetMajorsList()
+      const result = data.map(item => ({
+        ...item,
+        name: item.name,
+        value: item.id,
+      }))
+      // console.log(data)
+      setOptionsKhoa(result)
+      setSelectedKhoa(result[0])
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
-  const fetchDanhSachKhoa = () => {
-    setFaculties(apiKhoaList)
-    const khoaQuanLy = apiKhoaList.filter(k => k.value === dt.khoaQuanLy)[0]
-    setSelectFaculty(khoaQuanLy)
+  const handleSave = async () => {
+    if (!/^[a-zA-Z0-9_]+$/.test(name)) {
+      toast.error('Lớp không được chưa khoảng cách')
+      return
+    }
+
+    try {
+      dispatch(setLoading(true))
+      const dataRequest = {
+        ...dt,
+        majorId: selectedKhoa.id,
+        name,
+        headTeacherId: selectTeacher.value,
+        academicYear: selectedNamHoc.value,
+      }
+      const data = await callApiUpdateClass(dataRequest)
+      // console.log(data)
+      toast.success('Cập nhật thành công')
+      refresh()
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
-  const fetchDanhSachNamHoc = () => {
-    setYears(apiNamHocList)
-    setSelectYear(apiNamHocList[0])
-  }
+  const onClickDeleteItem = async id => {
+    const { isDenied } = await Swal.fire({
+      title: 'Bạn có chắc muốn xoá không?',
+      showConfirmButton: false,
+      showDenyButton: true,
+      denyButtonText: 'Xoá',
+      showCancelButton: true,
+    })
 
-  const getFacultyName = value => {
-    return faculties.filter(faculty => faculty.value === value)[0]?.name
-  }
-
-  const handleSave = () => {}
-
-  const handleEdit = () => {
-    setShowEdit(true)
-  }
-
-  const onClickHuy = () => {
-    setShowEdit(false)
+    if (isDenied) {
+      try {
+        dispatch(setLoading(true))
+        const data = await callApiDeleteClass(id)
+        // console.log(data)
+        toast.success('Xoá thành công')
+        refresh()
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      } finally {
+        dispatch(setLoading(false))
+      }
+    }
   }
 
   return (
@@ -90,62 +143,60 @@ export default function ItemRowDanhSachLop({ dt, index, onClickDeleteItem }) {
       {!isShowEdit ? (
         <tr className='text-center'>
           <td className='border border-primary text-main'>{index + 1}</td>
+          <td className='border border-primary text-main'>{major.name}</td>
+          <td className='border border-primary text-main'>{dt.name}</td>
           <td className='border border-primary text-main'>
-            {getFacultyName(dt.khoaQuanLy)}
+            {dt.headTeacherFullName}
           </td>
-          <td className='border border-primary text-main'>{dt.lop}</td>
-          <td className='border border-primary text-main'>
-            {dt.giaoVienChuNhiem}
-          </td>
-          <td className='border border-primary text-main'>{dt.khoa}</td>
+          <td className='border border-primary text-main'>{dt.academicYear}</td>
           <td className='border border-primary text-main flex gap-2 justify-center'>
-            <Button label='Sửa' type='edit' onClick={handleEdit} />
+            <Button label='Sửa' type='edit' onClick={() => setShowEdit(true)} />
             <Button
               label='Xóa'
               type='delete'
-              onClick={() => {
-                onClickDeleteItem(index)
-              }}
+              onClick={() => onClickDeleteItem(dt.id)}
             />
           </td>
         </tr>
       ) : (
         <tr className='text-center' key={index}>
           <td className='border border-primary text-main'>{index + 1}</td>
-          <td className='border border-primary'>
+          <td className='border border-primary text-main'>
             <InputSelect
-              options={faculties}
-              value={selectFaculty}
-              onChange={setSelectFaculty}
+              options={optionsKhoa}
+              value={selectedKhoa}
+              onChange={setSelectedKhoa}
             />
           </td>
-          <td className='border border-primary'>
-            <InputSelect
+          <td className='border border-primary text-main'>
+            <InputText
               name='selectClass'
-              options={classes}
-              value={selectClass}
-              onChange={setSelectClass}
+              value={name}
+              onChange={e => setName(e.target.value)}
             />
           </td>
-          <td className='border border-primary'>
+          <td className='border border-primary text-main'>
             <InputSelect
               name='selectTeacher'
-              options={teachers}
+              options={teacherOptions}
               value={selectTeacher}
               onChange={setSelectTeacher}
             />
           </td>
-          <td className='border border-primary'>
+          <td className='border border-primary text-main'>
             <InputSelect
-              name='selectYear'
-              options={years}
-              value={selectYear}
-              onChange={setSelectYear}
+              options={academyYearOptions}
+              value={selectedNamHoc}
+              onChange={setSelectedNamHoc}
             />
           </td>
           <td className='border border-primary flex gap-2 justify-center'>
             <Button label='Lưu' type='add' onClick={handleSave} />
-            <Button label='Hủy' type='outline' onClick={onClickHuy} />
+            <Button
+              label='Hủy'
+              type='outline'
+              onClick={() => setShowEdit(false)}
+            />
           </td>
         </tr>
       )}
