@@ -8,13 +8,19 @@ export default function Home() {
   const [listThongBao, setListThongBao] = useState({})
 
   useEffect(() => {
-    getList(0)
+    fetchListThongBao(0)
   }, [])
 
-  const getList = async page => {
+  const fetchListThongBao = async page => {
     try {
       const response = await requestHandler.get(
-        `/api/Announcement/GetAnnouncementsPaginationList?ItemPerPage=5&Page=${page}`,
+        '/api/Announcement/GetAnnouncementsPaginationList',
+        {
+          params: {
+            ItemPerPage: 5,
+            Page: page,
+          },
+        },
       )
       const data = response.data
       setListThongBao(data)
@@ -57,7 +63,7 @@ export default function Home() {
         currentPage={listThongBao.currentPage}
         isNextPage={listThongBao.isNextPage}
         isPreviousPage={listThongBao.isPreviousPage}
-        onPageChange={getList}
+        onPageChange={fetchListThongBao}
       />
     </>
   )
