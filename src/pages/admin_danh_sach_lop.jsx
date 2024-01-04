@@ -29,12 +29,14 @@ const HEADER_TABLE = [
 ]
 
 export default function AdminDanhSachLop() {
-  const optionsNamHoc = generateAcademyYearOptions()
+  const academyYearOptions = generateAcademyYearOptions()
 
-  const [optionsKhoa, setOptionsKhoa] = useState([])
-  const [listClass, setListClass] = useState({})
-  const [selectedKhoa, setSelectedKhoa] = useState({})
-  const [selectedNamHoc, setSelectedNamHoc] = useState(optionsNamHoc[0])
+  const [objectClasses, setObjectClasses] = useState({})
+  const [majorOptions, setMajorOptions] = useState([])
+  const [selectedMajor, setSelectedMajor] = useState({})
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
+    academyYearOptions[0],
+  )
   const [isAddNew, setIsAddNew] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -47,7 +49,7 @@ export default function AdminDanhSachLop() {
   useEffect(() => {
     fetchClasses()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedNamHoc, selectedKhoa])
+  }, [selectedAcademyYear, selectedMajor])
 
   const fetchClasses = async (page = 0) => {
     try {
@@ -55,11 +57,11 @@ export default function AdminDanhSachLop() {
       const data = await callApiGetClassesPaginationList(
         ITEM_PER_PAGE,
         page,
-        selectedNamHoc.value,
-        selectedKhoa.name,
+        selectedAcademyYear.value,
+        selectedMajor.name,
       )
       // console.log(data)
-      setListClass(data)
+      setObjectClasses(data)
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -78,8 +80,8 @@ export default function AdminDanhSachLop() {
         value: item.id,
       }))
       // console.log(data)
-      setOptionsKhoa(result)
-      setSelectedKhoa(result[0])
+      setMajorOptions(result)
+      setSelectedMajor(result[0])
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -89,13 +91,14 @@ export default function AdminDanhSachLop() {
   }
 
   const renderBodyTable = () => {
-    let arrJsx = listClass.data?.map((dt, index) => (
+    let arrJsx = objectClasses.data?.map((dt, index) => (
       <ItemRowDanhSachLop
         key={index}
         dt={dt}
         index={index}
-        major={selectedKhoa}
+        major={selectedMajor}
         refresh={fetchClasses}
+        objectClasses={objectClasses}
       />
     ))
     isAddNew &&
@@ -104,8 +107,8 @@ export default function AdminDanhSachLop() {
         <ItemRowDanhSachLopAdd
           key={-1}
           setIsAddNew={setIsAddNew}
-          majorId={selectedKhoa.id}
-          academicYear={selectedNamHoc.value}
+          majorId={selectedMajor.id}
+          academicYear={selectedAcademyYear.value}
           refresh={fetchClasses}
         />,
       ])
@@ -123,17 +126,17 @@ export default function AdminDanhSachLop() {
             </span>
             <div className='w-48'>
               <InputSelect
-                options={optionsKhoa}
-                value={selectedKhoa}
-                onChange={setSelectedKhoa}
+                options={majorOptions}
+                value={selectedMajor}
+                onChange={setSelectedMajor}
               />
             </div>
             <span className='font-bold text-primary text-main'>Khoá:</span>
             <div className='w-48'>
               <InputSelect
-                options={optionsNamHoc}
-                value={selectedNamHoc}
-                onChange={setSelectedNamHoc}
+                options={academyYearOptions}
+                value={selectedAcademyYear}
+                onChange={setSelectedAcademyYear}
               />
             </div>
           </div>
@@ -152,12 +155,12 @@ export default function AdminDanhSachLop() {
         <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
       </div>
       <Pagination
-        totalItems={listClass.totalItems}
-        totalPages={listClass.totalPages}
-        itemPerPage={listClass.itemPerPage}
-        currentPage={listClass.currentPage}
-        isNextPage={listClass.isNextPage}
-        isPreviousPage={listClass.isPreviousPage}
+        totalItems={objectClasses.totalItems}
+        totalPages={objectClasses.totalPages}
+        itemPerPage={objectClasses.itemPerPage}
+        currentPage={objectClasses.currentPage}
+        isNextPage={objectClasses.isNextPage}
+        isPreviousPage={objectClasses.isPreviousPage}
         onPageChange={fetchClasses}
       />
     </div>

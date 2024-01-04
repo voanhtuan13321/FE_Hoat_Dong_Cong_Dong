@@ -19,15 +19,15 @@ export const callApiGetClassesPaginationList = async (
   return await response.data
 }
 
-export const callApiCreateClass = async savedData => {
+export const callApiCreateClass = async values => {
   const url = `api/Class/CreateClass`
-  const response = await requestHandler.post(url, savedData)
+  const response = await requestHandler.post(url, values)
   return await response.data
 }
 
-export const callApiUpdateClass = async dataRequest => {
+export const callApiUpdateClass = async values => {
   const url = `api/Class/UpdateClass`
-  const response = await requestHandler.put(url, dataRequest)
+  const response = await requestHandler.put(url, values)
   return await response.data
 }
 
@@ -79,15 +79,15 @@ export const callApiGetAnnouncementsPaginationList = async (
   return await response.data
 }
 
-export const callApiCreateAnnouncement = async dataThongBao => {
+export const callApiCreateAnnouncement = async values => {
   const url = `api/Announcement/CreateAnnouncement`
-  const response = await requestHandler.post(url, dataThongBao)
+  const response = await requestHandler.post(url, values)
   return await response.data
 }
 
-export const callApiUpdateAnnouncement = async dataEdit => {
+export const callApiUpdateAnnouncement = async values => {
   const url = `api/Announcement/UpdateAnnouncement`
-  const repsonse = await requestHandler.put(url, dataEdit)
+  const repsonse = await requestHandler.put(url, values)
   return await repsonse.data
 }
 

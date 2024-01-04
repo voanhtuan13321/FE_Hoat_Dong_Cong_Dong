@@ -45,15 +45,11 @@ export default function AdminDanhSachThongBao() {
     }
   }
 
-  const onClickThem = () => {
-    setShowAddNew(true)
-  }
-
   const renderBodyTable = () => {
     let arrJsx = objectAnnouncements.data?.map((dt, index) => (
       <ItemRowTableDanhSachThongBaoAdmin
         key={index}
-        stt={index}
+        index={index}
         data={dt}
         refresh={fetchAnnouncements}
         objectAnnouncements={objectAnnouncements}
@@ -72,13 +68,18 @@ export default function AdminDanhSachThongBao() {
 
     return arrJsx
   }
+
   return (
     <div className='container mx-auto'>
       <Title title='danh sách thông báo' />
       <div>
         <div className='py-2 text-end'>
           {!isShowAddNew && (
-            <Button type='add' label='thêm' onClick={onClickThem} />
+            <Button
+              type='add'
+              label='thêm'
+              onClick={() => setShowAddNew(true)}
+            />
           )}
         </div>
         <div>

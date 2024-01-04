@@ -10,6 +10,7 @@ import InputSelect from './InputSelect'
 
 import { setLoading } from '../redux/storeSlice'
 import {
+  caculateIndex,
   callApiDeleteClass,
   callApiGetMajorsList,
   callApiGetTeachersList,
@@ -18,36 +19,44 @@ import {
   handleError,
 } from '../utils'
 
-export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
+export default function ItemRowDanhSachLop({
+  dt,
+  index,
+  major,
+  refresh,
+  objectClasses,
+}) {
   const academyYearOptions = generateAcademyYearOptions()
 
   const [isShowEdit, setShowEdit] = useState(false)
   const [teacherOptions, setTeacherOptions] = useState([])
   const [name, setName] = useState(dt.name)
-  const [selectTeacher, setSelectTeacher] = useState({})
-  const [selectedNamHoc, setSelectedNamHoc] = useState(academyYearOptions[0])
-  const [optionsKhoa, setOptionsKhoa] = useState([])
-  const [selectedKhoa, setSelectedKhoa] = useState({})
+  const [majorOptions, setMajorOptions] = useState([])
+  const [selectedMajor, setSelectedMajor] = useState({})
+  const [selectedTeacher, setSelectedTeacher] = useState({})
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
+    academyYearOptions[0],
+  )
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetchDanhSachGiaoVien()
-    fetchListKhoa()
+    fetchTeachers()
+    fetchListMajor()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     setName(dt.name)
-    setSelectedNamHoc(
+    setSelectedAcademyYear(
       academyYearOptions.find(item => item.value === dt.academicYear),
     )
-    setSelectedKhoa(optionsKhoa.find(item => item.name === major.name))
+    setSelectedMajor(majorOptions.find(item => item.name === major.name))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isShowEdit])
 
-  const fetchDanhSachGiaoVien = async () => {
+  const fetchTeachers = async () => {
     try {
       dispatch(setLoading(true))
       const data = await callApiGetTeachersList()
@@ -57,7 +66,7 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
         value: item.id,
       }))
       setTeacherOptions(result)
-      setSelectTeacher(result[0])
+      setSelectedTeacher(result[0])
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -66,7 +75,7 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
     }
   }
 
-  const fetchListKhoa = async () => {
+  const fetchListMajor = async () => {
     try {
       dispatch(setLoading(true))
       const data = await callApiGetMajorsList()
@@ -76,8 +85,8 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
         value: item.id,
       }))
       // console.log(data)
-      setOptionsKhoa(result)
-      setSelectedKhoa(result[0])
+      setMajorOptions(result)
+      setSelectedMajor(result[0])
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -96,10 +105,10 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
       dispatch(setLoading(true))
       const dataRequest = {
         ...dt,
-        majorId: selectedKhoa.id,
+        majorId: selectedMajor.id,
         name,
-        headTeacherId: selectTeacher.value,
-        academicYear: selectedNamHoc.value,
+        headTeacherId: selectedTeacher.value,
+        academicYear: selectedAcademyYear.value,
       }
       const data = await callApiUpdateClass(dataRequest)
       // console.log(data)
@@ -142,7 +151,9 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
     <>
       {!isShowEdit ? (
         <tr className='text-center'>
-          <td className='border border-primary text-main'>{index + 1}</td>
+          <td className='border border-primary text-main'>
+            {caculateIndex(objectClasses, index)}
+          </td>
           <td className='border border-primary text-main'>{major.name}</td>
           <td className='border border-primary text-main'>{dt.name}</td>
           <td className='border border-primary text-main'>
@@ -159,13 +170,15 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
           </td>
         </tr>
       ) : (
-        <tr className='text-center' key={index}>
-          <td className='border border-primary text-main'>{index + 1}</td>
+        <tr className='text-center'>
+          <td className='border border-primary text-main'>
+            {caculateIndex(objectClasses, index)}
+          </td>
           <td className='border border-primary text-main'>
             <InputSelect
-              options={optionsKhoa}
-              value={selectedKhoa}
-              onChange={setSelectedKhoa}
+              options={majorOptions}
+              value={selectedMajor}
+              onChange={setSelectedMajor}
             />
           </td>
           <td className='border border-primary text-main'>
@@ -177,17 +190,17 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
           </td>
           <td className='border border-primary text-main'>
             <InputSelect
-              name='selectTeacher'
+              name='selectedTeacher'
               options={teacherOptions}
-              value={selectTeacher}
-              onChange={setSelectTeacher}
+              value={selectedTeacher}
+              onChange={setSelectedTeacher}
             />
           </td>
           <td className='border border-primary text-main'>
             <InputSelect
               options={academyYearOptions}
-              value={selectedNamHoc}
-              onChange={setSelectedNamHoc}
+              value={selectedAcademyYear}
+              onChange={setSelectedAcademyYear}
             />
           </td>
           <td className='border border-primary flex gap-2 justify-center'>
