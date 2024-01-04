@@ -22,7 +22,6 @@ import {
 export default function ItemRowDanhSachLop({
   dt,
   index,
-  major,
   refresh,
   objectClasses,
 }) {
@@ -37,7 +36,6 @@ export default function ItemRowDanhSachLop({
   const [selectedAcademyYear, setSelectedAcademyYear] = useState(
     academyYearOptions[0],
   )
-
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -49,10 +47,15 @@ export default function ItemRowDanhSachLop({
 
   useEffect(() => {
     setName(dt.name)
+    setSelectedMajor(majorOptions.find(item => item.name === dt.majorName))
     setSelectedAcademyYear(
       academyYearOptions.find(item => item.value === dt.academicYear),
     )
-    setSelectedMajor(majorOptions.find(item => item.name === major.name))
+    setSelectedTeacher(
+      teacherOptions.find(
+        item => `${item.firstName} ${item.lastName}` === dt.headTeacherFullName,
+      ),
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isShowEdit])
 
@@ -113,6 +116,7 @@ export default function ItemRowDanhSachLop({
       const data = await callApiUpdateClass(dataRequest)
       // console.log(data)
       toast.success('Cập nhật thành công')
+      setShowEdit(false)
       refresh()
     } catch (error) {
       console.error(error)
@@ -154,7 +158,7 @@ export default function ItemRowDanhSachLop({
           <td className='border border-primary text-main'>
             {caculateIndex(objectClasses, index)}
           </td>
-          <td className='border border-primary text-main'>{major.name}</td>
+          <td className='border border-primary text-main'>{dt.majorName}</td>
           <td className='border border-primary text-main'>{dt.name}</td>
           <td className='border border-primary text-main'>
             {dt.headTeacherFullName}

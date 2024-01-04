@@ -4,6 +4,15 @@ import Title from '../components/Title'
 import ItemRowDanhSachSinhVienAdmin from '../components/ItemRowDanhSachSinhVienAdmin'
 import ItemAddRowDanhSachSinhVienAdmin from '../components/ItemAddRowDanhSachSinhVienAdmin'
 import Button from '../components/Button'
+import InputSelect from '../components/InputSelect'
+import {
+  callApiGetMajorsList,
+  generateAcademyYearOptions,
+  handleError,
+} from '../utils'
+import { useDispatch } from 'react-redux'
+import { setLoading } from '../redux/storeSlice'
+import { useNavigate } from 'react-router-dom'
 
 const dataTable = {
   header: [
@@ -60,21 +69,47 @@ const dataTable = {
 }
 
 export default function AdminDanhSachSinhVien() {
+  const academyYearOptions = generateAcademyYearOptions()
+
   const [data, setData] = useState([])
   const [isShowAddNew, setShowAddNew] = useState(false)
+  const [majorOptions, setMajorOptions] = useState([])
+  const [selectedMajor, setSelectedMajor] = useState({})
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
+    academyYearOptions[0],
+  )
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   useEffect(() => {
     setData(dataTable.value)
+    fetchMajors()
   }, [])
 
-  const onClickThem = () => {
-    setShowAddNew(true)
+  const fetchMajors = async () => {
+    try {
+      dispatch(setLoading(true))
+      const data = await callApiGetMajorsList()
+      const result = data.map(item => ({
+        ...item,
+        name: item.name,
+        value: item.id,
+      }))
+      // console.log(data)
+      setMajorOptions(result)
+      setSelectedMajor(result[0])
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
   const renderBodyTable = () => {
-    let arrJsx = data?.map((dt, index) => {
-      return <ItemRowDanhSachSinhVienAdmin data={dt} index={index} />
-    })
+    let arrJsx = data?.map((dt, index) => (
+      <ItemRowDanhSachSinhVienAdmin key={index} data={dt} index={index} />
+    ))
 
     isShowAddNew &&
       (arrJsx = [
@@ -94,9 +129,33 @@ export default function AdminDanhSachSinhVien() {
         <div>
           <Title title='danh sách sinh viên' />
         </div>
-        <div className='py-2 text-end'>
+        <div className='flex items-center justify-between mt-3'>
+          <div className='flex items-center gap-2'>
+            <span className='font-bold text-primary text-main'>
+              Thuộc khoa:
+            </span>
+            <div className='w-48'>
+              <InputSelect
+                options={majorOptions}
+                value={selectedMajor}
+                onChange={setSelectedMajor}
+              />
+            </div>
+            <span className='font-bold text-primary text-main'>Lớp:</span>
+            <div className='w-48'>
+              <InputSelect
+                options={academyYearOptions}
+                value={selectedAcademyYear}
+                onChange={setSelectedAcademyYear}
+              />
+            </div>
+          </div>
           {!isShowAddNew && (
-            <Button type='add' label='thêm' onClick={onClickThem} />
+            <Button
+              type='add'
+              label='thêm'
+              onClick={() => setShowAddNew(true)}
+            />
           )}
         </div>
         <div className='my-2'>

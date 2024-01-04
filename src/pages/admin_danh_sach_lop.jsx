@@ -58,9 +58,8 @@ export default function AdminDanhSachLop() {
         ITEM_PER_PAGE,
         page,
         selectedAcademyYear.value,
-        selectedMajor.name,
+        selectedMajor.value,
       )
-      // console.log(data)
       setObjectClasses(data)
     } catch (error) {
       console.error(error)
@@ -96,7 +95,6 @@ export default function AdminDanhSachLop() {
         key={index}
         dt={dt}
         index={index}
-        major={selectedMajor}
         refresh={fetchClasses}
         objectClasses={objectClasses}
       />

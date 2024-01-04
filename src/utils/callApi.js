@@ -11,10 +11,10 @@ export const callApiGetClassesPaginationList = async (
   ItemPerPage,
   Page,
   AcademyYear,
-  MajorName,
+  MajorId,
 ) => {
   const url = `api/Class/GetClassesPaginationList`
-  const config = { params: { ItemPerPage, Page, AcademyYear, MajorName } }
+  const config = { params: { ItemPerPage, Page, AcademyYear, MajorId } }
   const response = await requestHandler.get(url, config)
   return await response.data
 }
