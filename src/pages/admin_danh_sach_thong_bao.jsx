@@ -1,48 +1,43 @@
 import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+
 import Title from '../components/Title'
 import Button from '../components/Button'
 import Table from '../components/Table'
+import Pagination from '../components/Pagination'
 import ItemRowTableDanhSachThongBaoAdmin from '../components/ItemRowTableDanhSachThongBaoAdmin'
 import ItemRowTableDanhSachThongBaoAdminAdd from '../components/ItemRowTableDanhSachThongBaoAdminAdd'
-import { requestHandler } from '../utils'
-import Pagination from '../components/Pagination'
-import { useDispatch } from 'react-redux'
+
+import { ITEM_PER_PAGE, callApiGetAnnouncementsPaginationList } from '../utils'
 import { setLoading } from '../redux/storeSlice'
 
-const dataTable = {
-  header: [
-    { className: 'w-5%', title: 'stt' },
-    { className: 'w-20%', title: 'tiêu đề' },
-    { className: 'w-20%', title: 'thời gian' },
-    { className: '', title: 'nội dung' },
-    { className: 'w-20%', title: '' },
-  ],
-  // value: [
-  //   { tieuDe: 'z', thoiGian: 'vo anh tuan 1', noiDung: 'noidung' },
-  //   { tieuDe: 'gv002', thoiGian: 'vo anh tuan 2', noiDung: 'noidung' },
-  //   { tieuDe: 'gv003', thoiGian: 'vo anh tuan 3', noiDung: 'noidung' },
-  //   { tieuDe: 'gv004', thoiGian: 'vo anh tuan 4', noiDung: 'noidung' },
-  // ],
-}
+const HEADER_TABLE = [
+  { className: 'w-5%', title: 'stt' },
+  { className: 'w-20%', title: 'tiêu đề' },
+  { className: 'w-20%', title: 'thời gian' },
+  { className: '', title: 'nội dung' },
+  { className: 'w-20%', title: '' },
+]
 
 export default function AdminDanhSachThongBao() {
-  const [listThongBao, setListThongBao] = useState({})
+  const [objectAnnouncements, setObjectAnnouncements] = useState({})
   const [isShowAddNew, setShowAddNew] = useState(false)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    fetchListThongBao()
+    fetchAnnouncements()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchListThongBao = async (page = 0) => {
+  const fetchAnnouncements = async (page = 0) => {
     try {
       dispatch(setLoading(true))
-      const url = `api/Announcement/GetAnnouncementsPaginationList`
-      const config = { params: { ItemPerPage: 5, Page: page } }
-      const response = await requestHandler.get(url, config)
-      const data = await response.data
+      const data = await callApiGetAnnouncementsPaginationList(
+        ITEM_PER_PAGE,
+        page,
+      )
       // console.log(data)
-      setListThongBao(data)
+      setObjectAnnouncements(data)
     } catch (error) {
       alert(error.message)
     } finally {
@@ -55,12 +50,13 @@ export default function AdminDanhSachThongBao() {
   }
 
   const renderBodyTable = () => {
-    let arrJsx = listThongBao.data?.map((dt, index) => (
+    let arrJsx = objectAnnouncements.data?.map((dt, index) => (
       <ItemRowTableDanhSachThongBaoAdmin
         key={index}
         stt={index}
         data={dt}
-        refresh={fetchListThongBao}
+        refresh={fetchAnnouncements}
+        objectAnnouncements={objectAnnouncements}
       />
     ))
 
@@ -70,7 +66,7 @@ export default function AdminDanhSachThongBao() {
         <ItemRowTableDanhSachThongBaoAdminAdd
           key={-1}
           setShowAddNew={setShowAddNew}
-          refresh={fetchListThongBao}
+          refresh={fetchAnnouncements}
         />,
       ])
 
@@ -86,16 +82,16 @@ export default function AdminDanhSachThongBao() {
           )}
         </div>
         <div>
-          <Table header={dataTable.header}>{renderBodyTable()}</Table>
+          <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
         </div>
         <Pagination
-          totalItems={listThongBao.totalItems}
-          totalPages={listThongBao.totalPages}
-          itemPerPage={listThongBao.itemPerPage}
-          currentPage={listThongBao.currentPage}
-          isNextPage={listThongBao.isNextPage}
-          isPreviousPage={listThongBao.isPreviousPage}
-          onPageChange={fetchListThongBao}
+          totalItems={objectAnnouncements.totalItems}
+          totalPages={objectAnnouncements.totalPages}
+          itemPerPage={objectAnnouncements.itemPerPage}
+          currentPage={objectAnnouncements.currentPage}
+          isNextPage={objectAnnouncements.isNextPage}
+          isPreviousPage={objectAnnouncements.isPreviousPage}
+          onPageChange={fetchAnnouncements}
         />
       </div>
     </div>

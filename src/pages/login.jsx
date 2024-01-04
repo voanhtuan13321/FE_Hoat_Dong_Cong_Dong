@@ -17,7 +17,7 @@ import ErrorLabel from '../components/ErrorLabel'
 import User_login from '../assets/images/User_login.png'
 
 // function
-import { KEY_ROLE_TOKEN, localStorages, requestHandler } from '../utils'
+import { KEY_ROLE_TOKEN, callApiLogin, localStorages } from '../utils'
 import { setLoading, setRole } from '../redux/storeSlice'
 
 const initialFormLogin = { accountId: '', password: '' }
@@ -36,8 +36,7 @@ export default function Login() {
     // Thực hiện xử lý submit ở đây
     try {
       dispatch(setLoading(true))
-      const response = await requestHandler.post('/api/Auth/Login', values)
-      const { token } = await response.data
+      const { token } = await callApiLogin(values)
       toast.success('Đăng nhập thành công')
       localStorages.setToken(token)
 

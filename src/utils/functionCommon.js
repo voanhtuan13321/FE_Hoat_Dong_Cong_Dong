@@ -82,10 +82,13 @@ export const convertToObjectFormFormik = async data => ({
   street: data.street ?? '',
 })
 
-export const generateNamHocOptions = (length = 5) => {
+export const generateAcademyYearOptions = (length = 8) => {
   const currentYear = new Date().getFullYear()
   return Array.from({ length }, (_, i) => ({
     name: currentYear - i,
     value: currentYear - i,
   }))
 }
+
+export const caculateIndex = (data, inđex) =>
+  data.itemPerPage * (data.currentPage - 1) + inđex + 1

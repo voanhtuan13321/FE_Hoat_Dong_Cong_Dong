@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import toast from 'react-hot-toast'
+
 import Button from './Button'
 import InputSelect from './InputSelect'
 import InputText from './InputText'
-import { handleError, requestHandler } from '../utils'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+
+import {
+  callApiCreateClass,
+  callApiGetTeachersList,
+  handleError,
+} from '../utils'
 import { setLoading } from '../redux/storeSlice'
-import toast from 'react-hot-toast'
 
 export default function ItemRowDanhSachLopAdd({
   setIsAddNew,
@@ -27,16 +33,15 @@ export default function ItemRowDanhSachLopAdd({
   const fetchListGiaoVien = async () => {
     try {
       dispatch(setLoading(true))
-      const url = `api/User/GetTeachersList`
-      const response = await requestHandler.get(url)
-      const data = await response.data.map(item => ({
+      const data = await callApiGetTeachersList()
+      const result = data.map(item => ({
         ...item,
         name: item.firstName + ' ' + item.lastName,
         value: item.id,
       }))
       // console.log(data)
-      setOptionTeachers(data)
-      setSelectTeacher(data[0])
+      setOptionTeachers(result)
+      setSelectTeacher(result[0])
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -54,10 +59,8 @@ export default function ItemRowDanhSachLopAdd({
         name,
         academicYear,
       }
-      const url = `api/Class/CreateClass`
-      const response = await requestHandler.post(url, savedData)
-      const data = await response.data
-      console.log(data)
+      const data = await callApiCreateClass(savedData)
+      // console.log(data)
       toast.success('Thêm mới thành công')
       setIsAddNew(false)
       refresh()

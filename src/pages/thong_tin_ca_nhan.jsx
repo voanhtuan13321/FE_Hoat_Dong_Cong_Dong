@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { jwtDecode } from 'jwt-decode'
 
 // component
 import Title from '../components/Title'
@@ -18,15 +19,15 @@ import {
   KEY_ROLE_TOKEN,
   REGEX,
   ROLES,
+  callApiGetUserByUserId,
+  callApiUpdateUser,
   checkRoles,
   convertObjectToFormData,
   convertToObjectFormFormik,
   handleError,
   localStorages,
-  requestHandler,
 } from '../utils'
 import ErrorLabel from '../components/ErrorLabel'
-import { jwtDecode } from 'jwt-decode'
 import { setLoading, setRole } from '../redux/storeSlice'
 
 const initInfoUser = {
@@ -90,11 +91,8 @@ export default function ThongTinCaNhan() {
     const userId = decoded['UserId']
     if (userId) {
       try {
-        const url = 'api/User/GetUserByUserId'
-        const optionRequest = { params: { userId } }
         dispatch(setLoading(true))
-        const response = await requestHandler.get(url, optionRequest)
-        const data = await response.data
+        const data = await callApiGetUserByUserId(userId)
 
         const newValueFormik = await convertToObjectFormFormik(data)
         // console.log('newValueFormik', newValueFormik)
@@ -113,20 +111,18 @@ export default function ThongTinCaNhan() {
     const formData = await convertObjectToFormData(values)
 
     try {
-      const url = 'api/User/UpdateUser'
-      const optionRequest = {
-        headers: { 'Content-Type': 'application/form-data' },
-      }
-      const response = await requestHandler.put(url, formData, optionRequest)
-      const data = await response.data
+      dispatch(setLoading(true))
+      const data = await callApiUpdateUser(formData)
 
-      console.log(data)
+      // console.log(data)
       const newValueFormik = await convertToObjectFormFormik(data)
       formik.setValues(newValueFormik)
       setShowEdit(false)
     } catch (error) {
       console.error('Failed to update user', error)
       handleError(error, navigate)
+    } finally {
+      dispatch(setLoading(false))
     }
   }
 

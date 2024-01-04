@@ -1,22 +1,31 @@
 import React, { useEffect, useState } from 'react'
-import Button from './Button'
-import InputText from './InputText'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { generateNamHocOptions, handleError, requestHandler } from '../utils'
-import { setLoading } from '../redux/storeSlice'
-import InputSelect from './InputSelect'
 import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
 
+import Button from './Button'
+import InputText from './InputText'
+import InputSelect from './InputSelect'
+
+import { setLoading } from '../redux/storeSlice'
+import {
+  callApiDeleteClass,
+  callApiGetMajorsList,
+  callApiGetTeachersList,
+  callApiUpdateClass,
+  generateAcademyYearOptions,
+  handleError,
+} from '../utils'
+
 export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
-  const optionsNamHoc = generateNamHocOptions(5)
+  const academyYearOptions = generateAcademyYearOptions()
 
   const [isShowEdit, setShowEdit] = useState(false)
-  const [optionTeachers, setOptionTeachers] = useState([])
+  const [teacherOptions, setTeacherOptions] = useState([])
   const [name, setName] = useState(dt.name)
   const [selectTeacher, setSelectTeacher] = useState({})
-  const [selectedNamHoc, setSelectedNamHoc] = useState(optionsNamHoc[0])
+  const [selectedNamHoc, setSelectedNamHoc] = useState(academyYearOptions[0])
   const [optionsKhoa, setOptionsKhoa] = useState([])
   const [selectedKhoa, setSelectedKhoa] = useState({})
 
@@ -32,7 +41,7 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
   useEffect(() => {
     setName(dt.name)
     setSelectedNamHoc(
-      optionsNamHoc.find(item => item.value === dt.academicYear),
+      academyYearOptions.find(item => item.value === dt.academicYear),
     )
     setSelectedKhoa(optionsKhoa.find(item => item.name === major.name))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -41,15 +50,14 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
   const fetchDanhSachGiaoVien = async () => {
     try {
       dispatch(setLoading(true))
-      const url = `api/User/GetTeachersList`
-      const response = await requestHandler.get(url)
-      const data = await response.data.map(item => ({
+      const data = await callApiGetTeachersList()
+      const result = data.map(item => ({
         ...item,
         name: item.firstName + ' ' + item.lastName,
         value: item.id,
       }))
-      setOptionTeachers(data)
-      setSelectTeacher(data[0])
+      setTeacherOptions(result)
+      setSelectTeacher(result[0])
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -61,16 +69,15 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
   const fetchListKhoa = async () => {
     try {
       dispatch(setLoading(true))
-      const url = `api/Major/GetMajorsList`
-      const response = await requestHandler.get(url)
-      const data = await response.data.map(item => ({
+      const data = await callApiGetMajorsList()
+      const result = data.map(item => ({
         ...item,
         name: item.name,
         value: item.id,
       }))
       // console.log(data)
-      setOptionsKhoa(data)
-      setSelectedKhoa(data[0])
+      setOptionsKhoa(result)
+      setSelectedKhoa(result[0])
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -94,9 +101,7 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
         headTeacherId: selectTeacher.value,
         academicYear: selectedNamHoc.value,
       }
-      const url = `api/Class/UpdateClass`
-      const response = await requestHandler.put(url, dataRequest)
-      const data = await response.data
+      const data = await callApiUpdateClass(dataRequest)
       // console.log(data)
       toast.success('Cập nhật thành công')
       refresh()
@@ -106,12 +111,6 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
     } finally {
       dispatch(setLoading(false))
     }
-  }
-
-  const handleEdit = () => setShowEdit(true)
-
-  const onClickHuy = () => {
-    setShowEdit(false)
   }
 
   const onClickDeleteItem = async id => {
@@ -126,10 +125,7 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
     if (isDenied) {
       try {
         dispatch(setLoading(true))
-        const url = `api/Class/DeleteClass`
-        const config = { params: { classId: id } }
-        const response = await requestHandler.delete(url, config)
-        const data = await response.data
+        const data = await callApiDeleteClass(id)
         // console.log(data)
         toast.success('Xoá thành công')
         refresh()
@@ -154,7 +150,7 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
           </td>
           <td className='border border-primary text-main'>{dt.academicYear}</td>
           <td className='border border-primary text-main flex gap-2 justify-center'>
-            <Button label='Sửa' type='edit' onClick={handleEdit} />
+            <Button label='Sửa' type='edit' onClick={() => setShowEdit(true)} />
             <Button
               label='Xóa'
               type='delete'
@@ -182,21 +178,25 @@ export default function ItemRowDanhSachLop({ dt, index, major, refresh }) {
           <td className='border border-primary text-main'>
             <InputSelect
               name='selectTeacher'
-              options={optionTeachers}
+              options={teacherOptions}
               value={selectTeacher}
               onChange={setSelectTeacher}
             />
           </td>
           <td className='border border-primary text-main'>
             <InputSelect
-              options={optionsNamHoc}
+              options={academyYearOptions}
               value={selectedNamHoc}
               onChange={setSelectedNamHoc}
             />
           </td>
           <td className='border border-primary flex gap-2 justify-center'>
             <Button label='Lưu' type='add' onClick={handleSave} />
-            <Button label='Hủy' type='outline' onClick={onClickHuy} />
+            <Button
+              label='Hủy'
+              type='outline'
+              onClick={() => setShowEdit(false)}
+            />
           </td>
         </tr>
       )}

@@ -19,9 +19,9 @@ import AdminHoatDongCongDongCuaTruong from '../pages/admin_hoat_dong_cong_dong_c
 import { setRole } from '../redux/storeSlice'
 import { localStorages } from './localStorage'
 
+export const ITEM_PER_PAGE = 10
 export const KEY_ROLE_TOKEN =
   'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-
 export const ROLES = {
   client: 1,
   sinhVien: 2,
@@ -30,7 +30,6 @@ export const ROLES = {
   truongKhoa: 5,
   admin: 6,
 }
-
 export const REGEX = {
   textOnly: /^[^\d]*$/,
   phoneNum: /^(?:\+84|0)(\d{9,10})$/,
