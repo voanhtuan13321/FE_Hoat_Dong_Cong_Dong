@@ -2,34 +2,26 @@ import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import Button from './Button'
 import InputSelect from './InputSelect'
+import InputText from './InputText'
+import { requestHandler } from '../utils'
 
-const dataTable = {
-  khoa: [
-    { name: 'Khoa A', value: 1 },
-    { name: 'Khoa B', value: 2 },
-    { name: 'Khoa C', value: 3 },
-    { name: 'Khoa D', value: 4 },
-  ],
-  ten: [
-    { name: 'Nguyễn Văn A', value: 1 },
-    { name: 'Nguyễn Văn B', value: 2 },
-    { name: 'Nguyễn Văn C', value: 3 },
-    { name: 'Nguyễn Văn D', value: 4 },
-  ],
-}
 
 export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
   const [isShowEdit, setShowEdit] = useState(false)
-  const [listDanhSachKhoa, setListDanhSachKhoa] = useState([])
-  const [selectedTen, setSelectedTen] = useState({})
-  const [selectedKhoa, setSelectedKhoa] = useState({})
+  const [listGiaoVien, setListGiaoVien] = useState([{}])
+  const [selectedGiaoVien, setSelectedGiaoVien] = useState({})
   const [rowData, setRowData] = useState({
-    khoa: data.khoa,
-    ten: data.ten,
+    tenKhoa: data.name,
+    giaoVien: data.majorHeadFullName,
+  })
+  const [dataKhoa, setDataKhoa] = useState({
+    tenKhoa: data.name,
+    giaoVien: data.majorHeadFullName,
   })
 
   const onClickEdit = () => {
     setShowEdit(!isShowEdit)
+   
   }
 
   useEffect(() => {
@@ -37,49 +29,43 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
   }, [])
 
   const fetchListDanhSachKhoa = () => {
-    const khoaData = dataTable.khoa
-    const tenData = dataTable.ten
-
-    setListDanhSachKhoa({
-      khoa: khoaData,
-      ten: tenData,
+   
+    requestHandler.get('/api/User/GetTeachersList').then(response => {
+      const mapTen = response.data
+      const listTenGiaoVien = mapTen.map((teacher, index) => ({
+        name: teacher.firstName + ' ' + teacher.lastName,
+        value: teacher.id,
+      }))
+      setListGiaoVien(listTenGiaoVien)
+      setSelectedGiaoVien( getDanhSachGiaoVien(data.majorHeadId,listTenGiaoVien))
     })
 
-    setSelectedTen(getDanhSachTen(data.ten, tenData))
-    setSelectedKhoa(getDanhSachKhoa(data.khoa, khoaData))
-    setRowData({
-      ...rowData,
-      khoa: getDanhSachKhoa(data.khoa, khoaData).name,
-      ten: getDanhSachTen(data.ten, tenData).name,
-    })
+    // setRowData({
+    //   ...rowData,
+    //   khoa: getDanhSachKhoa(data.khoa, khoaData).name,
+    //   ten: getDanhSachTen(data.ten, tenData).name,
+    // })
+  }
+  const onSelectChange = (name, selectedOption) => {
+    setDataKhoa({ ...dataKhoa, [name]: selectedOption })
+    setSelectedGiaoVien(selectedOption)
   }
 
-  const getDanhSachKhoa = (value, khoaData) => {
-    return !value
-      ? khoaData[0]
-      : khoaData.find(item => item.value === value) || khoaData[0]
-  }
-
-  const getDanhSachTen = (value, tenData) => {
+  const getDanhSachGiaoVien = (value, tenData) => {
     return !value
       ? tenData[0]
       : tenData.find(item => item.value === value) || tenData[0]
   }
-
-  const onSelectOptionTen = selected => {
-    setSelectedTen(selected)
-    setRowData({ ...rowData, ten: selected.name })
+  const onChangeInput = event => {
+    const { name, value } = event.target
+    setDataKhoa({
+      ...dataKhoa,
+      [name]: value,
+    })
   }
-
-  const onSelectOptionKhoa = selected => {
-    setSelectedKhoa(selected)
-    setRowData({ ...rowData, khoa: selected.name })
-  }
-
   const onClickLuu = () => {
-    
+    console.log(dataKhoa);
   }
-
   const handleDeleteButtonClick = () => {
     Swal.fire({
       title: 'Are you sure?',
@@ -102,19 +88,15 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
 
   const renderContent = (value, name) =>
     isShowEdit ? (
-      name === 'ten' ? (
-        <InputSelect
-          name={name}
-          options={listDanhSachKhoa.ten}
-          value={selectedTen}
-          onChange={onSelectOptionTen}
-        />
+      name === 'tenKhoa' ? (
+      <InputText name={name} value={dataKhoa.tenKhoa}
+      onChange={onChangeInput}/>
       ) : (
         <InputSelect
-          name={name}
-          options={listDanhSachKhoa.khoa}
-          value={selectedKhoa}
-          onChange={onSelectOptionKhoa}
+        name={name}
+        value={selectedGiaoVien}
+        onChange={selected => onSelectChange(name, selected)}
+        options={listGiaoVien}
         />
       )
     ) : (
@@ -125,10 +107,10 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
     <tr className='text-main'>
       <td className='border border-primary p-1 text-center'>{stt + 1}</td>
       <td className='border border-primary p-1 text-center'>
-        {renderContent(rowData.khoa, 'khoa')}
+      {renderContent(rowData.tenKhoa,'tenKhoa')}
       </td>
       <td className='border border-primary p-1 text-center'>
-        {renderContent(rowData.ten, 'ten')}
+        {renderContent(rowData.giaoVien, 'giaoVien')}
       </td>
       <td className='border border-primary p-1 flex'>
         <div className='w-1/2 flex justify-center'>

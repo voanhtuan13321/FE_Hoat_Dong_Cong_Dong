@@ -1,39 +1,30 @@
 import React, { useEffect, useState } from 'react'
 import Button from './Button'
 import InputSelect from './InputSelect'
-import axios from 'axios'
 import { requestHandler } from '../utils'
 import InputText from './InputText'
 
-// const initState = {
-//   khoa: [
-//     { name: 'Khoa A', value: 1 },
-//     { name: 'Khoa B', value: 2 },
-//     { name: 'Khoa C', value: 3 },
-//     { name: 'Khoa D', value: 4 },
-//   ],
-//   ten: [
-//     { name: 'Nguyễn Văn A', value: 1 },
-//     { name: 'Nguyễn Văn B', value: 2 },
-//     { name: 'Nguyễn Văn C', value: 3 },
-//     { name: 'Nguyễn Văn D', value: 4 },
-//   ],
-// }
-
-export default function ItemRowTableDanhSachKhoaAdminAdd({ setShowAddNew }) {
+export default function ItemRowTableDanhSachKhoaAdminAdd({
+  setShowAddNew,
+  fetchListKhoa,
+}) {
   const [listGiaoVien, setListGiaoVien] = useState([])
   const [dataKhoa, setDataKhoa] = useState({
     tenKhoa: '',
     giaoVien: '',
   })
+
   useEffect(() => {
     getListGiaoVien()
   }, [])
+
   const [selectedGiaoVien, setSelectedGiaoVien] = useState({})
+
   const onSelectChange = (name, selectedOption) => {
     setDataKhoa({ ...dataKhoa, [name]: selectedOption })
     setSelectedGiaoVien(selectedOption)
   }
+
   const getListGiaoVien = () => {
     requestHandler.get('/api/User/GetTeachersList').then(response => {
       const mapTen = response.data
@@ -44,6 +35,7 @@ export default function ItemRowTableDanhSachKhoaAdminAdd({ setShowAddNew }) {
       setListGiaoVien(listTenGiaoVien)
     })
   }
+
   const onClickLuu = () => {
     const selectedData = {}
 
@@ -51,12 +43,14 @@ export default function ItemRowTableDanhSachKhoaAdminAdd({ setShowAddNew }) {
       majorHeadId: dataKhoa.giaoVien.value,
       name: dataKhoa.tenKhoa,
     })
-    console.log(selectedData)
+    
     requestHandler
       .post('/api/Major/CreateMajor', selectedData)
-      .then(res => console.log(res.data))
+      .then(res => {
+        setShowAddNew(false)
+        fetchListKhoa()
+      })
       .catch(er => console.log(er))
-    console.log(dataKhoa)
   }
   const onChangeInput = event => {
     const { name, value } = event.target

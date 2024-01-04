@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Title from '../components/Title'
 import Table from '../components/Table/index'
 import Button from '../components/Button'
 import ItemRowTableDanhSachKhoaAdmin from '../components/ItemRowTableDanhSachKhoaAdmin'
 import ItemRowTableDanhSachKhoaAdminAdd from '../components/ItemRowTableDanhSachKhoaAdminAdd'
+import { requestHandler } from '../utils'
 
 const dataTable = {
   header: [
@@ -12,35 +13,29 @@ const dataTable = {
     { className: '', title: 'Trưởng khoa' },
     { className: 'w-15%', title: '' },
   ],
-  value: [
-    { stt: 1, khoa: 'K.Cơ khí', ten: 'Nguyễn Văn A' },
-    { stt: 2, khoa: 'K.Cơ khí', ten: 'Nguyễn Văn B' },
-    { stt: 3, khoa: 'K.Cơ khí', ten: 'Nguyễn Văn C' },
-    { stt: 4, khoa: 'K.Cơ khí', ten: 'Nguyễn Văn D' },
-  ],
 }
 
 export default function AdminDanhSachKhoa() {
   const [listKhoa, setListKhoa] = useState([])
   const [isShowAddNew, setShowAddNew] = useState(false)
-
   useEffect(() => {
     fetchListKhoa()
   }, [])
 
   const fetchListKhoa = () => {
-    setListKhoa(dataTable.value)
+    requestHandler.get('/api/Major/GetMajorsList').then(response => {
+      setListKhoa(response.data)
+      console.log("List khoa",response.data);
+    })
   }
 
   const onClickThem = () => {
     setShowAddNew(true)
   }
-  
+
   const renderBodyTable = () => {
     let arrJsx = listKhoa.map((dt, index) => {
-      return (
-        <ItemRowTableDanhSachKhoaAdmin key={index} stt={index} data={dt} />
-      )
+      return <ItemRowTableDanhSachKhoaAdmin key={index} stt={index} data={dt} />
     })
 
     isShowAddNew &&
@@ -49,6 +44,7 @@ export default function AdminDanhSachKhoa() {
         <ItemRowTableDanhSachKhoaAdminAdd
           key={-1}
           setShowAddNew={setShowAddNew}
+          fetchListKhoa={fetchListKhoa}
         />,
       ])
 

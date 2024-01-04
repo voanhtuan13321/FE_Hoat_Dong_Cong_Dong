@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { ROLES } from '../utils'
 
 const initialState = {
-  role: ROLES.sinhVien,
+  role: ROLES.admin,
 }
 
 export const storeSlice = createSlice({
