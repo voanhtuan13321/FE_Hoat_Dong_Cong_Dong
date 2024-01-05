@@ -4,6 +4,7 @@ import Title from '../components/Title'
 import Button from '../components/Button'
 import ItemRowTableDanhSachGiaoVienAdmin from '../components/ItemRowTableDanhSachGiaoVienAdmin'
 import ItemRowTableDanhSachGiaoVienAdminAdd from '../components/ItemRowTableDanhSachGiaoVienAdminAdd'
+import {callApiGetTeachersList } from '../utils'
 
 const dataTable = {
   header: [
@@ -29,8 +30,10 @@ export default function AdminDanhSachGiaoVien() {
     fetchListGiaoVien()
   }, [])
 
-  const fetchListGiaoVien = () => {
-    setListGiaoVien(dataTable.value)
+  const fetchListGiaoVien = async () => {
+    const data = await callApiGetTeachersList()
+    console.log(data)
+    setListGiaoVien(data)
   }
 
   const onClickThem = () => {

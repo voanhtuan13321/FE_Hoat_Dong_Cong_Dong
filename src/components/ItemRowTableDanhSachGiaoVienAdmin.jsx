@@ -33,9 +33,9 @@ export default function ItemRowTableDanhSachGiaoVienAdmin({ stt, data }) {
     <tr>
       <td className='border border-primary p-1 text-center'>{stt}</td>
       <td className='border border-primary p-1 text-center'>
-        {data.maGiaoVien}
+        {data.teacherId}
       </td>
-      <td className='border border-primary p-1'>{data.hoVaTen}</td>
+      <td className='border border-primary p-1'>{data.firstName } {data.lastName}</td>
       <td className='border border-primary p-1 text-center'>
         <Button type='edit' label='sửa' onClick={onClickDoiMatKhau} />
       </td>
