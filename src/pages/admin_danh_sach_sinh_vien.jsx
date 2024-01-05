@@ -1,94 +1,57 @@
 import React, { useEffect, useState } from 'react'
-import Table from '../components/Table'
-import Title from '../components/Title'
-import ItemRowDanhSachSinhVienAdmin from '../components/ItemRowDanhSachSinhVienAdmin'
-import ItemAddRowDanhSachSinhVienAdmin from '../components/ItemAddRowDanhSachSinhVienAdmin'
-import Button from '../components/Button'
-import InputSelect from '../components/InputSelect'
-import {
-  callApiGetMajorsList,
-  generateAcademyYearOptions,
-  handleError,
-} from '../utils'
-import { useDispatch } from 'react-redux'
-import { setLoading } from '../redux/storeSlice'
+// import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
-const dataTable = {
-  header: [
-    { className: 'w-5%', title: 'stt' },
-    { className: 'w-15%', title: 'Mã sinh viên' },
-    { className: '', title: 'Họ tên' },
-    { className: 'w-15%', title: 'Đổi mật khẩu' },
-    { className: 'w-15%', title: 'Khoá tài khoản' },
-  ],
-  value: [
-    {
-      stt: 1,
-      svid: 'SV01',
-      name: 'Trần Văn Né',
-      passwork: '123456',
-      isDeleted: true,
-    },
-    {
-      stt: 1,
-      svid: 'SV01',
-      name: 'Trần Văn Né',
-      passwork: '123456',
-      isDeleted: true,
-    },
-    {
-      stt: 1,
-      svid: 'SV01',
-      name: 'Trần Văn Né',
-      passwork: '123456',
-      isDeleted: false,
-    },
-    {
-      stt: 1,
-      svid: 'SV01',
-      name: 'Trần Văn Né',
-      passwork: '123456',
-      isDeleted: true,
-    },
-    {
-      stt: 1,
-      svid: 'SV01',
-      name: 'Trần Văn Né',
-      passwork: '123456',
-      isDeleted: false,
-    },
-    {
-      stt: 1,
-      svid: 'SV01',
-      name: 'Trần Văn Né',
-      passwork: '123456',
-      isDeleted: true,
-    },
-  ],
-}
+import Table from '../components/Table'
+import Title from '../components/Title'
+import Button from '../components/Button'
+import InputSelect from '../components/Input/InputSelect'
+import ItemRowDanhSachSinhVienAdmin from '../components/ItemRow/ItemRowDanhSachSinhVienAdmin'
+
+import {
+  callApiGetClassesList,
+  callApiGetMajorsList,
+  callApiGetStudentsListByClassId,
+  checkAndHandleLogined,
+  handleError,
+} from '../utils'
+import DialogCreateUserStudent from '../components/DialogCustom/DialogCreateUserStudent'
+import DialogChangePassword from '../components/DialogCustom/DialogCreateUserStudent'
+
+const HEADER_TABLE = [
+  { className: 'w-5%', title: 'stt' },
+  { className: 'w-15%', title: 'Mã sinh viên' },
+  { className: '', title: 'Họ tên' },
+  { className: 'w-15%', title: 'Đổi mật khẩu' },
+  { className: 'w-15%', title: 'Khoá tài khoản' },
+  { className: 'w-15%', title: 'Chọn lớp trưởng' },
+]
 
 export default function AdminDanhSachSinhVien() {
-  const academyYearOptions = generateAcademyYearOptions()
-
-  const [data, setData] = useState([])
-  const [isShowAddNew, setShowAddNew] = useState(false)
+  const [students, setStudents] = useState([])
   const [majorOptions, setMajorOptions] = useState([])
+  const [classesOptions, setClassesOptions] = useState([])
   const [selectedMajor, setSelectedMajor] = useState({})
-  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
-    academyYearOptions[0],
-  )
-  const dispatch = useDispatch()
+  const [selectedClasse, setSelectedClasse] = useState({})
+  const [isShowDialog, setShowDialog] = useState(false)
+
   const navigate = useNavigate()
 
   useEffect(() => {
-    setData(dataTable.value)
+    checkAndHandleLogined(navigate)
     fetchMajors()
   }, [])
 
+  useEffect(() => {
+    fetchClasses()
+  }, [selectedMajor])
+
+  useEffect(() => {
+    fetchStudents()
+  }, [selectedClasse, selectedMajor])
+
   const fetchMajors = async () => {
     try {
-      dispatch(setLoading(true))
       const data = await callApiGetMajorsList()
       const result = data.map(item => ({
         ...item,
@@ -101,30 +64,75 @@ export default function AdminDanhSachSinhVien() {
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
+  const fetchClasses = async () => {
+    try {
+      const data = await callApiGetClassesList()
+      const result = data
+        .map(item => ({
+          ...item,
+          value: item.id,
+        }))
+        .filter(item => item.majorId === selectedMajor.value)
+      // console.log(result)
+      // console.log(selectedMajor)
+      setClassesOptions(result)
+      setSelectedClasse(result[0])
+      result.length === 0 && setStudents([])
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
+
+  const fetchStudents = async () => {
+    const classId = selectedClasse?.id
+
+    if (classId) {
+      try {
+        const data = await callApiGetStudentsListByClassId(classId)
+        // console.log(data)
+        setStudents(data)
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
+    } else {
+      setStudents([])
+    }
+  }
+
+  const onClickCreateUser = () => {
+    if (!selectedClasse) {
+      alert('Chưa chọn lớp')
+      return
+    }
+    setShowDialog(true)
+  }
+
   const renderBodyTable = () => {
-    let arrJsx = data?.map((dt, index) => (
-      <ItemRowDanhSachSinhVienAdmin key={index} data={dt} index={index} />
+    return students?.map((data, index) => (
+      <ItemRowDanhSachSinhVienAdmin
+        key={index}
+        data={data}
+        index={index}
+        classPresidentId={selectedClasse?.classPresidentId}
+        refresh={fetchClasses}
+      />
     ))
-
-    isShowAddNew &&
-      (arrJsx = [
-        ...arrJsx,
-        <ItemAddRowDanhSachSinhVienAdmin
-          key={-1}
-          setShowAddNew={setShowAddNew}
-        />,
-      ])
-
-    return arrJsx
   }
 
   return (
     <>
+      <DialogCreateUserStudent
+        isShowDialog={isShowDialog}
+        setShowDialog={setShowDialog}
+        classId={selectedClasse?.id}
+        refresh={fetchStudents}
+      />
+
       <div className='container p-2 justify-center m-auto'>
         <div>
           <Title title='danh sách sinh viên' />
@@ -142,24 +150,26 @@ export default function AdminDanhSachSinhVien() {
               />
             </div>
             <span className='font-bold text-primary text-main'>Lớp:</span>
-            <div className='w-48'>
-              <InputSelect
-                options={academyYearOptions}
-                value={selectedAcademyYear}
-                onChange={setSelectedAcademyYear}
-              />
+            <div className='w-48 flex items-center'>
+              {classesOptions.length > 0 ? (
+                <div className='w-[300px]'>
+                  <InputSelect
+                    options={classesOptions}
+                    value={selectedClasse}
+                    onChange={setSelectedClasse}
+                  />
+                </div>
+              ) : (
+                <span className='text-main text-red-500'>
+                  Khoa này không có lớp
+                </span>
+              )}
             </div>
           </div>
-          {!isShowAddNew && (
-            <Button
-              type='add'
-              label='thêm'
-              onClick={() => setShowAddNew(true)}
-            />
-          )}
+          <Button type='add' label='thêm' onClick={onClickCreateUser} />
         </div>
         <div className='my-2'>
-          <Table header={dataTable.header}>{renderBodyTable()}</Table>
+          <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
         </div>
       </div>
     </>

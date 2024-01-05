@@ -1,9 +1,16 @@
 import { requestHandler } from './requestHandler'
 
 // auth
-export const callApiLogin = async values => {
-  const response = await requestHandler.post('/api/Auth/Login', values)
+export const callApiLogin = async data => {
+  const url = '/api/Auth/Login'
+  const response = await requestHandler.post(url, data)
   return await response.data
+}
+
+export const callApiChangePassword = async data => {
+  const url = '/api/Auth/ChangePassword'
+  const repsonse = await requestHandler.post(url, data)
+  return await repsonse.data
 }
 
 // class
@@ -19,16 +26,28 @@ export const callApiGetClassesPaginationList = async (
   return await response.data
 }
 
-export const callApiCreateClass = async values => {
-  const url = `api/Class/CreateClass`
-  const response = await requestHandler.post(url, values)
+export const callApiGetClassesList = async () => {
+  const url = `api/Class/GetClassesList?time=${new Date().getTime()}`
+  const response = await requestHandler.get(url)
   return await response.data
 }
 
-export const callApiUpdateClass = async values => {
-  const url = `api/Class/UpdateClass`
-  const response = await requestHandler.put(url, values)
+export const callApiCreateClass = async data => {
+  const url = `api/Class/CreateClass`
+  const response = await requestHandler.post(url, data)
   return await response.data
+}
+
+export const callApiUpdateClass = async data => {
+  const url = `api/Class/UpdateClass`
+  const response = await requestHandler.put(url, data)
+  return await response.data
+}
+
+export const callApiUpdateClassPresident = async data => {
+  const url = `api/Class/UpdateClassPresident`
+  const repsonse = await requestHandler.patch(url, data)
+  return await repsonse.data
 }
 
 export const callApiDeleteClass = async classId => {
@@ -40,7 +59,7 @@ export const callApiDeleteClass = async classId => {
 
 // major
 export const callApiGetMajorsList = async () => {
-  const url = `api/Major/GetMajorsList`
+  const url = `api/Major/GetMajorsList?time=${new Date().getTime()}`
   const response = await requestHandler.get(url)
   return await response.data
 }
@@ -53,6 +72,19 @@ export const callApiGetUserByUserId = async userId => {
   return await response.data
 }
 
+export const callApiGetStudentsListByClassId = async classId => {
+  const url = 'api/User/GetStudentsListByClassId'
+  const config = { params: { classId } }
+  const response = await requestHandler.get(url, config)
+  return await response.data
+}
+
+export const callApiCreateUser = async data => {
+  const url = 'api/User/CreateUser'
+  const repsonse = await requestHandler.post(url, data)
+  return await repsonse.data
+}
+
 export const callApiUpdateUser = async formData => {
   const url = 'api/User/UpdateUser'
   const config = {
@@ -60,6 +92,12 @@ export const callApiUpdateUser = async formData => {
   }
   const response = await requestHandler.put(url, formData, config)
   return await response.data
+}
+
+export const callApiUpdateUserStatus = async data => {
+  const url = 'api/User/UpdateUserStatus'
+  const repsonse = await requestHandler.patch(url, data)
+  return await repsonse.data
 }
 
 export const callApiGetTeachersList = async () => {
@@ -79,15 +117,15 @@ export const callApiGetAnnouncementsPaginationList = async (
   return await response.data
 }
 
-export const callApiCreateAnnouncement = async values => {
+export const callApiCreateAnnouncement = async data => {
   const url = `api/Announcement/CreateAnnouncement`
-  const response = await requestHandler.post(url, values)
+  const response = await requestHandler.post(url, data)
   return await response.data
 }
 
-export const callApiUpdateAnnouncement = async values => {
+export const callApiUpdateAnnouncement = async data => {
   const url = `api/Announcement/UpdateAnnouncement`
-  const repsonse = await requestHandler.put(url, values)
+  const repsonse = await requestHandler.put(url, data)
   return await repsonse.data
 }
 

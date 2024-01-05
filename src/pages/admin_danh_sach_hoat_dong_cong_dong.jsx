@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react'
 import Title from '../components/Title'
 import Table from '../components/Table'
 import Button from '../components/Button'
-import ItemRowDanhSachHoatDongCongDongAdmin from '../components/ItemRowDanhSachHoatDongCongDongAdmin'
+import ItemRowDanhSachHoatDongCongDongAdmin from '../components/ItemRow/ItemRowDanhSachHoatDongCongDongAdmin'
+import { checkAndHandleLogined } from '../utils'
+import { useNavigate } from 'react-router-dom'
 
 const dataTable = {
   header: [
@@ -24,8 +26,10 @@ const dataTable = {
 export default function AdminDanhSachHoatDongCongDong() {
   const [data, setData] = useState([])
   const [addButtonDisabled, setAddButtonDisabled] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
+    checkAndHandleLogined(navigate)
     fetchListHDCD()
   }, [])
 

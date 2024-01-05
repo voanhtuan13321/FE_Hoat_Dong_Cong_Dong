@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import Title from '../components/Title'
 import Button from '../components/Button'
 import Table from '../components/Table'
 import Pagination from '../components/Pagination'
-import ItemRowTableDanhSachThongBaoAdmin from '../components/ItemRowTableDanhSachThongBaoAdmin'
-import ItemRowTableDanhSachThongBaoAdminAdd from '../components/ItemRowTableDanhSachThongBaoAdminAdd'
+import ItemRowTableDanhSachThongBaoAdmin from '../components/ItemRow/ItemRowTableDanhSachThongBaoAdmin'
+import ItemRowTableDanhSachThongBaoAdminAdd from '../components/ItemRow/ItemRowTableDanhSachThongBaoAdminAdd'
 
-import { ITEM_PER_PAGE, callApiGetAnnouncementsPaginationList } from '../utils'
-import { setLoading } from '../redux/storeSlice'
+import {
+  ITEM_PER_PAGE,
+  callApiGetAnnouncementsPaginationList,
+  checkAndHandleLogined,
+} from '../utils'
 
 const HEADER_TABLE = [
   { className: 'w-5%', title: 'stt' },
@@ -22,16 +25,16 @@ const HEADER_TABLE = [
 export default function AdminDanhSachThongBao() {
   const [objectAnnouncements, setObjectAnnouncements] = useState({})
   const [isShowAddNew, setShowAddNew] = useState(false)
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   useEffect(() => {
+    checkAndHandleLogined(navigate)
     fetchAnnouncements()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchAnnouncements = async (page = 0) => {
     try {
-      dispatch(setLoading(true))
       const data = await callApiGetAnnouncementsPaginationList(
         ITEM_PER_PAGE,
         page,
@@ -40,8 +43,6 @@ export default function AdminDanhSachThongBao() {
       setObjectAnnouncements(data)
     } catch (error) {
       alert(error.message)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 

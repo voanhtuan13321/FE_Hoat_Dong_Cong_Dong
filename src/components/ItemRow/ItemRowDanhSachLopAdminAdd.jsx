@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 import toast from 'react-hot-toast'
 
-import Button from './Button'
-import InputSelect from './InputSelect'
-import InputText from './InputText'
+import Button from '../Button'
+import InputSelect from '../Input/InputSelect'
+import InputText from '../Input/InputText'
 
 import {
   callApiCreateClass,
   callApiGetTeachersList,
   handleError,
-} from '../utils'
-import { setLoading } from '../redux/storeSlice'
+} from '../../utils'
 
 export default function ItemRowDanhSachLopAdd({
   setIsAddNew,
@@ -24,7 +22,6 @@ export default function ItemRowDanhSachLopAdd({
   const [selectTeacher, setSelectTeacher] = useState({})
   const [name, setName] = useState('')
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   useEffect(() => {
     fetchListGiaoVien()
@@ -32,7 +29,6 @@ export default function ItemRowDanhSachLopAdd({
 
   const fetchListGiaoVien = async () => {
     try {
-      dispatch(setLoading(true))
       const data = await callApiGetTeachersList()
       const result = data.map(item => ({
         ...item,
@@ -45,14 +41,11 @@ export default function ItemRowDanhSachLopAdd({
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
   const handleSave = async () => {
     try {
-      dispatch(setLoading(true))
       const savedData = {
         majorId,
         headTeacherId: selectTeacher.value,
@@ -67,8 +60,6 @@ export default function ItemRowDanhSachLopAdd({
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 

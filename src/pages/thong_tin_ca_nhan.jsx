@@ -7,11 +7,11 @@ import { jwtDecode } from 'jwt-decode'
 
 // component
 import Title from '../components/Title'
-import InputText from '../components/InputText'
-import InputDate from '../components/InputDate'
-import InputAvatar from '../components/InputAvatar'
-import InputTextArea from '../components/InputTextArea'
-import InputSelect from '../components/InputSelect'
+import InputText from '../components/Input/InputText'
+import InputDate from '../components/Input/InputDate'
+import InputAvatar from '../components/Input/InputAvatar'
+import InputTextArea from '../components/Input/InputTextArea'
+import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
 
 // function
@@ -26,9 +26,10 @@ import {
   convertToObjectFormFormik,
   handleError,
   localStorages,
+  optionsGender,
 } from '../utils'
 import ErrorLabel from '../components/ErrorLabel'
-import { setLoading, setRole } from '../redux/storeSlice'
+import { setRole } from '../redux/storeSlice'
 
 const initInfoUser = {
   id: '',
@@ -54,11 +55,6 @@ const initInfoUser = {
   ward: '',
   street: '',
 }
-
-const optionsGender = [
-  { name: 'Nam', value: true },
-  { name: 'Nữ', value: false },
-]
 
 export default function ThongTinCaNhan() {
   const [isShowEdit, setShowEdit] = useState(false)
@@ -91,7 +87,6 @@ export default function ThongTinCaNhan() {
     const userId = decoded['UserId']
     if (userId) {
       try {
-        dispatch(setLoading(true))
         const data = await callApiGetUserByUserId(userId)
 
         const newValueFormik = await convertToObjectFormFormik(data)
@@ -100,8 +95,6 @@ export default function ThongTinCaNhan() {
       } catch (error) {
         console.error('Failed to get user', error)
         // handleError(error, navigate)
-      } finally {
-        dispatch(setLoading(false))
       }
     }
   }
@@ -111,9 +104,7 @@ export default function ThongTinCaNhan() {
     const formData = await convertObjectToFormData(values)
 
     try {
-      dispatch(setLoading(true))
       const data = await callApiUpdateUser(formData)
-
       // console.log(data)
       const newValueFormik = await convertToObjectFormFormik(data)
       formik.setValues(newValueFormik)
@@ -121,8 +112,6 @@ export default function ThongTinCaNhan() {
     } catch (error) {
       console.error('Failed to update user', error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
@@ -130,8 +119,8 @@ export default function ThongTinCaNhan() {
     initialValues: initInfoUser,
     validationSchema: Yup.object({
       firstName: Yup.string()
-        .required('HỌ bắt buộc phải nhập')
-        .max(20, 'HỌ không được quá 20 ký tự'),
+        .required('Bắt buộc nhập')
+        .max(20, 'Không được quá 20 ký tự'),
       lastName: Yup.string()
         .required('Tên bắt buộc phải nhập')
         .max(20, 'Tên không được quá 20 ký tự'),
@@ -145,6 +134,10 @@ export default function ThongTinCaNhan() {
       identificationCardId: Yup.string().max(
         20,
         'CCCD không được quá 20 ký tự',
+      ),
+      identificationCardIssueDate: Yup.date().max(
+        new Date(),
+        'Ngày không được lớn hơn ngày hiện tại',
       ),
       identificationCardIssuePlace: Yup.string().max(
         30,
@@ -270,12 +263,13 @@ export default function ThongTinCaNhan() {
             onChange={event =>
               formik.setFieldValue(
                 'identificationCardIssueDate',
-                event.target.value,
+                new Date(event.target.value),
               )
             }
             value={formik.values.identificationCardIssueDate}
             disabled={!isShowEdit}
           />
+          <ErrorLabel formik={formik} keyFormik='identificationCardIssueDate' />
         </div>
         <div>
           <InputText

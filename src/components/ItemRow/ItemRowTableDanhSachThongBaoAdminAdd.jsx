@@ -1,13 +1,11 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 
-import Button from './Button'
-import InputText from './InputText'
+import Button from '../Button'
+import InputText from '../Input/InputText'
 
-import { setLoading } from '../redux/storeSlice'
-import { callApiCreateAnnouncement, handleError } from '../utils'
+import { callApiCreateAnnouncement, handleError } from '../../utils'
 
 const initState = { title: '', content: '' }
 
@@ -16,7 +14,6 @@ export default function ItemRowTableDanhSachThongBaoAdminAdd({
   refresh,
 }) {
   const [dataThongBao, setDataThongBao] = useState(initState)
-  const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const onChangeInput = event => {
@@ -26,7 +23,6 @@ export default function ItemRowTableDanhSachThongBaoAdminAdd({
 
   const onClickLuu = async () => {
     try {
-      dispatch(setLoading(true))
       const data = await callApiCreateAnnouncement(dataThongBao)
       // console.log(data)
       toast.success('Thêm mới thành công')
@@ -36,8 +32,6 @@ export default function ItemRowTableDanhSachThongBaoAdminAdd({
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 

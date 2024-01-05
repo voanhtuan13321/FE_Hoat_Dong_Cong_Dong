@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import Title from '../components/Title'
-import InputSelect from '../components/InputSelect'
+import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
 import Table from '../components/Table'
-import ItemRowDanhSachLop from '../components/ItemRowDanhSachLopAdmin'
-import ItemRowDanhSachLopAdd from '../components/ItemRowDanhSachLopAdminAdd'
+import ItemRowDanhSachLop from '../components/ItemRow/ItemRowDanhSachLopAdmin'
+import ItemRowDanhSachLopAdd from '../components/ItemRow/ItemRowDanhSachLopAdminAdd'
 import Pagination from '../components/Pagination'
 
-import { setLoading } from '../redux/storeSlice'
 import {
   ITEM_PER_PAGE,
   callApiGetClassesPaginationList,
   callApiGetMajorsList,
+  checkAndHandleLogined,
   generateAcademyYearOptions,
   handleError,
 } from '../utils'
@@ -38,10 +37,10 @@ export default function AdminDanhSachLop() {
     academyYearOptions[0],
   )
   const [isAddNew, setIsAddNew] = useState(false)
-  const dispatch = useDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {
+    checkAndHandleLogined(navigate)
     fetchMajors()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -53,7 +52,6 @@ export default function AdminDanhSachLop() {
 
   const fetchClasses = async (page = 0) => {
     try {
-      dispatch(setLoading(true))
       const data = await callApiGetClassesPaginationList(
         ITEM_PER_PAGE,
         page,
@@ -64,14 +62,11 @@ export default function AdminDanhSachLop() {
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
   const fetchMajors = async () => {
     try {
-      dispatch(setLoading(true))
       const data = await callApiGetMajorsList()
       const result = data.map(item => ({
         ...item,
@@ -84,8 +79,6 @@ export default function AdminDanhSachLop() {
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 

@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import InputSelect from '../components/InputSelect'
+import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
 import Table from '../components/Table'
-import ItemRowTableTuDanhGia from '../components/ItemRowTableTuDanhGia'
+import ItemRowTableTuDanhGia from '../components/ItemRow/ItemRowTableTuDanhGia'
 import Title from '../components/Title'
 import { ROLES, checkRoles } from '../utils'
 

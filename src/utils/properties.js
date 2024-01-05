@@ -22,6 +22,7 @@ import { localStorages } from './localStorage'
 export const ITEM_PER_PAGE = 10
 export const KEY_ROLE_TOKEN =
   'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+
 export const ROLES = {
   client: 1,
   sinhVien: 2,
@@ -30,10 +31,22 @@ export const ROLES = {
   truongKhoa: 5,
   admin: 6,
 }
+
 export const REGEX = {
-  textOnly: /^[^\d]*$/,
+  textOnly: /^[a-zA-ZÀ-Ỹà-ỹ ]+$/,
+  dontSpace: /^[a-zA-Z0-9_]+$/,
   phoneNum: /^(?:\+84|0)(\d{9,10})$/,
   link: /^(http|https):\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/,
+}
+
+export const optionsGender = [
+  { name: 'Nam', value: true },
+  { name: 'Nữ', value: false },
+]
+
+export const STATUS_USER = {
+  ACCOUNT_LOCKED: -1,
+  ACCOUNT_UNLOCK: 0,
 }
 
 export const routers = [

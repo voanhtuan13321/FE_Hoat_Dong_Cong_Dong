@@ -8,8 +8,8 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 // component
-import InputText from '../components/InputText'
-import InputPassword from '../components/InputPassword'
+import InputText from '../components/Input/InputText'
+import InputPassword from '../components/Input/InputPassword'
 import Button from '../components/Button'
 import ErrorLabel from '../components/ErrorLabel'
 
@@ -18,7 +18,7 @@ import User_login from '../assets/images/User_login.png'
 
 // function
 import { KEY_ROLE_TOKEN, callApiLogin, localStorages } from '../utils'
-import { setLoading, setRole } from '../redux/storeSlice'
+import { setRole } from '../redux/storeSlice'
 
 const initialFormLogin = { accountId: '', password: '' }
 
@@ -35,7 +35,6 @@ export default function Login() {
   const onSubmit = async values => {
     // Thực hiện xử lý submit ở đây
     try {
-      dispatch(setLoading(true))
       const { token } = await callApiLogin(values)
       toast.success('Đăng nhập thành công')
       localStorages.setToken(token)
@@ -45,9 +44,6 @@ export default function Login() {
       navigate('/')
     } catch (error) {
       handleLoginError(error)
-      alert(error.message)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
@@ -63,6 +59,7 @@ export default function Login() {
         Swal.fire('Tài khoản của bạn đã bị khoá', '', 'error')
         break
       default:
+        console.error(error)
         alert(error.message)
     }
   }

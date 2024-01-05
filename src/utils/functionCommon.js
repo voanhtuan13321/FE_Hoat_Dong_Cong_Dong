@@ -4,12 +4,16 @@ import { requestHandler } from './requestHandler'
 
 export const checkRoles = (roles = [], targetRole) => roles.includes(targetRole)
 
+export const checkAndHandleLogined = navigate => {
+  const token = localStorages.getToken()
+  !token && navigate('/login')
+}
+
 export const exportFileExcel = (jsonData = [], fileName = '') => {
   if (!Array.isArray(jsonData) || jsonData.length === 0) {
     console.error('Invalid jsonData')
     return
   }
-
   // Tạo sheet từ dữ liệu JSON
   const sheet = XLSX.utils.json_to_sheet(jsonData)
   // Tạo workbook và thêm sheet vào workbook
@@ -41,26 +45,25 @@ export const convertObjectToFormData = async obj => {
 export const handleError = (error, navigate) => {
   switch (error.response.status) {
     case 401:
-      alert('Authentication')
+      // alert('Authentication')
       localStorages.removeToken()
       navigate('/login')
       break
     case 403:
-      alert('Forbidden')
+      // alert('Forbidden')
       localStorages.removeToken()
       navigate('/login')
       break
     default:
-      alert('Failed to all api', error.message)
+      alert(error.message)
   }
 }
 
 export const convertToObjectFormFormik = async data => ({
   id: data.id ?? '',
   classId: data.classId ?? '',
-  avatar: `${requestHandler.defaults.baseURL}api/User/GetAvatar?userId=${
-    data.id
-  }&time=${new Date().getTime()}`,
+  avatar: `${requestHandler.defaults.baseURL}api/User/GetAvatar
+    ?userId=${data.id}&time=${new Date().getTime()}`,
   firstName: data.firstName ?? '',
   lastName: data.lastName ?? '',
   dateOfBirth: new Date(data.dateOfBirth),

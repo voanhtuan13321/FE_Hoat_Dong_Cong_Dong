@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import Title from '../components/Title'
 import Table from '../components/Table/index'
 import Button from '../components/Button'
-import ItemRowTableDanhSachKhoaAdmin from '../components/ItemRowTableDanhSachKhoaAdmin'
-import ItemRowTableDanhSachKhoaAdminAdd from '../components/ItemRowTableDanhSachKhoaAdminAdd'
+import ItemRowTableDanhSachKhoaAdmin from '../components/ItemRow/ItemRowTableDanhSachKhoaAdmin'
+import ItemRowTableDanhSachKhoaAdminAdd from '../components/ItemRow/ItemRowTableDanhSachKhoaAdminAdd'
 
 const dataTable = {
   header: [

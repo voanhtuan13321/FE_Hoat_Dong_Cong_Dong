@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
 
-import Button from './Button'
-import InputText from './InputText'
-import InputSelect from './InputSelect'
+import InputText from '../Input/InputText'
+import InputSelect from '../Input/InputSelect'
 
-import { setLoading } from '../redux/storeSlice'
 import {
+  REGEX,
   caculateIndex,
   callApiDeleteClass,
   callApiGetMajorsList,
@@ -17,7 +15,8 @@ import {
   callApiUpdateClass,
   generateAcademyYearOptions,
   handleError,
-} from '../utils'
+} from '../../utils'
+import Button from '../Button'
 
 export default function ItemRowDanhSachLop({
   dt,
@@ -36,7 +35,6 @@ export default function ItemRowDanhSachLop({
   const [selectedAcademyYear, setSelectedAcademyYear] = useState(
     academyYearOptions[0],
   )
-  const dispatch = useDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -61,7 +59,6 @@ export default function ItemRowDanhSachLop({
 
   const fetchTeachers = async () => {
     try {
-      dispatch(setLoading(true))
       const data = await callApiGetTeachersList()
       const result = data.map(item => ({
         ...item,
@@ -73,14 +70,11 @@ export default function ItemRowDanhSachLop({
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
   const fetchListMajor = async () => {
     try {
-      dispatch(setLoading(true))
       const data = await callApiGetMajorsList()
       const result = data.map(item => ({
         ...item,
@@ -93,19 +87,16 @@ export default function ItemRowDanhSachLop({
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
   const handleSave = async () => {
-    if (!/^[a-zA-Z0-9_]+$/.test(name)) {
+    if (!REGEX.dontSpace.test(name)) {
       toast.error('Lớp không được chưa khoảng cách')
       return
     }
 
     try {
-      dispatch(setLoading(true))
       const dataRequest = {
         ...dt,
         majorId: selectedMajor.id,
@@ -121,8 +112,6 @@ export default function ItemRowDanhSachLop({
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
@@ -137,7 +126,6 @@ export default function ItemRowDanhSachLop({
 
     if (isDenied) {
       try {
-        dispatch(setLoading(true))
         const data = await callApiDeleteClass(id)
         // console.log(data)
         toast.success('Xoá thành công')
@@ -145,8 +133,6 @@ export default function ItemRowDanhSachLop({
       } catch (error) {
         console.error(error)
         handleError(error, navigate)
-      } finally {
-        dispatch(setLoading(false))
       }
     }
   }
