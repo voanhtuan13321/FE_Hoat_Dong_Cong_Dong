@@ -3,48 +3,52 @@ import Swal from 'sweetalert2'
 import Button from './Button'
 import InputSelect from './InputSelect'
 import InputText from './InputText'
-import { requestHandler } from '../utils'
+import {
+  callApiDeleteMajor,
+  callApiGetTeachersList,
+  callApiUpdateMajor,
+  handleError,
+  requestHandler,
+} from '../utils'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
-
-export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
+export default function ItemRowTableDanhSachKhoaAdmin({
+  stt,
+  data,
+  refresh,
+  objectMajors,
+}) {
   const [isShowEdit, setShowEdit] = useState(false)
   const [listGiaoVien, setListGiaoVien] = useState([{}])
   const [selectedGiaoVien, setSelectedGiaoVien] = useState({})
-  const [rowData, setRowData] = useState({
-    tenKhoa: data.name,
-    giaoVien: data.majorHeadFullName,
-  })
-  const [dataKhoa, setDataKhoa] = useState({
-    tenKhoa: data.name,
-    giaoVien: data.majorHeadFullName,
-  })
-
+  const [dataKhoa, setDataKhoa] = useState({ ...data })
+  const navigate = useNavigate()
   const onClickEdit = () => {
     setShowEdit(!isShowEdit)
-   
+    console.log(dataKhoa)
   }
 
   useEffect(() => {
-    fetchListDanhSachKhoa()
+    fetchListDanhSachGiaoVien()
   }, [])
 
-  const fetchListDanhSachKhoa = () => {
-   
-    requestHandler.get('/api/User/GetTeachersList').then(response => {
-      const mapTen = response.data
-      const listTenGiaoVien = mapTen.map((teacher, index) => ({
-        name: teacher.firstName + ' ' + teacher.lastName,
-        value: teacher.id,
+  const fetchListDanhSachGiaoVien = async () => {
+    try {
+      const data = await callApiGetTeachersList()
+      const result = data.map(item => ({
+        ...item,
+        name: item.firstName + ' ' + item.lastName,
+        value: item.id,
       }))
-      setListGiaoVien(listTenGiaoVien)
-      setSelectedGiaoVien( getDanhSachGiaoVien(data.majorHeadId,listTenGiaoVien))
-    })
-
-    // setRowData({
-    //   ...rowData,
-    //   khoa: getDanhSachKhoa(data.khoa, khoaData).name,
-    //   ten: getDanhSachTen(data.ten, tenData).name,
-    // })
+      setListGiaoVien(result)
+      const dataSelectSet = getDanhSachGiaoVien(data.majorHeadId, result)
+      console.log('dataSelect', dataSelectSet)
+      setSelectedGiaoVien(dataSelectSet)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
   }
   const onSelectChange = (name, selectedOption) => {
     setDataKhoa({ ...dataKhoa, [name]: selectedOption })
@@ -52,7 +56,7 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
   }
 
   const getDanhSachGiaoVien = (value, tenData) => {
-    return !value
+    return value
       ? tenData[0]
       : tenData.find(item => item.value === value) || tenData[0]
   }
@@ -63,40 +67,58 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
       [name]: value,
     })
   }
-  const onClickLuu = () => {
-    console.log(dataKhoa);
+  const onClickLuu = async () => {
+    const dataEdit = {}
+    Object.assign(dataEdit, {
+      id: dataKhoa.id,
+      majorHeadId: dataKhoa.giaoVien.value,
+      name: dataKhoa.name,
+    })
+    try {
+      await callApiUpdateMajor(dataEdit)
+      toast.success('Cập nhật thành công')
+      setShowEdit(false)
+      refresh()
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
   }
-  const handleDeleteButtonClick = () => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
+
+  const handleDeleteButtonClick = async id => {
+    await Swal.fire({
+      title: 'Bạn có chắc chắn muốn xóa?',
+      text: 'Xóa khoa sẽ xóa toàn bộ lớp và sinh viên thuộc khoa',
       icon: 'warning',
       showCancelButton: true,
+      cancelButtonText: 'Hủy',
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
-    }).then(result => {
+      confirmButtonText: 'Có, tôi chắc chắn!',
+    }).then(async result => {
       if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'Your file has been deleted.',
-          icon: 'success',
-        })
+        try {
+          await callApiDeleteMajor(id)
+          console.log('Xóa')
+          toast.success('Xóa thành công')
+          refresh()
+        } catch (error) {
+          alert(error.message)
+        }
       }
     })
   }
 
   const renderContent = (value, name) =>
     isShowEdit ? (
-      name === 'tenKhoa' ? (
-      <InputText name={name} value={dataKhoa.tenKhoa}
-      onChange={onChangeInput}/>
+      name === 'name' ? (
+        <InputText name={name} value={value} onChange={onChangeInput} />
       ) : (
         <InputSelect
-        name={name}
-        value={selectedGiaoVien}
-        onChange={selected => onSelectChange(name, selected)}
-        options={listGiaoVien}
+          name={name}
+          value={selectedGiaoVien}
+          onChange={selected => onSelectChange(name, selected)}
+          options={listGiaoVien}
         />
       )
     ) : (
@@ -107,10 +129,10 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
     <tr className='text-main'>
       <td className='border border-primary p-1 text-center'>{stt + 1}</td>
       <td className='border border-primary p-1 text-center'>
-      {renderContent(rowData.tenKhoa,'tenKhoa')}
+        {renderContent(dataKhoa.name, 'name')}
       </td>
       <td className='border border-primary p-1 text-center'>
-        {renderContent(rowData.giaoVien, 'giaoVien')}
+        {renderContent(dataKhoa.majorHeadFullName, 'giaoVien')}
       </td>
       <td className='border border-primary p-1 flex'>
         <div className='w-1/2 flex justify-center'>
@@ -124,7 +146,11 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
           <Button
             label={isShowEdit ? 'hủy' : 'Xóa'}
             type={isShowEdit ? 'outline' : 'delete'}
-            onClick={isShowEdit ? onClickEdit : handleDeleteButtonClick}
+            onClick={
+              isShowEdit
+                ? onClickEdit
+                : () => handleDeleteButtonClick(dataKhoa.id)
+            }
           />
         </div>
       </td>

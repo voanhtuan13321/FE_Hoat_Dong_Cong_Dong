@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import Button from './Button'
 import InputSelect from './InputSelect'
-import { requestHandler } from '../utils'
+import { callApiGetTeachersList, handleError, requestHandler } from '../utils'
 import InputText from './InputText'
+import { useNavigate } from 'react-router-dom'
 
 export default function ItemRowTableDanhSachKhoaAdminAdd({
   setShowAddNew,
@@ -13,7 +14,7 @@ export default function ItemRowTableDanhSachKhoaAdminAdd({
     tenKhoa: '',
     giaoVien: '',
   })
-
+  const navigate = useNavigate()
   useEffect(() => {
     getListGiaoVien()
   }, [])
@@ -25,15 +26,19 @@ export default function ItemRowTableDanhSachKhoaAdminAdd({
     setSelectedGiaoVien(selectedOption)
   }
 
-  const getListGiaoVien = () => {
-    requestHandler.get('/api/User/GetTeachersList').then(response => {
-      const mapTen = response.data
-      const listTenGiaoVien = mapTen.map((teacher, index) => ({
-        name: teacher.firstName + ' ' + teacher.lastName,
-        value: teacher.id,
+  const getListGiaoVien = async () => {
+    try {
+      const data = await callApiGetTeachersList()
+      const result = data.map(item => ({
+        ...item,
+        name: item.firstName + ' ' + item.lastName,
+        value: item.id,
       }))
-      setListGiaoVien(listTenGiaoVien)
-    })
+      setListGiaoVien(result)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
   }
 
   const onClickLuu = () => {
@@ -43,7 +48,7 @@ export default function ItemRowTableDanhSachKhoaAdminAdd({
       majorHeadId: dataKhoa.giaoVien.value,
       name: dataKhoa.tenKhoa,
     })
-    
+
     requestHandler
       .post('/api/Major/CreateMajor', selectedData)
       .then(res => {

@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import Title from '../components/Title'
 import Table from '../components/Table/index'
 import Button from '../components/Button'
 import ItemRowTableDanhSachKhoaAdmin from '../components/ItemRowTableDanhSachKhoaAdmin'
 import ItemRowTableDanhSachKhoaAdminAdd from '../components/ItemRowTableDanhSachKhoaAdminAdd'
-import { requestHandler } from '../utils'
 
+import { ITEM_PER_PAGE, callApiGetMajorsPaginationList } from '../utils'
+import { setLoading } from '../redux/storeSlice'
+import { useDispatch } from 'react-redux'
+import Pagination from '../components/Pagination'
 const dataTable = {
   header: [
     { className: 'w-5%', title: 'stt' },
@@ -16,17 +19,22 @@ const dataTable = {
 }
 
 export default function AdminDanhSachKhoa() {
-  const [listKhoa, setListKhoa] = useState([])
+  const [objectMajors, setObjectMajors] = useState({})
   const [isShowAddNew, setShowAddNew] = useState(false)
+  const dispatch = useDispatch()
   useEffect(() => {
     fetchListKhoa()
   }, [])
 
-  const fetchListKhoa = () => {
-    requestHandler.get('/api/Major/GetMajorsList').then(response => {
-      setListKhoa(response.data)
-      console.log("List khoa",response.data);
-    })
+  const fetchListKhoa = async (page = 0) => {
+    try {
+      const data = await callApiGetMajorsPaginationList(ITEM_PER_PAGE, page)
+      setObjectMajors(data)
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
   const onClickThem = () => {
@@ -34,8 +42,16 @@ export default function AdminDanhSachKhoa() {
   }
 
   const renderBodyTable = () => {
-    let arrJsx = listKhoa.map((dt, index) => {
-      return <ItemRowTableDanhSachKhoaAdmin key={index} stt={index} data={dt} />
+    let arrJsx = objectMajors.data?.map((dt, index) => {
+      return (
+        <ItemRowTableDanhSachKhoaAdmin
+          key={index}
+          stt={index}
+          data={dt}
+          refresh={fetchListKhoa}
+          objectMajors={objectMajors}
+        />
+      )
     })
 
     isShowAddNew &&
@@ -44,7 +60,8 @@ export default function AdminDanhSachKhoa() {
         <ItemRowTableDanhSachKhoaAdminAdd
           key={-1}
           setShowAddNew={setShowAddNew}
-          fetchListKhoa={fetchListKhoa}
+          refresh={fetchListKhoa}
+          objectMajors={objectMajors}
         />,
       ])
 
@@ -62,6 +79,15 @@ export default function AdminDanhSachKhoa() {
           )}
         </div>
         <Table header={dataTable.header}>{renderBodyTable()}</Table>
+        <Pagination
+          totalItems={objectMajors.totalItems}
+          totalPages={objectMajors.totalPages}
+          itemPerPage={objectMajors.itemPerPage}
+          currentPage={objectMajors.currentPage}
+          isNextPage={objectMajors.isNextPage}
+          isPreviousPage={objectMajors.isPreviousPage}
+          onPageChange={fetchListKhoa}
+        />
       </div>
     </>
   )
