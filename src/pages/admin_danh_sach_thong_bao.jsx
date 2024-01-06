@@ -41,7 +41,7 @@ export default function AdminDanhSachThongBao() {
       const config = { params: { ItemPerPage: 5, Page: page } }
       const response = await requestHandler.get(url, config)
       const data = await response.data
-      // console.log(data)
+      console.log(data)
       setListThongBao(data)
     } catch (error) {
       alert(error.message)
@@ -68,7 +68,7 @@ export default function AdminDanhSachThongBao() {
       (arrJsx = [
         ...arrJsx,
         <ItemRowTableDanhSachThongBaoAdminAdd
-          key={-1}
+          index={-1}
           setShowAddNew={setShowAddNew}
           refresh={fetchListThongBao}
         />,

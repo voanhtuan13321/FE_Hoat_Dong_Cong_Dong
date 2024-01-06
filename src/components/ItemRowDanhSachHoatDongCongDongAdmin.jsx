@@ -1,16 +1,23 @@
 import React, { useState } from 'react'
 import Button from './Button'
 import InputText from './InputText'
+import Swal from 'sweetalert2'
+import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { setLoading } from '../redux/storeSlice'
+import { useNavigate } from 'react-router-dom'
+import { handleError, requestHandler } from '../utils'
 
 export default function ItemRowDanhSachHoatDongCongDongAdmin({
-  data,
   index,
-  isEdit,
-  setAddButtonDisabled,
+  data,
+  refresh,
 }) {
-  const [isEditing, setIsEditing] = useState(isEdit)
-  const [dataHDCD, setDataHDCD] = useState(data)
-
+  const [isEditing, setIsEditing] = useState(false)
+  const [dataHDCD, setDataHDCD] = useState({ ...data })
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+ 
   const onChangeInput = event => {
     const { name, value } = event.target
     setDataHDCD({
@@ -19,22 +26,58 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
     })
   }
 
-  const handleSaveClick = () => {
-    console.log('save', dataHDCD)
-    // Gọi API để lưu dữ liệu với chỉ số index
-    setIsEditing(false)
-  }
-
   const handleEditClick = () => {
     setIsEditing(true)
   }
-  const handleDeleteRow = () => {
-    console.log('delete', dataHDCD)
+
+  const handleSaveClick = async () => {
+    try {
+      dispatch(setLoading(true))
+      const url = `api/CommunityActivityType/UpdateAnnouncement`
+      const repsonse = await requestHandler.put(url, dataHDCD)
+      const data = await repsonse.data
+      toast.success('Cập nhật thành công')
+      setIsEditing(false)
+      refresh()
+    } catch (e) {
+      console.error(e)
+      handleError(e, navigate)
+    } finally {
+      dispatch(setLoading(false))
+    }
+  }
+
+  const handleDeleteRow = async id => {
+    const { isDenied } = await Swal.fire({
+      title: 'Bạn có chắc muốn xoá?',
+      showCancelButton: true,
+      cancelButtonText: 'Huỷ',
+      showDenyButton: true,
+      denyButtonText: 'Xoá',
+      showConfirmButton: false,
+    })
+
+    if (isDenied) {
+      try {
+        dispatch(setLoading(true))
+        const url = `api/CommunityActivityType/DeleteCommunityActivityType`
+        const config = { params: { communityActivityTypeId: id } }
+        const repsonse = await requestHandler.delete(url, config)
+        const data = await repsonse.data
+        toast.success('Xoá thành công')
+        setIsEditing(false)
+        refresh()
+      } catch (e) {
+        alert(e.message)
+      } finally {
+        dispatch(setLoading(false))
+      }
+    }
   }
 
   const handleCancelButton = () => {
-    setDataHDCD(data)
-    setAddButtonDisabled ? setAddButtonDisabled(false) : setIsEditing(false)
+    setDataHDCD({ ...data })
+    setIsEditing(false)
   }
 
   return (
@@ -42,35 +85,34 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
       <td className='border border-primary p-1 text-center'>{index + 1}</td>
       <td className='border border-primary p-1 text-center'>
         {!isEditing ? (
-          dataHDCD.loaiHDCD
+          data.name
         ) : (
           <InputText
-            name='loaiHDCD'
-            value={dataHDCD.loaiHDCD}
-            onChange={e => onChangeInput(e)}
+            name='name'
+            value={dataHDCD.name}
+            onChange={onChangeInput}
           />
         )}
       </td>
       <td className='border border-primary p-1 text-center'>
         {!isEditing ? (
-          dataHDCD.minPoint
+          data.minScore
         ) : (
           <InputText
-            name='minPoint'
-            value={dataHDCD.minPoint}
-            onChange={e => onChangeInput(e)}
+            name='minScore'
+            value={dataHDCD.minScore}
+            onChange={onChangeInput}
           />
         )}
       </td>
       <td className='border border-primary p-1 text-center'>
         {!isEditing ? (
-          dataHDCD.maxPoint
+          data.maxScore
         ) : (
           <InputText
-            name='maxPoint'
-            value={dataHDCD.maxPoint}
-            disabled={!isEditing}
-            onChange={e => onChangeInput(e)}
+            name='maxScore'
+            value={dataHDCD.maxScore}
+            onChange={onChangeInput}
           />
         )}
       </td>
@@ -87,7 +129,7 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
             onClick={e => handleCancelButton()}
           />
         ) : (
-          <Button type='delete' label='Xoá' onClick={e => handleDeleteRow()} />
+          <Button type='delete' label='Xoá' onClick={e => handleDeleteRow(data.id)} />
         )}
       </td>
     </tr>

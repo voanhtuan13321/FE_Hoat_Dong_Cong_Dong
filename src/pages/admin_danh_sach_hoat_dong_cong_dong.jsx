@@ -3,6 +3,11 @@ import Title from '../components/Title'
 import Table from '../components/Table'
 import Button from '../components/Button'
 import ItemRowDanhSachHoatDongCongDongAdmin from '../components/ItemRowDanhSachHoatDongCongDongAdmin'
+import ItemRowDanhSachHoatDongCongDongAdminAdd from '../components/ItemRowDanhSachHoatDongCongDongAdminAdd'
+import { requestHandler } from '../utils'
+import { useDispatch } from 'react-redux'
+import { setLoading } from '../redux/storeSlice'
+import Pagination from '../components/Pagination'
 
 const dataTable = {
   header: [
@@ -12,56 +17,53 @@ const dataTable = {
     { className: 'w-15%', title: 'Max điểm' },
     { className: 'w-20%', title: '' },
   ],
-  value: [
-    { loaiHDCD: 'Hiến máu', minPoint: 10, maxPoint: 30 },
-    { loaiHDCD: 'Hiến máu', minPoint: 10, maxPoint: 30 },
-    { loaiHDCD: 'Hiến máu', minPoint: 10, maxPoint: 30 },
-    { loaiHDCD: 'Hiến máu', minPoint: 10, maxPoint: 30 },
-    { loaiHDCD: 'Hiến máu', minPoint: 10, maxPoint: 30 },
-  ],
 }
 
 export default function AdminDanhSachHoatDongCongDong() {
-  const [data, setData] = useState([])
+  const [listHDCD, setListHDCD] = useState([])
   const [addButtonDisabled, setAddButtonDisabled] = useState(false)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     fetchListHDCD()
   }, [])
 
-  const fetchListHDCD = () => {
-    setData(dataTable.value)
+  const fetchListHDCD = async (page = 0) => {
+    try {
+      dispatch(setLoading(true))
+      const url = `api/CommunityActivityType/GetCommunityActivityTypesPaginationList`
+      const config = { params: { ItemPerPage: 5, Page: page } }
+      const response = await requestHandler.get(url, config)
+      const data = await response.data
+      console.log(data)
+      setListHDCD(data)
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      dispatch(setLoading(false))
+    }
   }
 
   const handleAddRow = () => {
     setAddButtonDisabled(true)
   }
-  const dataAddRow = () => {
-    return {
-      loaiHDCD: '',
-      minPoint: 0,
-      maxPoint: 0,
-    }
-  }
 
   const renderBodyTable = () => {
-    let arrJsx = data.map((dt, index) => {
-      return (
+    let arrJsx = listHDCD.data?.map((dt, index) => (
         <ItemRowDanhSachHoatDongCongDongAdmin
+          key={index}
           index={index}
           data={dt}
-          isEdit={false}
+          refresh={fetchListHDCD}      
         />
-      )
-    })
+    ))
     addButtonDisabled &&
       (arrJsx = [
         ...arrJsx,
-        <ItemRowDanhSachHoatDongCongDongAdmin
-          index={-1}
-          data={dataAddRow()}
-          isEdit={true}
+        <ItemRowDanhSachHoatDongCongDongAdminAdd
+          key={-1}
           setAddButtonDisabled={setAddButtonDisabled}
+          refresh={fetchListHDCD}
         />,
       ])
 
@@ -69,22 +71,30 @@ export default function AdminDanhSachHoatDongCongDong() {
   }
 
   return (
-    <>
       <div className='container p-2 justify-center m-auto'>
         <Title title={'Danh sách các hoạt động cộng đồng'} />
-
         <div className='py-2'>
           <div className='text-end py-2'>
+          {!addButtonDisabled && (
             <Button
               type={'add'}
               label={'Thêm'}
-              disabled={addButtonDisabled}
-              onClick={e => handleAddRow()}
+              onClick={handleAddRow}
             />
+            )}
           </div>
           <Table header={dataTable.header}>{renderBodyTable()}</Table>
         </div>
+        <Pagination
+          totalItems={listHDCD.totalItems}
+          totalPages={listHDCD.totalPages}
+          itemPerPage={listHDCD.itemPerPage}
+          currentPage={listHDCD.currentPage}
+          isNextPage={listHDCD.isNextPage}
+          isPreviousPage={listHDCD.isPreviousPage}
+          onPageChange={fetchListHDCD}
+        />
       </div>
-    </>
+  
   )
 }
