@@ -97,7 +97,7 @@ export const routers = [
     path: '/danh-sach-lop',
     label: 'danh sách lớp',
     element: <DanhSachLop />,
-    roles: [ROLES.sinhVien, ROLES.lopTruong, ROLES.giaoVien],
+    roles: [ROLES.sinhVien, ROLES.lopTruong, ROLES.giaoVien, ROLES.truongKhoa],
     onClick: function (navigator) {
       navigator(this.path)
     },

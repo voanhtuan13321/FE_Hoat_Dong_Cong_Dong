@@ -52,6 +52,7 @@ export default function AdminDanhSachHoatDongCongDong() {
     let arrJsx = data.map((dt, index) => {
       return (
         <ItemRowDanhSachHoatDongCongDongAdmin
+          key={index}
           index={index}
           data={dt}
           isEdit={false}
@@ -62,6 +63,7 @@ export default function AdminDanhSachHoatDongCongDong() {
       (arrJsx = [
         ...arrJsx,
         <ItemRowDanhSachHoatDongCongDongAdmin
+          key={-1}
           index={-1}
           data={dataAddRow()}
           isEdit={true}

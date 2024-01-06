@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { jwtDecode } from 'jwt-decode'
 
 // component
 import Title from '../components/Title'
@@ -16,20 +14,20 @@ import Button from '../components/Button'
 
 // function
 import {
-  KEY_ROLE_TOKEN,
   REGEX,
   ROLES,
   callApiGetUserByUserId,
   callApiUpdateUser,
-  checkRoles,
+  checkAndHandleLogined,
+  checkPermissionToAccessThePage,
   convertObjectToFormData,
   convertToObjectFormFormik,
+  getUserId,
+  getUserRole,
   handleError,
-  localStorages,
   optionsGender,
 } from '../utils'
 import ErrorLabel from '../components/ErrorLabel'
-import { setRole } from '../redux/storeSlice'
 
 const initInfoUser = {
   id: '',
@@ -59,32 +57,17 @@ const initInfoUser = {
 export default function ThongTinCaNhan() {
   const [isShowEdit, setShowEdit] = useState(false)
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   useEffect(() => {
-    const token = localStorages.getToken()
-
-    if (token) {
-      const decoded = jwtDecode(token)
-      const role = decoded[KEY_ROLE_TOKEN]
-      dispatch(setRole(role))
-
-      if (checkRoles([ROLES.client], role)) {
-        alert('bạn phải đăng nhập')
-        navigate('/login')
-      }
-      fetchInfoUser()
-    } else {
-      alert('bạn phải đăng nhập')
-      navigate('/login')
-    }
+    checkAndHandleLogined(navigate)
+    const targetRoles = [ROLES.client, ROLES.giaoVien, ROLES.truongKhoa]
+    checkPermissionToAccessThePage(getUserRole(), targetRoles, navigate)
+    fetchInfoUser()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchInfoUser = async () => {
-    const token = localStorages.getToken()
-    const decoded = jwtDecode(token)
-    const userId = decoded['UserId']
+    const userId = getUserId()
     if (userId) {
       try {
         const data = await callApiGetUserByUserId(userId)

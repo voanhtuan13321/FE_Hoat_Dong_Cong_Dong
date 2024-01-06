@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-// import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import Table from '../components/Table'
@@ -7,16 +6,19 @@ import Title from '../components/Title'
 import Button from '../components/Button'
 import InputSelect from '../components/Input/InputSelect'
 import ItemRowDanhSachSinhVienAdmin from '../components/ItemRow/ItemRowDanhSachSinhVienAdmin'
+import DialogCreateUserStudent from '../components/DialogCustom/DialogCreateUserStudent'
+import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 
 import {
+  ROLES,
   callApiGetClassesList,
   callApiGetMajorsList,
   callApiGetStudentsListByClassId,
   checkAndHandleLogined,
+  checkPermissionToAccessThePage,
+  getUserRole,
   handleError,
 } from '../utils'
-import DialogCreateUserStudent from '../components/DialogCustom/DialogCreateUserStudent'
-import DialogChangePassword from '../components/DialogCustom/DialogCreateUserStudent'
 
 const HEADER_TABLE = [
   { className: 'w-5%', title: 'stt' },
@@ -39,15 +41,19 @@ export default function AdminDanhSachSinhVien() {
 
   useEffect(() => {
     checkAndHandleLogined(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.admin], navigate)
     fetchMajors()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     fetchClasses()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMajor])
 
   useEffect(() => {
     fetchStudents()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClasse, selectedMajor])
 
   const fetchMajors = async () => {
@@ -113,15 +119,17 @@ export default function AdminDanhSachSinhVien() {
   }
 
   const renderBodyTable = () => {
-    return students?.map((data, index) => (
-      <ItemRowDanhSachSinhVienAdmin
-        key={index}
-        data={data}
-        index={index}
-        classPresidentId={selectedClasse?.classPresidentId}
-        refresh={fetchClasses}
-      />
-    ))
+    return students?.length === 0
+      ? [<ItemRowNoData key={-1} colSpan={6} />]
+      : students?.map((data, index) => (
+          <ItemRowDanhSachSinhVienAdmin
+            key={index}
+            data={data}
+            index={index}
+            classPresidentId={selectedClasse?.classPresidentId}
+            refresh={fetchClasses}
+          />
+        ))
   }
 
   return (
