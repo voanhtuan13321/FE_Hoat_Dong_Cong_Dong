@@ -45,6 +45,7 @@ export default function AdminDanhSachThongBao() {
         ITEM_PER_PAGE,
         page,
       )
+      // console.log(data)
       setObjectAnnouncements(data)
 
     } catch (error) {

@@ -4,7 +4,7 @@ import { setLoading } from '../redux/storeSlice'
 import { store } from '../redux/store'
 
 const requestHandler = axios.create({
-  baseURL: 'https://fe19-2405-4802-6ea4-6950-9859-5159-9c52-8c2b.ngrok-free.app/',
+  baseURL: 'https://0ec9-2405-4802-6ea4-6950-1c8c-f1f6-e513-c990.ngrok-free.app/',
   timeout: 10000,
   headers: { 'ngrok-skip-browser-warning': 'true' },
 })
