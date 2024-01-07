@@ -1,77 +1,68 @@
 import React, { useState } from 'react'
-import Button from '../Button'
-
 import toast from 'react-hot-toast'
-import { setLoading } from '../../redux/storeSlice'
-import { handleError, requestHandler } from '../../utils'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+
+import Button from '../Button'
 import InputText from '../Input/InputText'
+
+import { callApiCreateCommunityActivityType, handleError } from '../../utils'
 
 const initState = { name: '', minScore: '', maxScore: ''}
 
 export default function ItemRowDanhSachHoatDongCongDongAdmin({
-  index,
   setAddButtonDisabled,
-  refresh
+  refresh,
 }) {
-  const [dataHDCD, setDataHDCD] = useState(initState)
-  const dispatch = useDispatch()
+  const [dataCommunityActivity, setDataCommunityActivity] = useState(initState)
   const navigate = useNavigate()
-  
+
   const onChangeInput = event => {
     const { name, value } = event.target
-    setDataHDCD({
-      ...dataHDCD,
+    setDataCommunityActivity({
+      ...dataCommunityActivity,
       [name]: value,
     })
   }
 
   const handleSaveClick = async () => {
     try {
-      dispatch(setLoading(true))
-      const url = `api/CommunityActivityType/CreateCommunityActivityType`
-      const response = await requestHandler.post(url, dataHDCD)
-      const data = await response.data
-      console.log(data)
+      const data = await callApiCreateCommunityActivityType(dataCommunityActivity)
       toast.success('Thêm mới thành công')
-      setDataHDCD(initState)
+      setDataCommunityActivity(initState)
       setAddButtonDisabled(false)
       refresh()
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
   return (
-    <tr key={index}>
+    <tr>
       <td className='border border-primary p-1 text-center'>0</td>
       <td className='border border-primary p-1 text-center'>
           <InputText
             name='name'
-            value={dataHDCD.name}
+            value={dataCommunityActivity.name}
             onChange={onChangeInput}
           />
       </td>
       <td className='border border-primary p-1 text-center'>
           <InputText
             name='minScore'
-            value={dataHDCD.minScore}
+            value={dataCommunityActivity.minScore}
             onChange={onChangeInput}
           />
       </td>
       <td className='border border-primary p-1 text-center'>
           <InputText
             name='maxScore'
-            value={dataHDCD.maxScore}
+            value={dataCommunityActivity.maxScore}
             onChange={onChangeInput}
           />
       </td>
       <td className='border border-primary p-1 flex gap-3 justify-center'>
-          <Button type='add' label='lưu' onClick={() => handleSaveClick()} />
+          <Button type='add' label='lưu' onClick={handleSaveClick} />
           <Button
             type='outline'
             label='Huỷ'
