@@ -22,6 +22,7 @@ export default function AdminDanhSachKhoa() {
   const [objectMajors, setObjectMajors] = useState({})
   const [isShowAddNew, setShowAddNew] = useState(false)
   const dispatch = useDispatch()
+
   useEffect(() => {
     fetchListKhoa()
   }, [])

@@ -13,53 +13,49 @@ import {
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 
-export default function ItemRowTableDanhSachKhoaAdmin({
-  stt,
-  data,
-  refresh,
-  objectMajors,
-}) {
+export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
   const [isShowEdit, setShowEdit] = useState(false)
   const [listGiaoVien, setListGiaoVien] = useState([{}])
   const [selectedGiaoVien, setSelectedGiaoVien] = useState({})
   const [dataKhoa, setDataKhoa] = useState({ ...data })
   const navigate = useNavigate()
+
   const onClickEdit = () => {
     setShowEdit(!isShowEdit)
-    console.log(dataKhoa)
   }
 
   useEffect(() => {
     fetchListDanhSachGiaoVien()
   }, [])
 
+  useEffect(() => {
+    setDataKhoa(data)
+  }, [data])
+
   const fetchListDanhSachGiaoVien = async () => {
     try {
-      const data = await callApiGetTeachersList()
-      const result = data.map(item => ({
+      const dataList = await callApiGetTeachersList()
+      const result = dataList.map(item => ({
         ...item,
         name: item.firstName + ' ' + item.lastName,
         value: item.id,
       }))
       setListGiaoVien(result)
-      const dataSelectSet = getDanhSachGiaoVien(data.majorHeadId, result)
-      console.log('dataSelect', dataSelectSet)
-      setSelectedGiaoVien(dataSelectSet)
+      const dataSelectSet = getDanhSachGiaoVien(data.majorHeadId, dataList)
+      setSelectedGiaoVien({
+        name: dataSelectSet.firstName + ' ' + dataSelectSet.lastName,
+        value: dataSelectSet.id,
+      })
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
     }
   }
-  const onSelectChange = (name, selectedOption) => {
-    setDataKhoa({ ...dataKhoa, [name]: selectedOption })
-    setSelectedGiaoVien(selectedOption)
-  }
 
   const getDanhSachGiaoVien = (value, tenData) => {
-    return value
-      ? tenData[0]
-      : tenData.find(item => item.value === value) || tenData[0]
+    return !value ? tenData[0] : tenData.find(item => item.id === value)
   }
+
   const onChangeInput = event => {
     const { name, value } = event.target
     setDataKhoa({
@@ -67,13 +63,13 @@ export default function ItemRowTableDanhSachKhoaAdmin({
       [name]: value,
     })
   }
+
   const onClickLuu = async () => {
-    const dataEdit = {}
-    Object.assign(dataEdit, {
+    const dataEdit = {
       id: dataKhoa.id,
-      majorHeadId: dataKhoa.giaoVien.value,
+      majorHeadId: selectedGiaoVien.id,
       name: dataKhoa.name,
-    })
+    }
     try {
       await callApiUpdateMajor(dataEdit)
       toast.success('Cập nhật thành công')
@@ -109,51 +105,56 @@ export default function ItemRowTableDanhSachKhoaAdmin({
     })
   }
 
-  const renderContent = (value, name) =>
-    isShowEdit ? (
-      name === 'name' ? (
-        <InputText name={name} value={value} onChange={onChangeInput} />
-      ) : (
-        <InputSelect
-          name={name}
-          value={selectedGiaoVien}
-          onChange={selected => onSelectChange(name, selected)}
-          options={listGiaoVien}
-        />
-      )
-    ) : (
-      value
-    )
-
   return (
-    <tr className='text-main'>
-      <td className='border border-primary p-1 text-center'>{stt + 1}</td>
-      <td className='border border-primary p-1 text-center'>
-        {renderContent(dataKhoa.name, 'name')}
-      </td>
-      <td className='border border-primary p-1 text-center'>
-        {renderContent(dataKhoa.majorHeadFullName, 'giaoVien')}
-      </td>
-      <td className='border border-primary p-1 flex'>
-        <div className='w-1/2 flex justify-center'>
-          <Button
-            label={isShowEdit ? 'lưu' : 'sửa'}
-            type={isShowEdit ? '' : 'edit'}
-            onClick={isShowEdit ? onClickLuu : onClickEdit}
-          />
-        </div>
-        <div className='w-1/2 flex justify-center'>
-          <Button
-            label={isShowEdit ? 'hủy' : 'Xóa'}
-            type={isShowEdit ? 'outline' : 'delete'}
-            onClick={
-              isShowEdit
-                ? onClickEdit
-                : () => handleDeleteButtonClick(dataKhoa.id)
-            }
-          />
-        </div>
-      </td>
-    </tr>
+    <>
+      {isShowEdit ? (
+        <tr className='text-main'>
+          <td className='border border-primary p-1 text-center'>{stt + 1}</td>
+          <td className='border border-primary p-1 text-center'>
+            <InputText
+              name='name'
+              value={dataKhoa.name}
+              onChange={onChangeInput}
+            />
+          </td>
+          <td className='border border-primary p-1 text-center'>
+            <InputSelect
+              name='giaoVien'
+              value={selectedGiaoVien}
+              onChange={setSelectedGiaoVien}
+              options={listGiaoVien}
+            />
+          </td>
+          <td className='border border-primary p-1 flex'>
+            <div className='w-1/2 flex justify-center'>
+              <Button label='lưu' type='' onClick={onClickLuu} />
+            </div>
+            <div className='w-1/2 flex justify-center'>
+              <Button label='hủy' type='outline' onClick={onClickEdit} />
+            </div>
+          </td>
+        </tr>
+      ) : (
+        <tr className='text-main'>
+          <td className='border border-primary p-1 text-center'>{stt + 1}</td>
+          <td className='border border-primary p-1 text-center'>{data.name}</td>
+          <td className='border border-primary p-1 text-center'>
+            {data.majorHeadFullName}
+          </td>
+          <td className='border border-primary p-1 flex'>
+            <div className='w-1/2 flex justify-center'>
+              <Button label='sửa' type='edit' onClick={onClickEdit} />
+            </div>
+            <div className='w-1/2 flex justify-center'>
+              <Button
+                label='Xóa'
+                type='delete'
+                onClick={() => handleDeleteButtonClick(data.id)}
+              />
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   )
 }

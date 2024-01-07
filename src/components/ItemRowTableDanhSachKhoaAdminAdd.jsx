@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 
 export default function ItemRowTableDanhSachKhoaAdminAdd({
   setShowAddNew,
-  fetchListKhoa,
+  refresh,
 }) {
   const [listGiaoVien, setListGiaoVien] = useState([])
   const [dataKhoa, setDataKhoa] = useState({
@@ -35,6 +35,7 @@ export default function ItemRowTableDanhSachKhoaAdminAdd({
         value: item.id,
       }))
       setListGiaoVien(result)
+      setSelectedGiaoVien(result[0])
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -53,7 +54,7 @@ export default function ItemRowTableDanhSachKhoaAdminAdd({
       .post('/api/Major/CreateMajor', selectedData)
       .then(res => {
         setShowAddNew(false)
-        fetchListKhoa()
+        refresh()
       })
       .catch(er => console.log(er))
   }
