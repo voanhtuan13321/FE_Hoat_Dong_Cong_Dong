@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import InputSelect from './InputSelect'
-import InputNumber from './InputNumber'
-import InputText from './InputText'
-import InputCheckbox from './InputCheckbox'
-import Button from './Button'
-import { ROLES, checkRoles } from '../utils'
+import InputSelect from '../Input/InputSelect'
+import InputNumber from '../Input/InputNumber'
+import InputText from '../Input/InputText'
+import InputCheckbox from '../Input/InputCheckbox'
+import Button from '../Button'
+import { ROLES, checkRoles } from '../../utils'
 
 const loaiHoatDong = [
   { name: 'Hiến máu', value: 1, khungDiem: { min: 200, max: 300 } },

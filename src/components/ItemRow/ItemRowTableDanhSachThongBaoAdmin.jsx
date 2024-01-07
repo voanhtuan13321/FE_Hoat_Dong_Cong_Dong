@@ -1,30 +1,32 @@
 import React, { useState } from 'react'
-import Button from './Button'
-import InputText from './InputText'
 import { format } from 'date-fns'
-import { useDispatch } from 'react-redux'
-import { setLoading } from '../redux/storeSlice'
-import { handleError, requestHandler } from '../utils'
 import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
 
+import Button from '../Button'
+import InputText from '../Input/InputText'
+
+import {
+  caculateIndex,
+  callApiDeleteAnnouncement,
+  callApiUpdateAnnouncement,
+  handleError,
+} from '../../utils'
+
 export default function ItemRowTableDanhSachThongBaoAdmin({
-  stt,
+  index,
   data,
   refresh,
+  objectAnnouncements,
 }) {
   const [dataEdit, setDataEdit] = useState({ ...data })
   const [isShowEdit, setShowEdit] = useState(false)
-  const dispatch = useDispatch()
   const navigate = useNavigate()
-
-
 
   const onClickEdit = () => {
     setShowEdit(true)
   }
-
   const onClickHuy = () => {
     setShowEdit(false)
     setDataEdit({ ...data })
@@ -32,18 +34,13 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
 
   const onClickLuu = async () => {
     try {
-      dispatch(setLoading(true))
-      const url = `api/Announcement/UpdateAnnouncement`
-      const repsonse = await requestHandler.put(url, dataEdit)
-      const data = await repsonse.data
+      const data = await callApiUpdateAnnouncement(dataEdit)
       toast.success('Cập nhật thành công')
       setShowEdit(false)
       refresh()
     } catch (e) {
       console.error(e)
       handleError(e, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
@@ -59,18 +56,12 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
 
     if (isDenied) {
       try {
-        dispatch(setLoading(true))
-        const url = `api/Announcement/DeleteAnnouncement`
-        const config = { params: { announcementId: id } }
-        const repsonse = await requestHandler.delete(url, config)
-        const data = await repsonse.data
+        const data = await callApiDeleteAnnouncement(id)
         toast.success('Xoá thành công')
         setShowEdit(false)
         refresh()
       } catch (e) {
         alert(e.message)
-      } finally {
-        dispatch(setLoading(false))
       }
     }
   }
@@ -85,7 +76,7 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
       {isShowEdit ? (
         <tr>
           <td className='border border-primary p-1 text-center text-main'>
-            {stt + 1}
+            {caculateIndex(objectAnnouncements, index)}
           </td>
           <td className='border border-primary p-1 text-center text-main'>
             <InputText
@@ -114,7 +105,7 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
       ) : (
         <tr>
           <td className='border border-primary p-1 text-center text-main'>
-            {stt + 1}
+            {caculateIndex(objectAnnouncements, index)}
           </td>
           <td className='border border-primary p-1 text-main'>{data.title}</td>
           <td className='border border-primary p-1 text-main'>
@@ -125,7 +116,11 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
           </td>
           <td className='border border-primary p-1 text-main'>
             <div className='flex justify-center gap-3'>
-              <Button type='edit' label='sửa' onClick={onClickEdit} />
+              <Button
+                type='edit'
+                label='sửa'
+                onClick={() => setShowEdit(true)}
+              />
               <Button
                 type='delete'
                 label='xoá'

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Button from './Button'
-import InputSelect from './InputSelect'
+import Button from '../Button'
+import InputSelect from '../Input/InputSelect'
 
 const initState = {
   khoa: [

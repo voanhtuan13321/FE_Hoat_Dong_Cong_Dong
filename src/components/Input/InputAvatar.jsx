@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Button from './Button'
+import Button from '../Button'
 
 /**
  * const [file, setFile] = useState('https://picsum.photos/150/500')

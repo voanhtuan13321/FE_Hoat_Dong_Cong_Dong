@@ -35,7 +35,7 @@ const Pagination = ({
         pageClassName='border border-solid w-10 h-10 rounded-md hover:text-white hover:bg-primary cursor-pointer flex'
         pageLinkClassName='py-2 px-4'
         marginPagesDisplayed={2}
-        forcePage={currentPage - 1 || -1}
+        forcePage={currentPage - 1 || 0}
         previousLabel={
           isPreviousPage ? (
             <span className='w-10 h-10 flex items-center justify-center bg-white  hover:bg-primary hover:text-white text-main rounded-md border border-solid'>

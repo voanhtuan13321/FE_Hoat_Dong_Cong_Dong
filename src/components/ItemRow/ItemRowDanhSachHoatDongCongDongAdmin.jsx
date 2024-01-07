@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
-import Button from './Button'
-import InputText from './InputText'
 import Swal from 'sweetalert2'
 import toast from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
-import { setLoading } from '../redux/storeSlice'
 import { useNavigate } from 'react-router-dom'
-import { handleError, requestHandler } from '../utils'
+import InputText from '../Input/InputText'
+import Button from '../Button'
+import { handleError, requestHandler } from '../../utils'
+import { setLoading } from '../../redux/storeSlice'
+
+
 
 export default function ItemRowDanhSachHoatDongCongDongAdmin({
   index,
@@ -124,7 +126,6 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
         )}
         {isEditing ? (
           <Button
-            type='outline'
             label='Huỷ'
             onClick={e => handleCancelButton()}
           />

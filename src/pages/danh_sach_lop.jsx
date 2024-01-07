@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Title from '../components/Title'
-import InputSelect from '../components/InputSelect'
+import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
-import ItemRowTableDanhSachLop from '../components/ItemRowTableDanhSachLop'
+import ItemRowTableDanhSachLop from '../components/ItemRow/ItemRowTableDanhSachLop'
 import Table from '../components/Table'
 
 const apiClassList = [

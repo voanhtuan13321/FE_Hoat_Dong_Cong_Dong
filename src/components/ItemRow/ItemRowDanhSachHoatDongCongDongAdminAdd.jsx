@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import Button from './Button'
-import InputText from './InputText'
+import Button from '../Button'
+
 import toast from 'react-hot-toast'
-import { setLoading } from '../redux/storeSlice'
-import { handleError, requestHandler } from '../utils'
+import { setLoading } from '../../redux/storeSlice'
+import { handleError, requestHandler } from '../../utils'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import InputText from '../Input/InputText'
 
 const initState = { name: '', minScore: '', maxScore: ''}
 

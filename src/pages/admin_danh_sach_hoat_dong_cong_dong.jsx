@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react'
 import Title from '../components/Title'
 import Table from '../components/Table'
 import Button from '../components/Button'
-import ItemRowDanhSachHoatDongCongDongAdmin from '../components/ItemRowDanhSachHoatDongCongDongAdmin'
-import ItemRowDanhSachHoatDongCongDongAdminAdd from '../components/ItemRowDanhSachHoatDongCongDongAdminAdd'
+import ItemRowDanhSachHoatDongCongDongAdmin from '../components/ItemRow/ItemRowDanhSachHoatDongCongDongAdmin'
+import ItemRowDanhSachHoatDongCongDongAdminAdd from '../components/ItemRow/ItemRowDanhSachHoatDongCongDongAdminAdd'
 import { requestHandler } from '../utils'
 import { useDispatch } from 'react-redux'
 import { setLoading } from '../redux/storeSlice'
 import Pagination from '../components/Pagination'
+import { checkAndHandleLogined } from '../utils'
+import { useNavigate } from 'react-router-dom'
+
 
 const dataTable = {
   header: [
@@ -22,9 +25,13 @@ const dataTable = {
 export default function AdminDanhSachHoatDongCongDong() {
   const [listHDCD, setListHDCD] = useState([])
   const [addButtonDisabled, setAddButtonDisabled] = useState(false)
+
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+
 
   useEffect(() => {
+    checkAndHandleLogined(navigate)
     fetchListHDCD()
   }, [])
 
