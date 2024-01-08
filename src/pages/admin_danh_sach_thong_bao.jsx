@@ -40,12 +40,14 @@ export default function AdminDanhSachThongBao() {
 
   const fetchAnnouncements = async (page = 0) => {
     try {
+
       const data = await callApiGetAnnouncementsPaginationList(
         ITEM_PER_PAGE,
         page,
       )
       // console.log(data)
       setObjectAnnouncements(data)
+
     } catch (error) {
       alert(error.message)
     }

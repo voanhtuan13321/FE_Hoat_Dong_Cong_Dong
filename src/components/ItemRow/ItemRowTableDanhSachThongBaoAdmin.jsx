@@ -24,6 +24,9 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
   const [isShowEdit, setShowEdit] = useState(false)
   const navigate = useNavigate()
 
+  const onClickEdit = () => {
+    setShowEdit(true)
+  }
   const onClickHuy = () => {
     setShowEdit(false)
     setDataEdit({ ...data })

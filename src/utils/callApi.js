@@ -135,3 +135,33 @@ export const callApiDeleteAnnouncement = async announcementId => {
   const repsonse = await requestHandler.delete(url, config)
   return await repsonse.data
 }
+// CommunityActivityType
+export const callApiGetCommunityActivityTypesPaginationList = async (
+  ItemPerPage,
+  Page,
+) => {
+  const url = `api/CommunityActivityType/GetCommunityActivityTypesPaginationList`
+  const config = { params: { ItemPerPage, Page } }
+  const response = await requestHandler.get(url, config)
+  return await response.data
+}
+
+export const callApiCreateCommunityActivityType = async data => {
+  const url = `api/CommunityActivityType/CreateCommunityActivityType`
+  const response = await requestHandler.post(url, data)
+  return await response.data
+}
+
+export const callApiUpdateCommunityActivityType = async data => {
+  const url = `api/CommunityActivityType/UpdateAnnouncement`
+  const repsonse = await requestHandler.put(url, data)
+  return await repsonse.data
+}
+
+export const callApiDeleteCommunityActivityType = async communityActivityTypeId => {
+  const url = `api/CommunityActivityType/DeleteCommunityActivityType`
+  const config = { params: { communityActivityTypeId } }
+  const repsonse = await requestHandler.delete(url, config)
+  return await repsonse.data
+}
+
