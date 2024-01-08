@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Swal from 'sweetalert2'
 import Button from '../Button'
 import InputCheckbox from '../Input/InputCheckbox'
+import DialogCreateUserTeacher from '../DialogCustom/DialogCreateUserTeacher'
 
 export default function ItemRowTableDanhSachGiaoVienAdmin({ stt, data }) {
+
   const onClickDoiMatKhau = () => {
     Swal.fire({
       title: 'Nhập mật khẩu mới',
@@ -31,11 +33,11 @@ export default function ItemRowTableDanhSachGiaoVienAdmin({ stt, data }) {
 
   return (
     <tr>
-      <td className='border border-primary p-1 text-center'>{stt}</td>
+      <td className='border border-primary p-1 text-center'>{stt +1 }</td>
       <td className='border border-primary p-1 text-center'>
-        {data.maGiaoVien}
+        {data.teacherId}
       </td>
-      <td className='border border-primary p-1'>{data.hoVaTen}</td>
+      <td className='border border-primary p-1'>{data.firstName + " " + data.lastName}</td>
       <td className='border border-primary p-1 text-center'>
         <Button type='edit' label='sửa' onClick={onClickDoiMatKhau} />
       </td>
