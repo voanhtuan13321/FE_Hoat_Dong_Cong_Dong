@@ -23,8 +23,6 @@ export default function InputAvatar({ isEdit, name, value, onChange }) {
     value && typeof value === 'string' && setSrcImg(value)
   }, [value])
 
-  const onClickThem = () => inputFileRef.current.click()
-
   const onChangeFile = event => {
     const file = event.target.files[0]
     onChange(file)
@@ -38,7 +36,11 @@ export default function InputAvatar({ isEdit, name, value, onChange }) {
       </div>
       {isEdit && (
         <div className='text-center mt-2'>
-          <Button type='outline' label='thêm ảnh' onClick={onClickThem} />
+          <Button
+            type='outline'
+            label='thêm ảnh'
+            onClick={() => inputFileRef.current.click()}
+          />
         </div>
       )}
 

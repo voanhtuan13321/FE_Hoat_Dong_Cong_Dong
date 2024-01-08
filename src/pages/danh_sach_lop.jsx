@@ -1,127 +1,194 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import Title from '../components/Title'
-import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
-import ItemRowTableDanhSachLop from '../components/ItemRow/ItemRowTableDanhSachLop'
+import InputSelect from '../components/Input/InputSelect'
 import Table from '../components/Table'
+import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
+import ItemRowTableDanhSachLop from '../components/ItemRow/ItemRowTableDanhSachLop'
 
-const apiClassList = [
-  { name: 'Chọn Lớp', value: 0 },
-  { name: '18CA1', value: 1 },
-  { name: '18CA2', value: 2 },
-  { name: '18CA3', value: 3 },
+import {
+  ROLES,
+  callApiGetClassesByTeacherId,
+  callApiGetStudentsListByClassId,
+  callApiGetUserByUserId,
+  checkAndHandleLogined,
+  checkPermissionToAccessThePage,
+  checkRoles,
+  generateAcademyYearOptions,
+  getUserId,
+  getUserRole,
+  handleError,
+} from '../utils'
+
+const HEADER_TEACHER = [
+  { className: 'w-5%', title: 'stt' },
+  { className: 'w-10%', title: 'Số thẻ sinh viên' },
+  { className: 'w-10%', title: 'Tên sinh viên' },
+  { className: 'w-10%', title: 'Số điện thoại' },
+  { className: 'w-10%', title: 'Email' },
+  { className: 'w-10%', title: 'Facebook' },
+  { className: 'w-20%', title: 'Địa chỉ' },
+  { className: 'w-5%', title: 'Chọn lớp trưởng' },
+  { className: 'w-5%', title: 'Xem chi tiết' },
 ]
-
-const apiNamHocList = [
-  { name: 'Chọn năm', value: 0 },
-  { name: '2021', value: 1 },
-  { name: '2022', value: 2 },
-  { name: '2023', value: 3 },
+const HEADER_STUDENT = [
+  { className: 'w-5%', title: 'stt' },
+  { className: 'w-10%', title: 'Số thẻ sinh viên' },
+  { className: 'w-10%', title: 'Tên sinh viên' },
+  { className: 'w-10%', title: 'Số điện thoại' },
+  { className: 'w-10%', title: 'Email' },
+  { className: 'w-10%', title: 'Facebook' },
+  { className: 'w-20%', title: 'Địa chỉ' },
+  { className: 'w-5%', title: 'Xem chi tiết' },
 ]
-
-const dataTable = {
-  header: [
-    { className: 'w-5%', title: 'stt' },
-    { className: 'w-10%', title: 'Số thẻ sinh viên' },
-    { className: 'w-10%', title: 'Tên sinh viên' },
-    { className: 'w-10%', title: 'Số điện thoại' },
-    { className: 'w-10%', title: 'Email' },
-    { className: 'w-10%', title: 'Facebook' },
-    { className: 'w-20%', title: 'Địa chỉ' },
-    { className: 'w-5%', title: 'Chọn lớp trưởng' },
-    { className: 'w-20%', title: 'Xem chi tiết' },
-  ],
-  value: [
-    {
-      soTheSV: '1203908',
-      hoTen: 'Nguyễn Văn Né',
-      sdt: '0905123123',
-      email: 'NeVan@Gmail.com',
-      fb: 'http://www.fb.com',
-      diaChi:
-        'Số 34, Đường Nguyễn Thị Cận, Phường Hoà Minh, Quân Liên chiểu, TP Đà Nẵng',
-      chonLopTruong: false,
-    },
-    {
-      soTheSV: '1231231',
-      hoTen: 'Nguyễn Văn Né',
-      sdt: '0905123123',
-      email: 'NeVan@Gmail.com',
-      fb: 'http://www.fb.com',
-      diaChi:
-        'Số 34, Đường Nguyễn Thị Cận, Phường Hoà Minh, Quân Liên chiểu, TP Đà Nẵng',
-      chonLopTruong: true,
-    },
-  ],
-}
 
 export default function DanhSachLop() {
-  const [listHocSinh, setListHocSinh] = useState([])
-  const [danhSachLop, setDanhSachLop] = useState([])
-  const [danhSachNam, setDanhSachNam] = useState([])
-  const [selectClass, setSelectClass] = useState(apiClassList[0])
-  const [selectYear, setSelectYear] = useState(apiNamHocList[0])
+  const academyYearOptions = generateAcademyYearOptions()
+
+  const [students, setStudents] = useState([])
+  const [classesOptions, setClassesOptions] = useState([])
+  const [selectedClasses, setSelectedClasses] = useState({})
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
+    academyYearOptions[0],
+  )
+  const navigate = useNavigate()
 
   useEffect(() => {
-    fetchListHocSinh()
-    fetchListLop()
-    fetchListNamHoc()
+    checkAndHandleLogined(navigate)
+    checkPermissionToAccessThePage(
+      getUserRole(),
+      [ROLES.sinhVien, ROLES.giaoVien],
+      navigate,
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchListHocSinh = () => {
-    setListHocSinh(dataTable.value)
+  useEffect(() => {
+    fetchClasses()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAcademyYear])
+
+  useEffect(() => {
+    fetchStudents()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAcademyYear, selectedClasses])
+
+  const fetchClasses = async () => {
+    const roles = getUserRole()
+    if (!checkRoles(roles, [ROLES.giaoVien])) {
+      return
+    }
+
+    const userId = getUserId()
+    try {
+      const data = await callApiGetClassesByTeacherId(userId)
+      const result = data
+        .map(item => ({
+          ...item,
+          value: item.id,
+        }))
+        .filter(item => item.academicYear === selectedAcademyYear.value)
+      setClassesOptions(result)
+      setSelectedClasses(result[0])
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
   }
 
-  const fetchListLop = () => {
-    setDanhSachLop(apiClassList)
-  }
+  const fetchStudents = async () => {
+    const roles = getUserRole()
+    const userId = getUserId()
+    if (!userId) return
 
-  const fetchListNamHoc = () => {
-    setDanhSachNam(apiNamHocList)
+    const user = await callApiGetUserByUserId(userId)
+
+    const classId = checkRoles(roles, [ROLES.sinhVien])
+      ? user.classId
+      : selectedClasses?.value ?? ''
+
+    if (classId) {
+      try {
+        const data = await callApiGetStudentsListByClassId(classId)
+        console.log('student', data)
+        setStudents(data)
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
+    } else {
+      setStudents([])
+    }
   }
 
   const handleXacNhan = () => {
-    console.log(listHocSinh)
+    console.log(students)
   }
 
   const renderBodyTable = () => {
-    return listHocSinh.map((dt, index) => (
-      <ItemRowTableDanhSachLop key={index} dt={dt} index={index} />
-    ))
+    return students.length === 0
+      ? [<ItemRowNoData key={-1} colSpan={9} />]
+      : students.map((dt, index) => (
+          <ItemRowTableDanhSachLop
+            key={index}
+            dt={dt}
+            index={index}
+            classPresidentId={selectedClasses.classPresidentId}
+            refresh={fetchClasses}
+          />
+        ))
   }
 
   return (
     <div className='container mx-auto'>
       <Title title='danh sách lớp' />
       <div className='mt-3'>
-        <div className='flex items-center justify-between gap-2 '>
-          <div className='flex items-center gap-2'>
-            <span className='font-bold text-primary text-main'>
-              Thuộc khoa:
-            </span>
-            <div className='w-48'>
-              <InputSelect
-                options={danhSachLop}
-                value={selectClass}
-                onChange={setSelectClass}
-              />
+        {checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa]) && (
+          <div className='flex items-center justify-between gap-2 '>
+            <div className='flex items-center gap-2'>
+              <span className='font-bold text-primary text-main'>Khoá:</span>
+              <div className='w-48'>
+                <InputSelect
+                  options={academyYearOptions}
+                  value={selectedAcademyYear}
+                  onChange={setSelectedAcademyYear}
+                />
+              </div>
+              <span className='font-bold text-primary text-main'>Lớp:</span>
+              <div className='w-48 flex items-center'>
+                {classesOptions.length === 0 ? (
+                  <span className='text-main text-red-500'>
+                    Khoá này không có lớp
+                  </span>
+                ) : (
+                  <div className='w-[300px]'>
+                    <InputSelect
+                      options={classesOptions}
+                      value={selectedClasses}
+                      onChange={setSelectedClasses}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-            <span className='font-bold text-primary text-main'>Khoá:</span>
-            <div className='w-48'>
-              <InputSelect
-                options={danhSachNam}
-                value={selectYear}
-                onChange={setSelectYear}
-              />
+            <div className=''>
+              <Button label='Xác nhận' type='primary' onClick={handleXacNhan} />
             </div>
           </div>
-          <div className=''>
-            <Button label='Xác nhận' type='primary' onClick={handleXacNhan} />
-          </div>
-        </div>
+        )}
       </div>
       <div className='my-2'>
-        <Table header={dataTable.header}>{renderBodyTable()}</Table>
+        <Table
+          header={
+            checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa])
+              ? HEADER_TEACHER
+              : HEADER_STUDENT
+          }
+        >
+          {renderBodyTable()}
+        </Table>
       </div>
     </div>
   )

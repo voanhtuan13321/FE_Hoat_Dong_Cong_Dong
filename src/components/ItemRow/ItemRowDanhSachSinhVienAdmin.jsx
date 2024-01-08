@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import Button from '../Button'
 import InputCheckbox from '../Input/InputCheckbox'
-import DialogChangePassword from '../DialogCustom/DialogCreateUserStudent'
+import DialogChangePassword from '../DialogCustom/DialogChangePassword'
 
 import {
   STATUS_USER,
@@ -41,10 +41,7 @@ export default function ItemRowDanhSachSinhVienAdmin({
 
   const changeClassPresident = async () => {
     try {
-      const dataRequest = {
-        classId: user.classId,
-        classPresidentId: user.id,
-      }
+      const dataRequest = { classId: user.classId, classPresidentId: user.id }
       const data = await callApiUpdateClassPresident(dataRequest)
       // console.log(data)
       refresh()

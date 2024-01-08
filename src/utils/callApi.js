@@ -20,7 +20,7 @@ export const callApiGetClassesPaginationList = async (
   AcademyYear,
   MajorId,
 ) => {
-  const url = `api/Class/GetClassesPaginationList`
+  const url = `api/Class/GetClassesPaginationList?time=${new Date().getTime()}`
   const config = { params: { ItemPerPage, Page, AcademyYear, MajorId } }
   const response = await requestHandler.get(url, config)
   return await response.data
@@ -29,6 +29,13 @@ export const callApiGetClassesPaginationList = async (
 export const callApiGetClassesList = async () => {
   const url = `api/Class/GetClassesList?time=${new Date().getTime()}`
   const response = await requestHandler.get(url)
+  return await response.data
+}
+
+export const callApiGetClassesByTeacherId = async teacherId => {
+  const url = `api/Class/GetClassesByTeacherId?time=${new Date().getTime()}`
+  const config = { params: { teacherId } }
+  const response = await requestHandler.get(url, config)
   return await response.data
 }
 
@@ -66,14 +73,14 @@ export const callApiGetMajorsList = async () => {
 
 // user
 export const callApiGetUserByUserId = async userId => {
-  const url = 'api/User/GetUserByUserId'
+  const url = `api/User/GetUserByUserId?time=${new Date().getTime()}`
   const config = { params: { userId } }
   const response = await requestHandler.get(url, config)
   return await response.data
 }
 
 export const callApiGetStudentsListByClassId = async classId => {
-  const url = 'api/User/GetStudentsListByClassId'
+  const url = `api/User/GetStudentsListByClassId?time=${new Date().getTime()}`
   const config = { params: { classId } }
   const response = await requestHandler.get(url, config)
   return await response.data
@@ -101,7 +108,7 @@ export const callApiUpdateUserStatus = async data => {
 }
 
 export const callApiGetTeachersList = async () => {
-  const url = `api/User/GetTeachersList`
+  const url = `api/User/GetTeachersList?time=${new Date().getTime()}`
   const response = await requestHandler.get(url)
   return await response.data
 }
@@ -111,7 +118,7 @@ export const callApiGetAnnouncementsPaginationList = async (
   ItemPerPage,
   Page,
 ) => {
-  const url = `api/Announcement/GetAnnouncementsPaginationList`
+  const url = `api/Announcement/GetAnnouncementsPaginationList?time=${new Date().getTime()}`
   const config = { params: { ItemPerPage, Page } }
   const response = await requestHandler.get(url, config)
   return await response.data

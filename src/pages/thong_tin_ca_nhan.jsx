@@ -28,6 +28,7 @@ import {
   optionsGender,
 } from '../utils'
 import ErrorLabel from '../components/ErrorLabel'
+import toast from 'react-hot-toast'
 
 const initInfoUser = {
   id: '',
@@ -71,7 +72,6 @@ export default function ThongTinCaNhan() {
     if (userId) {
       try {
         const data = await callApiGetUserByUserId(userId)
-
         const newValueFormik = await convertToObjectFormFormik(data)
         // console.log('newValueFormik', newValueFormik)
         formik.setValues(newValueFormik)
@@ -90,6 +90,7 @@ export default function ThongTinCaNhan() {
       const data = await callApiUpdateUser(formData)
       // console.log(data)
       const newValueFormik = await convertToObjectFormFormik(data)
+      toast.success('Cập nhật thành công')
       formik.setValues(newValueFormik)
       setShowEdit(false)
     } catch (error) {
@@ -187,13 +188,6 @@ export default function ThongTinCaNhan() {
           />
         </div>
         <div>
-          <InputText
-            label='Nơi sinh'
-            {...generatedProperties('placeOfBirth')}
-          />
-          <ErrorLabel formik={formik} keyFormik='placeOfBirth' />
-        </div>
-        <div>
           <InputSelect
             label='Giới tính'
             options={optionsGender}
@@ -203,6 +197,13 @@ export default function ThongTinCaNhan() {
             onChange={({ value }) => formik.setFieldValue('gender', value)}
             disabled={true}
           />
+        </div>
+        <div>
+          <InputText
+            label='Nơi sinh'
+            {...generatedProperties('placeOfBirth')}
+          />
+          <ErrorLabel formik={formik} keyFormik='placeOfBirth' />
         </div>
         <div>
           <InputText label='Email' {...generatedProperties('email')} />

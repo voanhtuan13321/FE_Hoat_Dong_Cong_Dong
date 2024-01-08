@@ -75,7 +75,6 @@ export default function AdminDanhSachLop() {
       const data = await callApiGetMajorsList()
       const result = data.map(item => ({
         ...item,
-        name: item.name,
         value: item.id,
       }))
       // console.log(data)

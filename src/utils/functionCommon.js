@@ -3,6 +3,7 @@ import { localStorages } from './localStorage'
 import { requestHandler } from './requestHandler'
 import { jwtDecode } from 'jwt-decode'
 import { KEY_ROLE_TOKEN, ROLES } from './properties'
+import Swal from 'sweetalert2'
 
 const condition = {
   DEFAULT: 1,
@@ -22,10 +23,14 @@ export const getHighestRole = (roles = []) =>
 const convertRolesTextToRolesNumber = roles =>
   roles.map(role => condition[role])
 
-export const checkRoles = (roles = [], targetRole) => roles.includes(targetRole)
+export const checkRoles = (roles = [], targetRoles = []) =>
+  roles.some(role => targetRoles.includes(condition[role]))
+
+export const checkRoles2 = (roles = [], targetRoles = []) =>
+  roles.some(role => targetRoles.includes(role))
 
 export const checkPermissionToAccessThePageAdmin = (roles = [], navigate) => {
-  if (!checkRoles(convertRolesTextToRolesNumber(roles), ROLES.admin)) {
+  if (!checkRoles(convertRolesTextToRolesNumber(roles), [ROLES.admin])) {
     alert('Bạn không phải là admin nên không được truy cập trang này')
     navigate('/')
   }
@@ -36,14 +41,10 @@ export const checkPermissionToAccessThePage = (
   targetRoles = [],
   navigate,
 ) => {
-  const rolesNumber = roles.map(role => condition[role])
-  for (const role of rolesNumber) {
-    if (targetRoles.includes(role)) {
-      return
-    }
+  if (!checkRoles(roles, targetRoles)) {
+    Swal.fire('Bạn không có quyền truy cập trang này', '', 'error')
+    navigate('/')
   }
-  alert('Bạn không có quyền truy cập trang')
-  navigate('/')
 }
 
 export const checkAndHandleLogined = navigate => {

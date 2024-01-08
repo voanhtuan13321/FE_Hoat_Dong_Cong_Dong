@@ -13,10 +13,7 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
 
   const onChangeInput = event => {
     const { name, value } = event.target
-    setDataHDCD({
-      ...dataHDCD,
-      [name]: value,
-    })
+    setDataHDCD({ ...dataHDCD, [name]: value })
   }
 
   const handleSaveClick = () => {

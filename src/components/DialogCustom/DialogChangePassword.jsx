@@ -1,70 +1,46 @@
 import React from 'react'
-import DialogCustom from '.'
-import InputText from '../Input/InputText'
-import ErrorLabel from '../ErrorLabel'
-import InputSelect from '../Input/InputSelect'
-import InputDate from '../Input/InputDate'
-import Button from '../Button'
-import {
-  REGEX,
-  callApiCreateUser,
-  handleError,
-  optionsGender,
-} from '../../utils'
 import { useFormik } from 'formik'
 import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import toast from 'react-hot-toast'
 
-const initialFormCreateUser = {
-  classId: '',
-  firstName: '',
-  lastName: '',
-  gender: true,
-  dateOfBirth: new Date(),
-  identificationCardId: '',
-  isStudent: true,
-}
+import DialogCustom from '.'
+import ErrorLabel from '../ErrorLabel'
+import InputPassword from '../Input/InputPassword'
+import Button from '../Button'
 
-export default function DialogCreateUserStudent({
+import { callApiChangePassword, handleError } from '../../utils'
+
+const initialValues = { password: '', passwordConfirm: '' }
+
+export default function DialogChangePassword({
+  userId,
   isShowDialog,
   setShowDialog,
-  classId,
-  refresh,
 }) {
   const navigate = useNavigate()
 
+  const validationSchema = Yup.object({
+    password: Yup.string().required('Bắt buộc nhập'),
+    passwordConfirm: Yup.string()
+      .oneOf([Yup.ref('password'), null], 'Nhập lại mật khẩu không khớp')
+      .required('Bắt buộc nhập'),
+  })
+
   const onSubmit = async values => {
     try {
-      const dataRequest = { ...values, classId }
-      const data = await callApiCreateUser(dataRequest)
-      // console.log(data)
-      toast.success('Thêm mới thành công')
+      const dataRequest = { ...values, userId }
+      const data = await callApiChangePassword(dataRequest)
+      // console.log(dataRequest)
+      toast.success('Cập nhật thành công')
       setShowDialog(false)
-      refresh()
     } catch (error) {
       console.error(error)
-      formik.setFieldError('identificationCardId', 'CCCD bị trùng')
       handleError(error, navigate)
     }
   }
 
-  const formik = useFormik({
-    initialValues: initialFormCreateUser,
-    validationSchema: Yup.object({
-      firstName: Yup.string()
-        .required('Bắt buộc nhập')
-        .matches(REGEX.textOnly, 'Không được chứa số và ký tự đặc biệt'),
-      lastName: Yup.string()
-        .required('Bắt buộc nhập')
-        .matches(REGEX.textOnly, 'Không được chứa số và ký tự đặc biệt'),
-      dateOfBirth: Yup.date()
-        .required('Bắt buộc nhập')
-        .max(new Date(), 'Ngày không được lớn hơn ngày hiện tại'),
-      identificationCardId: Yup.string().required('Bắt buộc nhập'),
-    }),
-    onSubmit: onSubmit,
-  })
+  const formik = useFormik({ initialValues, validationSchema, onSubmit })
 
   const generatedProperties = name => ({
     name: name,
@@ -74,47 +50,25 @@ export default function DialogCreateUserStudent({
 
   const onClickCancelCreateUser = () => {
     setShowDialog(false)
-    formik.setValues(initialFormCreateUser)
+    formik.setValues(initialValues)
   }
 
   return (
-    <DialogCustom isOpen={isShowDialog} title='thêm mới sinh viên'>
-      <form className='grid grid-cols-2 gap-2' onSubmit={formik.handleSubmit}>
+    <DialogCustom isOpen={isShowDialog} title='cập nhật mật khẩu'>
+      <form onSubmit={formik.handleSubmit}>
         <div>
-          <InputText label='Họ' {...generatedProperties('firstName')} />
-          <ErrorLabel formik={formik} keyFormik='firstName' />
-        </div>
-        <div>
-          <InputText label='Tên' {...generatedProperties('lastName')} />
-          <ErrorLabel formik={formik} keyFormik='lastName' />
-        </div>
-        <div>
-          <InputSelect
-            label='Giới tính'
-            options={optionsGender}
-            value={optionsGender.find(
-              item => item.value === formik.values.gender,
-            )}
-            onChange={({ value }) => formik.setFieldValue('gender', value)}
+          <InputPassword
+            label='Mật khẩu mới'
+            {...generatedProperties('password')}
           />
+          <ErrorLabel formik={formik} keyFormik='password' />
         </div>
         <div>
-          <InputDate
-            label='Ngày sinh'
-            name='dateOfBirth'
-            onChange={event =>
-              formik.setFieldValue('dateOfBirth', new Date(event.target.value))
-            }
-            value={formik.values.dateOfBirth}
+          <InputPassword
+            label='Nhập lại mật khẩu'
+            {...generatedProperties('passwordConfirm')}
           />
-          <ErrorLabel formik={formik} keyFormik='dateOfBirth' />
-        </div>
-        <div className='col-span-2'>
-          <InputText
-            label='CCCD'
-            {...generatedProperties('identificationCardId')}
-          />
-          <ErrorLabel formik={formik} keyFormik='identificationCardId' />
+          <ErrorLabel formik={formik} keyFormik='passwordConfirm' />
         </div>
         <div className='col-span-2 mt-4 flex justify-end gap-2'>
           <Button
@@ -122,7 +76,7 @@ export default function DialogCreateUserStudent({
             type='outline'
             onClick={onClickCancelCreateUser}
           />
-          <Button label='Tạo mới' submit={true} />
+          <Button label='Cập nhật' submit={true} />
         </div>
       </form>
     </DialogCustom>

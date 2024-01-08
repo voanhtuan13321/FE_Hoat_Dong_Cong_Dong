@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+
 import InputSelect from '../Input/InputSelect'
 import InputNumber from '../Input/InputNumber'
 import InputText from '../Input/InputText'
 import InputCheckbox from '../Input/InputCheckbox'
 import Button from '../Button'
-import { ROLES, checkRoles } from '../../utils'
+
+import { ROLES, checkRoles2 } from '../../utils'
 
 const loaiHoatDong = [
   { name: 'Hiến máu', value: 1, khungDiem: { min: 200, max: 300 } },
@@ -15,7 +17,6 @@ const loaiHoatDong = [
 export default function ItemRowTableTuDanhGia({
   index,
   data,
-  onChangeStateItemRowTable,
   onClickDeleteItem,
 }) {
   const role = useSelector(state => state.role)
@@ -27,6 +28,8 @@ export default function ItemRowTableTuDanhGia({
     diemBanCanSuDanhGia: data.diemBanCanSuDanhGia,
     linkMinhChung: data.linkMinhChung,
   })
+
+  const [isEdit, setShowEdit] = useState(false)
 
   useEffect(() => {
     fetchListLoaiHoatDong()
@@ -59,61 +62,93 @@ export default function ItemRowTableTuDanhGia({
     setRowData({ ...rowData, [name]: newValue || value })
   }
 
-  useEffect(() => {
-    onChangeStateItemRowTable(index, rowData)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowData])
+  const onClickCancel = () => {
+    setShowEdit(false)
+  }
 
   return (
-    <tr className='text-main'>
-      <td className='border border-primary p-1 text-center'>{index + 1}</td>
-      <td className='border border-primary p-1'>
-        <InputSelect
-          options={listLoaiHoatDong}
-          value={selected}
-          onChange={onSelectOption}
-        />
-      </td>
-      <td className='border border-primary p-1 text-center'>
-        {`${selected.khungDiem?.min} - ${selected.khungDiem?.max}`}
-      </td>
-      <td className='border border-primary p-1'>
-        <InputNumber
-          name='diemTuDanhGia'
-          value={data.diemTuDanhGia}
-          onChange={onChangeValue}
-        />
-      </td>
-      <td className='border border-primary p-1'>
-        {/* {data.diemBanCanSuDanhGia} */}
-        <InputNumber
-          name='diemBanCanSuDanhGia'
-          value={data.diemBanCanSuDanhGia}
-          onChange={onChangeValue}
-        />
-      </td>
-      <td className='border border-primary p-1'>
-        {/* {data.linkMinhChung} */}
-        <InputText
-          name='linkMinhChung'
-          value={data.linkMinhChung}
-          onChange={onChangeValue}
-        />
-      </td>
-      {!checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role) && (
-        <td className='border border-primary p-1 text-center'>
-          <Button
-            type='delete'
-            label='xoá'
-            onClick={() => onClickDeleteItem(index)}
-          />
-        </td>
+    <>
+      {isEdit ? (
+        <tr className='text-main'>
+          <td className='border border-primary p-1 text-center'>{index + 1}</td>
+          <td className='border border-primary p-1'>
+            <InputSelect
+              options={listLoaiHoatDong}
+              value={selected}
+              onChange={onSelectOption}
+            />
+          </td>
+          <td className='border border-primary p-1 text-center'>
+            {`${selected.khungDiem?.min} - ${selected.khungDiem?.max}`}
+          </td>
+          <td className='border border-primary p-1'>
+            <InputNumber
+              name='diemTuDanhGia'
+              value={data.diemTuDanhGia}
+              onChange={onChangeValue}
+            />
+          </td>
+          <td className='border border-primary p-1'>
+            {/* {data.diemBanCanSuDanhGia} */}
+            <InputNumber
+              name='diemBanCanSuDanhGia'
+              value={data.diemBanCanSuDanhGia}
+              onChange={onChangeValue}
+            />
+          </td>
+          <td className='border border-primary p-1'>
+            {/* {data.linkMinhChung} */}
+            <InputText
+              name='linkMinhChung'
+              value={data.linkMinhChung}
+              onChange={onChangeValue}
+            />
+          </td>
+          {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
+            <td className='border border-primary p-1 text-center flex gap-1 justify-center'>
+              <Button type='' label='lưu' onClick={() => {}} />
+              <Button type='outline' label='huỷ' onClick={onClickCancel} />
+            </td>
+          )}
+          {checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
+            <td className='border border-primary p-1 text-center'>
+              <InputCheckbox />
+            </td>
+          )}
+        </tr>
+      ) : (
+        <tr className='text-main'>
+          <td className='border border-primary p-1 text-center'>{index + 1}</td>
+          <td className='border border-primary p-1'>hoat dong</td>
+          <td className='border border-primary p-1 text-center'>
+            {`${selected.khungDiem?.min} - ${selected.khungDiem?.max}`}
+          </td>
+          <td className='border border-primary p-1'>{data.diemTuDanhGia}</td>
+          <td className='border border-primary p-1'>
+            {data.diemBanCanSuDanhGia}
+          </td>
+          <td className='border border-primary p-1'>{data.linkMinhChung}</td>
+          {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
+            <td className='border border-primary p-1 text-center flex gap-1'>
+              <Button
+                type='edit'
+                label='sửa'
+                onClick={() => setShowEdit(true)}
+              />
+              <Button
+                type='delete'
+                label='xoá'
+                onClick={() => onClickDeleteItem(index)}
+              />
+            </td>
+          )}
+          {checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
+            <td className='border border-primary p-1 text-center'>
+              <InputCheckbox />
+            </td>
+          )}
+        </tr>
       )}
-      {checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role) && (
-        <td className='border border-primary p-1 text-center'>
-          <InputCheckbox />
-        </td>
-      )}
-    </tr>
+    </>
   )
 }

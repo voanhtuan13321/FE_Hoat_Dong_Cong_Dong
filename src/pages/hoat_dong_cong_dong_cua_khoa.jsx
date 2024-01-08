@@ -77,7 +77,7 @@ export default function HoatDongCongDongCuaKhoa() {
         </div>
         <Table header={dataTable.header}>{renderBodyTable()}</Table>
         <div className='flex  py-2 justify-end gap-4'>
-          {checkRoles([ROLES.truongKhoa], role) && shouldShowButton() && (
+          {checkRoles([ROLES.truongKhoa], [role]) && shouldShowButton() && (
             <Button label='Xác nhận' />
           )}
           <Button label='Xuất file' />

@@ -20,13 +20,13 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
   refresh,
   objectAnnouncements,
 }) {
-  const [dataEdit, setDataEdit] = useState({ ...data })
+  const [dataEdit, setDataEdit] = useState(data)
   const [isShowEdit, setShowEdit] = useState(false)
   const navigate = useNavigate()
 
   const onClickHuy = () => {
     setShowEdit(false)
-    setDataEdit({ ...data })
+    setDataEdit(data)
   }
 
   const onClickLuu = async () => {
