@@ -24,7 +24,6 @@ export default function App() {
     if (token) {
       const decoded = jwtDecode(token)
       dispatch(setRole(decoded[KEY_ROLE_TOKEN]))
-      // dispatch(setUserId(decoded['UserId']))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

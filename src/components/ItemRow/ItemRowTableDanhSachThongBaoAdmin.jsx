@@ -1,20 +1,18 @@
 import React, { useState } from 'react'
 import { format } from 'date-fns'
-import { useDispatch } from 'react-redux'
 import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
 
-import Button from './Button'
-import InputText from './InputText'
+import Button from '../Button'
+import InputText from '../Input/InputText'
 
-import { setLoading } from '../redux/storeSlice'
 import {
   caculateIndex,
   callApiDeleteAnnouncement,
   callApiUpdateAnnouncement,
   handleError,
-} from '../utils'
+} from '../../utils'
 
 export default function ItemRowTableDanhSachThongBaoAdmin({
   index,
@@ -22,19 +20,20 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
   refresh,
   objectAnnouncements,
 }) {
-  const [dataEdit, setDataEdit] = useState({ ...data })
+  const [dataEdit, setDataEdit] = useState(data)
   const [isShowEdit, setShowEdit] = useState(false)
-  const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const onClickEdit = () => {
+    setShowEdit(true)
+  }
   const onClickHuy = () => {
     setShowEdit(false)
-    setDataEdit({ ...data })
+    setDataEdit(data)
   }
 
   const onClickLuu = async () => {
     try {
-      dispatch(setLoading(true))
       const data = await callApiUpdateAnnouncement(dataEdit)
       toast.success('Cập nhật thành công')
       setShowEdit(false)
@@ -42,8 +41,6 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
     } catch (e) {
       console.error(e)
       handleError(e, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
@@ -59,15 +56,12 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
 
     if (isDenied) {
       try {
-        dispatch(setLoading(true))
         const data = await callApiDeleteAnnouncement(id)
         toast.success('Xoá thành công')
         setShowEdit(false)
         refresh()
       } catch (e) {
         alert(e.message)
-      } finally {
-        dispatch(setLoading(false))
       }
     }
   }

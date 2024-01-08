@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Title from '../components/Title'
 import Table from '../components/Table'
-import InputSelect from '../components/InputSelect'
+import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
 import { useSelector } from 'react-redux'
 import { ROLES, checkRoles } from '../utils'
@@ -77,7 +77,7 @@ export default function HoatDongCongDongCuaKhoa() {
         </div>
         <Table header={dataTable.header}>{renderBodyTable()}</Table>
         <div className='flex  py-2 justify-end gap-4'>
-          {checkRoles([ROLES.truongKhoa], role) && shouldShowButton() && (
+          {checkRoles([ROLES.truongKhoa], [role]) && shouldShowButton() && (
             <Button label='Xác nhận' />
           )}
           <Button label='Xuất file' />

@@ -1,16 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import InputSelect from '../components/InputSelect'
+import queryString from 'query-string'
+
+import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
 import Table from '../components/Table'
-import ItemRowTableTuDanhGia from '../components/ItemRowTableTuDanhGia'
 import Title from '../components/Title'
-import { ROLES, checkRoles } from '../utils'
+import ItemRowTableTuDanhGia from '../components/ItemRow/ItemRowTableTuDanhGia'
 
-const optionsDotDanhGia = [
-  { name: '2022-2023', value: 1 },
-  { name: '2021-2022', value: 2 },
-]
+import { ROLES, checkRoles2, generateAcademyYearOptions } from '../utils'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const dataTable = {
   header: [
@@ -39,38 +38,22 @@ const dataTable = {
 }
 
 export default function TuDanhGia() {
+  const academyYearOptions = generateAcademyYearOptions()
   const role = useSelector(state => state.role)
-  const [selected, setSelected] = useState(optionsDotDanhGia[0])
+
   const [listTuDanhGia, setListTuDanhGia] = useState(dataTable.value)
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
+    academyYearOptions[0],
+  )
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const onClickThem = () => {
-    setListTuDanhGia([
-      ...listTuDanhGia,
-      {
-        loaiHoatDong: 2,
-        diemTuDanhGia: 0,
-        diemBanCanSuDanhGia: 0,
-        linkMinhChung: '',
-      },
-    ])
-  }
+  const onClickAdd = () => {}
 
-  const onClickDeleteItem = index => {
-    console.log(index)
-    const cloneStates = [...listTuDanhGia]
-    cloneStates.splice(index, 1)
-    setListTuDanhGia(cloneStates)
-  }
-
-  const onChangeStateItemRowTable = (index, rowData) => {
-    const cloneStates = [...listTuDanhGia]
-    cloneStates[index] = rowData
-    setListTuDanhGia(cloneStates)
-  }
-
-  const onClickXacNhan = () => {
-    console.log(listTuDanhGia)
-  }
+  useEffect(() => {
+    const { studentId } = queryString.parse(location.search)
+    console.log(studentId)
+  }, [])
 
   const onClickXacNhanThamGia = () => {
     alert('Xac Nhan tham gia')
@@ -85,25 +68,16 @@ export default function TuDanhGia() {
       { className: 'w-10%', title: 'điểm ban cán sự đánh giá' },
       { className: '', title: 'link minh chứng' },
     ]
-
-    if (checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role)) {
+    if (checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role])) {
       return [...header, { className: 'w-5%', title: 'xác nhận' }]
     }
     return [...header, { className: 'w-5%', title: '' }]
   }
 
   const renderBodyTable = () => {
-    return listTuDanhGia.map((dt, index) => {
-      return (
-        <ItemRowTableTuDanhGia
-          key={index}
-          index={index}
-          data={dt}
-          onChangeStateItemRowTable={onChangeStateItemRowTable}
-          onClickDeleteItem={onClickDeleteItem}
-        />
-      )
-    })
+    return listTuDanhGia.map((dt, index) => (
+      <ItemRowTableTuDanhGia key={index} index={index} data={dt} />
+    ))
   }
 
   return (
@@ -116,9 +90,9 @@ export default function TuDanhGia() {
           </span>
           <div className='w-48'>
             <InputSelect
-              options={optionsDotDanhGia}
-              value={selected}
-              onChange={setSelected}
+              options={academyYearOptions}
+              value={selectedAcademyYear}
+              onChange={setSelectedAcademyYear}
             />
           </div>
         </div>
@@ -130,17 +104,16 @@ export default function TuDanhGia() {
         <div className='flex justify-between items-center'>
           <h3 className='uppercase font-bold'>nội dung tự đánh giá</h3>
           <div>
-            {!checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role) && (
-              <Button label='thêm' type='add' onClick={onClickThem} />
+            {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
+              <Button label='thêm' type='add' onClick={onClickAdd} />
             )}
           </div>
         </div>
         <div className='my-2'>
           <Table header={genHeaderByRole()}>{renderBodyTable()}</Table>
         </div>
-        {!checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role) && (
+        {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
           <div className='flex justify-end gap-2'>
-            <Button label='lưu' onClick={onClickXacNhan} />
             <Button label='xác nhận tham gia' onClick={onClickXacNhanThamGia} />
           </div>
         )}

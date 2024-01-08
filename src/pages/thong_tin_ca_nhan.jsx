@@ -1,34 +1,34 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { jwtDecode } from 'jwt-decode'
 
 // component
 import Title from '../components/Title'
-import InputText from '../components/InputText'
-import InputDate from '../components/InputDate'
-import InputAvatar from '../components/InputAvatar'
-import InputTextArea from '../components/InputTextArea'
-import InputSelect from '../components/InputSelect'
+import InputText from '../components/Input/InputText'
+import InputDate from '../components/Input/InputDate'
+import InputAvatar from '../components/Input/InputAvatar'
+import InputTextArea from '../components/Input/InputTextArea'
+import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
 
 // function
 import {
-  KEY_ROLE_TOKEN,
   REGEX,
   ROLES,
   callApiGetUserByUserId,
   callApiUpdateUser,
-  checkRoles,
+  checkAndHandleLogined,
+  checkPermissionToAccessThePage,
   convertObjectToFormData,
   convertToObjectFormFormik,
+  getUserId,
+  getUserRole,
   handleError,
-  localStorages,
+  optionsGender,
 } from '../utils'
 import ErrorLabel from '../components/ErrorLabel'
-import { setLoading, setRole } from '../redux/storeSlice'
+import toast from 'react-hot-toast'
 
 const initInfoUser = {
   id: '',
@@ -55,53 +55,29 @@ const initInfoUser = {
   street: '',
 }
 
-const optionsGender = [
-  { name: 'Nam', value: true },
-  { name: 'Nữ', value: false },
-]
-
 export default function ThongTinCaNhan() {
   const [isShowEdit, setShowEdit] = useState(false)
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   useEffect(() => {
-    const token = localStorages.getToken()
-
-    if (token) {
-      const decoded = jwtDecode(token)
-      const role = decoded[KEY_ROLE_TOKEN]
-      dispatch(setRole(role))
-
-      if (checkRoles([ROLES.client], role)) {
-        alert('bạn phải đăng nhập')
-        navigate('/login')
-      }
-      fetchInfoUser()
-    } else {
-      alert('bạn phải đăng nhập')
-      navigate('/login')
-    }
+    checkAndHandleLogined(navigate)
+    const targetRoles = [ROLES.client, ROLES.giaoVien, ROLES.truongKhoa]
+    checkPermissionToAccessThePage(getUserRole(), targetRoles, navigate)
+    fetchInfoUser()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchInfoUser = async () => {
-    const token = localStorages.getToken()
-    const decoded = jwtDecode(token)
-    const userId = decoded['UserId']
+    const userId = getUserId()
     if (userId) {
       try {
-        dispatch(setLoading(true))
         const data = await callApiGetUserByUserId(userId)
-
         const newValueFormik = await convertToObjectFormFormik(data)
         // console.log('newValueFormik', newValueFormik)
         formik.setValues(newValueFormik)
       } catch (error) {
         console.error('Failed to get user', error)
         // handleError(error, navigate)
-      } finally {
-        dispatch(setLoading(false))
       }
     }
   }
@@ -111,18 +87,15 @@ export default function ThongTinCaNhan() {
     const formData = await convertObjectToFormData(values)
 
     try {
-      dispatch(setLoading(true))
       const data = await callApiUpdateUser(formData)
-
       // console.log(data)
       const newValueFormik = await convertToObjectFormFormik(data)
+      toast.success('Cập nhật thành công')
       formik.setValues(newValueFormik)
       setShowEdit(false)
     } catch (error) {
       console.error('Failed to update user', error)
       handleError(error, navigate)
-    } finally {
-      dispatch(setLoading(false))
     }
   }
 
@@ -130,8 +103,8 @@ export default function ThongTinCaNhan() {
     initialValues: initInfoUser,
     validationSchema: Yup.object({
       firstName: Yup.string()
-        .required('HỌ bắt buộc phải nhập')
-        .max(20, 'HỌ không được quá 20 ký tự'),
+        .required('Bắt buộc nhập')
+        .max(20, 'Không được quá 20 ký tự'),
       lastName: Yup.string()
         .required('Tên bắt buộc phải nhập')
         .max(20, 'Tên không được quá 20 ký tự'),
@@ -145,6 +118,10 @@ export default function ThongTinCaNhan() {
       identificationCardId: Yup.string().max(
         20,
         'CCCD không được quá 20 ký tự',
+      ),
+      identificationCardIssueDate: Yup.date().max(
+        new Date(),
+        'Ngày không được lớn hơn ngày hiện tại',
       ),
       identificationCardIssuePlace: Yup.string().max(
         30,
@@ -211,13 +188,6 @@ export default function ThongTinCaNhan() {
           />
         </div>
         <div>
-          <InputText
-            label='Nơi sinh'
-            {...generatedProperties('placeOfBirth')}
-          />
-          <ErrorLabel formik={formik} keyFormik='placeOfBirth' />
-        </div>
-        <div>
           <InputSelect
             label='Giới tính'
             options={optionsGender}
@@ -227,6 +197,13 @@ export default function ThongTinCaNhan() {
             onChange={({ value }) => formik.setFieldValue('gender', value)}
             disabled={true}
           />
+        </div>
+        <div>
+          <InputText
+            label='Nơi sinh'
+            {...generatedProperties('placeOfBirth')}
+          />
+          <ErrorLabel formik={formik} keyFormik='placeOfBirth' />
         </div>
         <div>
           <InputText label='Email' {...generatedProperties('email')} />
@@ -270,12 +247,13 @@ export default function ThongTinCaNhan() {
             onChange={event =>
               formik.setFieldValue(
                 'identificationCardIssueDate',
-                event.target.value,
+                new Date(event.target.value),
               )
             }
             value={formik.values.identificationCardIssueDate}
             disabled={!isShowEdit}
           />
+          <ErrorLabel formik={formik} keyFormik='identificationCardIssueDate' />
         </div>
         <div>
           <InputText

@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function Footer() {
   return (
-    <div className='p-3 bg-footer text-white'>
+    <div className='p-3 bg-footer text-white text-main'>
       <div className='container mx-auto grid grid-cols-4 gap-5'>
         <div>
           <h3 className='font-bold'>Phòng tổ chức hành chính</h3>
