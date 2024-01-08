@@ -22,28 +22,6 @@ import {
   handleError,
 } from '../utils'
 
-const HEADER_TEACHER = [
-  { className: 'w-5%', title: 'stt' },
-  { className: 'w-10%', title: 'Số thẻ sinh viên' },
-  { className: 'w-10%', title: 'Tên sinh viên' },
-  { className: 'w-10%', title: 'Số điện thoại' },
-  { className: 'w-10%', title: 'Email' },
-  { className: 'w-10%', title: 'Facebook' },
-  { className: 'w-20%', title: 'Địa chỉ' },
-  { className: 'w-5%', title: 'Chọn lớp trưởng' },
-  { className: 'w-5%', title: 'Xem chi tiết' },
-]
-const HEADER_STUDENT = [
-  { className: 'w-5%', title: 'stt' },
-  { className: 'w-10%', title: 'Số thẻ sinh viên' },
-  { className: 'w-10%', title: 'Tên sinh viên' },
-  { className: 'w-10%', title: 'Số điện thoại' },
-  { className: 'w-10%', title: 'Email' },
-  { className: 'w-10%', title: 'Facebook' },
-  { className: 'w-20%', title: 'Địa chỉ' },
-  { className: 'w-5%', title: 'Xem chi tiết' },
-]
-
 export default function DanhSachLop() {
   const academyYearOptions = generateAcademyYearOptions()
 
@@ -112,8 +90,12 @@ export default function DanhSachLop() {
     if (classId) {
       try {
         const data = await callApiGetStudentsListByClassId(classId)
-        console.log('student', data)
-        setStudents(data)
+        // console.log('student', data)
+        setStudents(
+          data.sort((stu1, stu2) =>
+            stu1.studentId.localeCompare(stu2.studentId),
+          ),
+        )
       } catch (error) {
         console.error(error)
         handleError(error, navigate)
@@ -139,6 +121,28 @@ export default function DanhSachLop() {
             refresh={fetchClasses}
           />
         ))
+  }
+
+  const genHeaders = () => {
+    const header = checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa])
+      ? [
+          { className: 'w-5%', title: 'Chọn lớp trưởng' },
+          { className: 'w-5%', title: 'Xem chi tiết' },
+        ]
+      : checkRoles(getUserRole(), [ROLES.lopTruong])
+        ? [{ className: 'w-5%', title: 'Xem chi tiết' }]
+        : []
+
+    return [
+      { className: 'w-5%', title: 'stt' },
+      { className: 'w-10%', title: 'Số thẻ sinh viên' },
+      { className: 'w-10%', title: 'Tên sinh viên' },
+      { className: 'w-10%', title: 'Số điện thoại' },
+      { className: 'w-10%', title: 'Email' },
+      { className: 'w-10%', title: 'Facebook' },
+      { className: 'w-20%', title: 'Địa chỉ' },
+      ...header,
+    ]
   }
 
   return (
@@ -180,15 +184,7 @@ export default function DanhSachLop() {
         )}
       </div>
       <div className='my-2'>
-        <Table
-          header={
-            checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa])
-              ? HEADER_TEACHER
-              : HEADER_STUDENT
-          }
-        >
-          {renderBodyTable()}
-        </Table>
+        <Table header={genHeaders()}>{renderBodyTable()}</Table>
       </div>
     </div>
   )

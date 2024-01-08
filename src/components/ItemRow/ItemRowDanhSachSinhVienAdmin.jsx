@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import Button from '../Button'
@@ -21,6 +21,10 @@ export default function ItemRowDanhSachSinhVienAdmin({
   const [user, setUser] = useState(data)
   const [isShowDialog, setShowDialog] = useState(false)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    setUser(data)
+  }, [data])
 
   const changeStatusAccountUser = async () => {
     try {
@@ -53,7 +57,7 @@ export default function ItemRowDanhSachSinhVienAdmin({
 
   return (
     <tr key={index}>
-      <td className='border border-primary p-1 text-center text-main'>
+      <td className='border border-primary text-center text-main'>
         {++index}
         <DialogChangePassword
           userId={user.id}
@@ -61,27 +65,29 @@ export default function ItemRowDanhSachSinhVienAdmin({
           setShowDialog={setShowDialog}
         />
       </td>
-      <td className='border border-primary p-1 text-center text-main'>
+      <td className='border border-primary text-center text-main'>
         {user.studentId}
       </td>
       <td className='border border-primary px-3 text-main'>{`${user.firstName} ${user.lastName}`}</td>
-      <td className='border border-primary p-1 text-center'>
+      <td className='border border-primary text-center'>
         <Button
           type={'edit'}
           label={'sửa'}
           onClick={() => setShowDialog(true)}
         />
       </td>
-      <td className='border border-primary p-1'>
+      <td className='border border-primary'>
         <InputCheckbox
           value={user.status === STATUS_USER.ACCOUNT_LOCKED}
-          onChange={changeStatusAccountUser}
+          onClick={changeStatusAccountUser}
+          onChange={() => {}}
         />
       </td>
-      <td className='border border-primary p-1'>
+      <td className='border border-primary'>
         <InputCheckbox
           value={classPresidentId === user.id}
-          onChange={changeClassPresident}
+          onClick={changeClassPresident}
+          onChange={() => {}}
         />
       </td>
     </tr>

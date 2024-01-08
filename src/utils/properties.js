@@ -39,6 +39,14 @@ export const REGEX = {
   link: /^(http|https):\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/,
 }
 
+export const COMMUNITY_ACTIVITY_STATUS = {
+  rejected: -1,
+  studentConfirmed: 1,
+  classPresidentConfirmed: 2,
+  headTeacherConfirmed: 3,
+  majorHeadConfirmed: 4,
+}
+
 export const optionsGender = [
   { name: 'Nam', value: true },
   { name: 'Nữ', value: false },

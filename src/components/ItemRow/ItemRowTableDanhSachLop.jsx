@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 
 import InputCheckbox from '../Input/InputCheckbox'
+import DialogDetailCommunityActivityStudent from '../DialogCustom/DialogDetailCommunityActivityStudent'
 
 import {
   ROLES,
@@ -9,6 +10,7 @@ import {
   getUserRole,
   handleError,
 } from '../../utils'
+import { useState } from 'react'
 
 export default function ItemRowTableDanhSachLop({
   dt,
@@ -16,6 +18,7 @@ export default function ItemRowTableDanhSachLop({
   classPresidentId,
   refresh,
 }) {
+  const [isShowDialog, setShowDialog] = useState(false)
   const navigate = useNavigate()
 
   const changeClassPresident = async () => {
@@ -32,6 +35,10 @@ export default function ItemRowTableDanhSachLop({
       console.error(error)
       handleError(error, navigate)
     }
+  }
+
+  const onClickDetails = () => {
+    setShowDialog(true)
   }
 
   return (
@@ -61,11 +68,20 @@ export default function ItemRowTableDanhSachLop({
           />
         </td>
       )}
-      <td className='border border-primary text-main p-2 underline text-primary cursor-pointer'>
-        <span onClick={() => navigate(`/tu-danh-gia?studentId=${dt.id}`)}>
-          Xem chi tiết
-        </span>
-      </td>
+      {checkRoles(getUserRole(), [
+        ROLES.lopTruong,
+        ROLES.giaoVien,
+        ROLES.truongKhoa,
+      ]) && (
+        <td className='border border-primary text-main p-2 underline text-primary cursor-pointer'>
+          <span onClick={onClickDetails}>Xem chi tiết</span>
+          <DialogDetailCommunityActivityStudent
+            userId={dt.id}
+            isShowDialog={isShowDialog}
+            setShowDialog={setShowDialog}
+          />
+        </td>
+      )}
     </tr>
   )
 }

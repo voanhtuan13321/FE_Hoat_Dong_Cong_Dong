@@ -21,9 +21,9 @@ import {
 const HEADER_TABLE = [
   { className: 'w-5%', title: 'stt' },
   { className: 'w-20%', title: 'tiêu đề' },
-  { className: 'w-20%', title: 'thời gian' },
+  { className: 'w-10%', title: 'thời gian' },
   { className: '', title: 'nội dung' },
-  { className: 'w-20%', title: '' },
+  { className: 'w-10%', title: '' },
 ]
 
 export default function AdminDanhSachThongBao() {
@@ -40,14 +40,12 @@ export default function AdminDanhSachThongBao() {
 
   const fetchAnnouncements = async (page = 0) => {
     try {
-
       const data = await callApiGetAnnouncementsPaginationList(
         ITEM_PER_PAGE,
         page,
       )
       // console.log(data)
       setObjectAnnouncements(data)
-
     } catch (error) {
       alert(error.message)
     }
@@ -94,15 +92,17 @@ export default function AdminDanhSachThongBao() {
         <div>
           <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
         </div>
-        <Pagination
-          totalItems={objectAnnouncements.totalItems}
-          totalPages={objectAnnouncements.totalPages}
-          itemPerPage={objectAnnouncements.itemPerPage}
-          currentPage={objectAnnouncements.currentPage}
-          isNextPage={objectAnnouncements.isNextPage}
-          isPreviousPage={objectAnnouncements.isPreviousPage}
-          onPageChange={fetchAnnouncements}
-        />
+        {objectAnnouncements.totalPages > 1 && (
+          <Pagination
+            totalItems={objectAnnouncements.totalItems}
+            totalPages={objectAnnouncements.totalPages}
+            itemPerPage={objectAnnouncements.itemPerPage}
+            currentPage={objectAnnouncements.currentPage}
+            isNextPage={objectAnnouncements.isNextPage}
+            isPreviousPage={objectAnnouncements.isPreviousPage}
+            onPageChange={fetchAnnouncements}
+          />
+        )}
       </div>
     </div>
   )

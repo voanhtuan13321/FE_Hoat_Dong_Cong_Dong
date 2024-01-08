@@ -58,12 +58,13 @@ export default function AdminDanhSachLop() {
   const fetchClasses = async (page = 0) => {
     try {
       const data = await callApiGetClassesPaginationList(
-        ITEM_PER_PAGE,
+        9999,
         page,
         selectedAcademyYear.value,
         selectedMajor.value,
       )
       setObjectClasses(data)
+      console.log(data)
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -152,15 +153,17 @@ export default function AdminDanhSachLop() {
       <div className='my-2'>
         <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
       </div>
-      <Pagination
-        totalItems={objectClasses.totalItems}
-        totalPages={objectClasses.totalPages}
-        itemPerPage={objectClasses.itemPerPage}
-        currentPage={objectClasses.currentPage}
-        isNextPage={objectClasses.isNextPage}
-        isPreviousPage={objectClasses.isPreviousPage}
-        onPageChange={fetchClasses}
-      />
+      {objectClasses.totalPages > 1 && (
+        <Pagination
+          totalItems={objectClasses.totalItems}
+          totalPages={objectClasses.totalPages}
+          itemPerPage={objectClasses.itemPerPage}
+          currentPage={objectClasses.currentPage}
+          isNextPage={objectClasses.isNextPage}
+          isPreviousPage={objectClasses.isPreviousPage}
+          onPageChange={fetchClasses}
+        />
+      )}
     </div>
   )
 }
