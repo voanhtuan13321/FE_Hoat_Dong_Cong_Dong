@@ -1,73 +1,114 @@
 import React, { useState } from 'react'
-import Button from '../Button'
+import Swal from 'sweetalert2'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 import InputText from '../Input/InputText'
+import Button from '../Button'
+
+import {
+  caculateIndex,
+  callApiUpdateCommunityActivityType,
+  callApiDeleteCommunityActivityType,
+  handleError,
+} from '../../utils'
 
 export default function ItemRowDanhSachHoatDongCongDongAdmin({
-  data,
   index,
-  isEdit,
-  setAddButtonDisabled,
+  data,
+  refresh,
+  listCommunityActivity,
 }) {
-  const [isEditing, setIsEditing] = useState(isEdit)
-  const [dataHDCD, setDataHDCD] = useState(data)
+  const [isEditing, setIsEditing] = useState(false)
+  const [dataCommunityActivity, setDataCommunityActivity] = useState({
+    ...data,
+  })
+  const navigate = useNavigate()
 
   const onChangeInput = event => {
     const { name, value } = event.target
-    setDataHDCD({ ...dataHDCD, [name]: value })
-  }
-
-  const handleSaveClick = () => {
-    console.log('save', dataHDCD)
-    // Gọi API để lưu dữ liệu với chỉ số index
-    setIsEditing(false)
+    setDataCommunityActivity({ ...dataCommunityActivity, [name]: value })
   }
 
   const handleEditClick = () => {
     setIsEditing(true)
   }
-  const handleDeleteRow = () => {
-    console.log('delete', dataHDCD)
+
+  const handleSaveClick = async () => {
+    try {
+      const data = await callApiUpdateCommunityActivityType(
+        dataCommunityActivity,
+      )
+      toast.success('Cập nhật thành công')
+      setIsEditing(false)
+      refresh()
+    } catch (e) {
+      console.error(e)
+      handleError(e, navigate)
+    }
+  }
+
+  const handleDeleteRow = async id => {
+    const { isDenied } = await Swal.fire({
+      title: 'Bạn có chắc muốn xoá?',
+      showCancelButton: true,
+      cancelButtonText: 'Huỷ',
+      showDenyButton: true,
+      denyButtonText: 'Xoá',
+      showConfirmButton: false,
+    })
+
+    if (isDenied) {
+      try {
+        const data = await callApiDeleteCommunityActivityType(id)
+        toast.success('Xoá thành công')
+        setIsEditing(false)
+        refresh()
+      } catch (e) {
+        alert(e.message)
+      }
+    }
   }
 
   const handleCancelButton = () => {
-    setDataHDCD(data)
-    setAddButtonDisabled ? setAddButtonDisabled(false) : setIsEditing(false)
+    setDataCommunityActivity({ ...data })
+    setIsEditing(false)
   }
 
   return (
-    <tr key={index}>
-      <td className='border border-primary p-1 text-center'>{index + 1}</td>
+    <tr>
+      <td className='border border-primary p-1 text-center'>
+        {caculateIndex(listCommunityActivity, index)}
+      </td>
       <td className='border border-primary p-1 text-center'>
         {!isEditing ? (
-          dataHDCD.loaiHDCD
+          data.name
         ) : (
           <InputText
-            name='loaiHDCD'
-            value={dataHDCD.loaiHDCD}
-            onChange={e => onChangeInput(e)}
+            name='name'
+            value={dataCommunityActivity.name}
+            onChange={onChangeInput}
           />
         )}
       </td>
       <td className='border border-primary p-1 text-center'>
         {!isEditing ? (
-          dataHDCD.minPoint
+          data.minScore
         ) : (
           <InputText
-            name='minPoint'
-            value={dataHDCD.minPoint}
-            onChange={e => onChangeInput(e)}
+            name='minScore'
+            value={dataCommunityActivity.minScore}
+            onChange={onChangeInput}
           />
         )}
       </td>
       <td className='border border-primary p-1 text-center'>
         {!isEditing ? (
-          dataHDCD.maxPoint
+          data.maxScore
         ) : (
           <InputText
-            name='maxPoint'
-            value={dataHDCD.maxPoint}
-            disabled={!isEditing}
-            onChange={e => onChangeInput(e)}
+            name='maxScore'
+            value={dataCommunityActivity.maxScore}
+            onChange={onChangeInput}
           />
         )}
       </td>
@@ -78,13 +119,13 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
           <Button type='edit' label='sửa' onClick={() => handleEditClick()} />
         )}
         {isEditing ? (
-          <Button
-            type='outline'
-            label='Huỷ'
-            onClick={e => handleCancelButton()}
-          />
+          <Button label='Huỷ' onClick={e => handleCancelButton()} />
         ) : (
-          <Button type='delete' label='Xoá' onClick={e => handleDeleteRow()} />
+          <Button
+            type='delete'
+            label='Xoá'
+            onClick={() => handleDeleteRow(data.id)}
+          />
         )}
       </td>
     </tr>
