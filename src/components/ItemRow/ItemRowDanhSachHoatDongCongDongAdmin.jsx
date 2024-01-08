@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Swal from 'sweetalert2'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+
 import InputText from '../Input/InputText'
 import Button from '../Button'
 
@@ -76,10 +77,10 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
 
   return (
     <tr>
-      <td className='border border-primary p-1 text-center'>
+      <td className='border border-primary p-1 text-center text-main'>
         {caculateIndex(listCommunityActivity, index)}
       </td>
-      <td className='border border-primary p-1 text-center'>
+      <td className='border border-primary p-1 text-main'>
         {!isEditing ? (
           data.name
         ) : (

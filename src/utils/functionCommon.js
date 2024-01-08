@@ -152,3 +152,5 @@ export const generateAcademyYearOptions = (length = 8) => {
 
 export const caculateIndex = (data, inđex) =>
   data.itemPerPage * (data.currentPage - 1) + inđex + 1
+
+export const checkIsCurrentYear = year => year === new Date().getFullYear()

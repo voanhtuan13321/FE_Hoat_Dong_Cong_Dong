@@ -60,6 +60,7 @@ export default function ThongTinCaNhan() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    console.log(getUserRole())
     checkAndHandleLogined(navigate)
     const targetRoles = [ROLES.client, ROLES.giaoVien, ROLES.truongKhoa]
     checkPermissionToAccessThePage(getUserRole(), targetRoles, navigate)

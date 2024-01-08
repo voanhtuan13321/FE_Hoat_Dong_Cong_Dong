@@ -80,7 +80,10 @@ export default function DialogCreateUserStudent({
 
   return (
     <DialogCustom isOpen={isShowDialog} title='thêm mới sinh viên'>
-      <form className='grid grid-cols-2 gap-2' onSubmit={formik.handleSubmit}>
+      <form
+        className='grid grid-cols-2 gap-2 w-[500px]'
+        onSubmit={formik.handleSubmit}
+      >
         <div>
           <InputText label='Họ' {...generatedProperties('firstName')} />
           <ErrorLabel formik={formik} keyFormik='firstName' />

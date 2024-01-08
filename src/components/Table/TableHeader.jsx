@@ -23,7 +23,7 @@ export default function TableHeader({ data }) {
       return (
         <th
           key={index}
-          className={`${dt.className} border border-primary bg-primary text-white text-main uppercase py-2`}
+          className={`${dt.className} border border-primary bg-primary text-white text-main text-center uppercase py-2`}
         >
           {dt.title}
         </th>

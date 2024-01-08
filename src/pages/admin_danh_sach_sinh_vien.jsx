@@ -24,9 +24,9 @@ const HEADER_TABLE = [
   { className: 'w-5%', title: 'stt' },
   { className: 'w-15%', title: 'Mã sinh viên' },
   { className: '', title: 'Họ tên' },
-  { className: 'w-15%', title: 'Đổi mật khẩu' },
-  { className: 'w-15%', title: 'Khoá tài khoản' },
-  { className: 'w-15%', title: 'Chọn lớp trưởng' },
+  { className: 'w-10%', title: 'Đổi mật khẩu' },
+  { className: 'w-10%', title: 'Khoá tài khoản' },
+  { className: 'w-10%', title: 'Chọn lớp trưởng' },
 ]
 
 export default function AdminDanhSachSinhVien() {
@@ -98,8 +98,12 @@ export default function AdminDanhSachSinhVien() {
     if (classId) {
       try {
         const data = await callApiGetStudentsListByClassId(classId)
-        // console.log(data)
-        setStudents(data)
+        console.log(data)
+        setStudents(
+          data.sort((stu1, stu2) =>
+            stu1.studentId.localeCompare(stu2.studentId),
+          ),
+        )
       } catch (error) {
         console.error(error)
         handleError(error, navigate)
