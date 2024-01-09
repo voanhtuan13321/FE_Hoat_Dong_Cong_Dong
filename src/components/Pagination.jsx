@@ -27,7 +27,7 @@ const Pagination = ({
   }
 
   return (
-    <div className='flex justify-center'>
+    <div className='flex justify-center justify-content-center absolute bottom-0 left-0 right-0 '>
       <ReactPaginate
         className='flex gap-1 my-6'
         pageCount={totalPages ?? 0}

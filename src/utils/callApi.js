@@ -241,6 +241,14 @@ export const callApiDeleteCommunityActivityType =
 // CommunityActivity
 const baseApiCommunityActivity = 'api/CommunityActivity'
 
+export const callApiGetUserCommunityActivitiesNoneYear = async (userId) => {
+  const url = `${baseApiCommunityActivity}/GetUserCommunityActivities`
+  const config = { params: { userId, time: new Date().getTime() } }
+  const response = await requestHandler.get(url, config)
+  return await response.data
+}
+
+
 export const callApiGetUserCommunityActivities = async (userId, year) => {
   const url = `${baseApiCommunityActivity}/GetUserCommunityActivities`
   const config = { params: { userId, year, time: new Date().getTime() } }
