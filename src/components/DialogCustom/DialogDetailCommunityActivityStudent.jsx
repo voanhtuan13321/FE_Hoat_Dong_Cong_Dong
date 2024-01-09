@@ -11,15 +11,21 @@ import Table from '../Table'
 import {
   ROLES,
   callApiGetUserCommunityActivities,
+  checkRoles,
   checkRoles2,
   generateAcademyYearOptions,
+  getUserRole,
   handleError,
 } from '../../utils'
+import { getRoles } from '@testing-library/react'
 
 export default function DialogDetailCommunityActivityStudent({
   userId,
   isShowDialog,
   setShowDialog,
+  studentName,
+  refresh,
+  refresh2,
 }) {
   const role = useSelector(state => state.role)
   const academyYearOptions = generateAcademyYearOptions()
@@ -76,13 +82,19 @@ export default function DialogDetailCommunityActivityStudent({
             index={index}
             data={data}
             refresh={fetchCommunityActivities}
+            refresh2={refresh2}
             academyYear={selectedAcademyYear.value}
           />
         ))
   }
 
+  const handleAcceptAll = () => {}
+
   return (
-    <DialogCustom isOpen={isShowDialog} title='chi tiết hoạt động'>
+    <DialogCustom
+      isOpen={isShowDialog}
+      title={`chi tiết hoạt động cộng đồng của sinh viên ${studentName}`}
+    >
       <div className='mx-auto w-[1600px]'>
         <div>
           <div className='my-2'>
@@ -95,6 +107,12 @@ export default function DialogDetailCommunityActivityStudent({
             type='outline'
             onClick={() => setShowDialog(false)}
           />
+          {checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa]) && (
+            <Button
+              label='xác nhận toàn bộ'
+              onClick={() => setShowDialog(false)}
+            />
+          )}
         </div>
       </div>
     </DialogCustom>

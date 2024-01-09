@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
-import Button from './Button'
-import InputSelect from './InputSelect'
-import InputText from './InputText'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
+import InputText from '../Input/InputText'
+import InputSelect from '../Input/InputSelect'
+import Button from '../Button'
 import {
   callApiDeleteMajor,
   callApiGetTeachersList,
   callApiUpdateMajor,
   handleError,
-  requestHandler,
-} from '../utils'
-import toast from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom'
+} from '../../utils'
 
 export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
   const [isShowEdit, setShowEdit] = useState(false)

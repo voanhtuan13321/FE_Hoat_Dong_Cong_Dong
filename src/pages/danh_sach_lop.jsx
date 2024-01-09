@@ -17,6 +17,7 @@ import {
   checkPermissionToAccessThePage,
   checkRoles,
   generateAcademyYearOptions,
+  generateYearOptions,
   getUserId,
   getUserRole,
   handleError,
@@ -31,6 +32,8 @@ export default function DanhSachLop() {
   const [selectedAcademyYear, setSelectedAcademyYear] = useState(
     academyYearOptions[0],
   )
+  const yearOptions = generateYearOptions(selectedAcademyYear.value)
+  const [selectedYear, setSelectedYear] = useState(yearOptions[0])
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -49,9 +52,14 @@ export default function DanhSachLop() {
   }, [selectedAcademyYear])
 
   useEffect(() => {
+    const yearOps = generateYearOptions(selectedAcademyYear.value)
+    setSelectedYear(yearOps[0])
+  }, [selectedClasses, selectedAcademyYear])
+
+  useEffect(() => {
     fetchStudents()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAcademyYear, selectedClasses])
+  }, [selectedAcademyYear, selectedClasses, selectedYear])
 
   const fetchClasses = async () => {
     const roles = getUserRole()
@@ -63,11 +71,8 @@ export default function DanhSachLop() {
     try {
       const data = await callApiGetClassesByTeacherId(userId)
       const result = data
-        .map(item => ({
-          ...item,
-          value: item.id,
-        }))
-        .filter(item => item.academicYear === selectedAcademyYear.value)
+        .map(item => ({ ...item, value: item.id }))
+        .filter(item => item?.academicYear === selectedAcademyYear.value)
       setClassesOptions(result)
       setSelectedClasses(result[0])
     } catch (error) {
@@ -89,8 +94,11 @@ export default function DanhSachLop() {
 
     if (classId) {
       try {
-        const data = await callApiGetStudentsListByClassId(classId)
-        // console.log('student', data)
+        const data = await callApiGetStudentsListByClassId(
+          classId,
+          selectedYear.value,
+        )
+        console.log('student', data)
         setStudents(
           data.sort((stu1, stu2) =>
             stu1.studentId.localeCompare(stu2.studentId),
@@ -110,6 +118,12 @@ export default function DanhSachLop() {
   }
 
   const renderBodyTable = () => {
+    if (
+      checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa]) &&
+      classesOptions.length === 0
+    )
+      return [<ItemRowNoData key={-1} colSpan={9} />]
+
     return students.length === 0
       ? [<ItemRowNoData key={-1} colSpan={9} />]
       : students.map((dt, index) => (
@@ -117,8 +131,9 @@ export default function DanhSachLop() {
             key={index}
             dt={dt}
             index={index}
-            classPresidentId={selectedClasses.classPresidentId}
+            classPresidentId={selectedClasses?.classPresidentId}
             refresh={fetchClasses}
+            refresh2={fetchStudents}
           />
         ))
   }
@@ -130,7 +145,7 @@ export default function DanhSachLop() {
           { className: 'w-5%', title: 'Xem chi tiết' },
         ]
       : checkRoles(getUserRole(), [ROLES.lopTruong])
-        ? [{ className: 'w-5%', title: 'Xem chi tiết' }]
+        ? [{ className: 'w-10%', title: 'Xem chi tiết' }]
         : []
 
     return [
@@ -138,9 +153,9 @@ export default function DanhSachLop() {
       { className: 'w-10%', title: 'Số thẻ sinh viên' },
       { className: 'w-10%', title: 'Tên sinh viên' },
       { className: 'w-10%', title: 'Số điện thoại' },
-      { className: 'w-10%', title: 'Email' },
-      { className: 'w-10%', title: 'Facebook' },
-      { className: 'w-20%', title: 'Địa chỉ' },
+      { className: 'w-15%', title: 'Email' },
+      { className: 'w-10%', title: 'trạng thái' },
+      { className: 'w-5%', title: 'Tổng điểm' },
       ...header,
     ]
   }
@@ -176,6 +191,20 @@ export default function DanhSachLop() {
                   </div>
                 )}
               </div>
+              {classesOptions.length === 0 || (
+                <>
+                  <span className='font-bold text-primary text-main'>
+                    Năm học:
+                  </span>
+                  <div className='w-48'>
+                    <InputSelect
+                      options={yearOptions}
+                      value={selectedYear}
+                      onChange={setSelectedYear}
+                    />
+                  </div>
+                </>
+              )}
             </div>
             <div className=''>
               <Button label='Xác nhận' type='primary' onClick={handleXacNhan} />

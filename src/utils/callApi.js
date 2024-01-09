@@ -117,9 +117,9 @@ export const callApiGetUserByUserId = async userId => {
   return await response.data
 }
 
-export const callApiGetStudentsListByClassId = async classId => {
+export const callApiGetStudentsListByClassId = async (classId, year) => {
   const url = `${baseApiUser}/GetStudentsListByClassId`
-  const config = { params: { classId, time: new Date().getTime() } }
+  const config = { params: { classId, year, time: new Date().getTime() } }
   const response = await requestHandler.get(url, config)
   return await response.data
 }
@@ -145,6 +145,13 @@ export const callApiUpdateUserStatus = async data => {
   return await response.data
 }
 
+export const callApiDeleteUser = async userId => {
+  const url = `${baseApiUser}/DeleteUser`
+  const config = { params: { userId } }
+  const response = await requestHandler.delete(url, config)
+  return await response.data
+}
+
 export const callApiGetTeachersList = async () => {
   const url = `${baseApiUser}/GetTeachersList`
   const config = { params: { time: new Date().getTime() } }
@@ -152,12 +159,13 @@ export const callApiGetTeachersList = async () => {
   return await response.data
 }
 
-export const callApiGetTeachersPaginationList = async (ItemPerPage,Page) => {
+export const callApiGetTeachersPaginationList = async (ItemPerPage, Page) => {
   const url = `api/User/GetTeachersPaginationList?time=${new Date().getTime()}`
-  const config = {params: {ItemPerPage , Page}}
-  const response = await requestHandler.get(url,config)
+  const config = { params: { ItemPerPage, Page } }
+  const response = await requestHandler.get(url, config)
   return await response.data
 }
+
 // Announcement
 const baseApiAnnouncement = 'api/Announcement'
 
@@ -264,5 +272,25 @@ export const callApiDeleteCommunityActivity = async caId => {
   const url = `${baseApiCommunityActivity}/DeleteCommunityActivity`
   const config = { params: { caId } }
   const response = await requestHandler.delete(url, config)
+  return await response.data
+}
+
+export const callApiUpdateUserCommunityActivitiesByHeadTeacher = async (
+  userId,
+  year,
+) => {
+  const url = `${baseApiCommunityActivity}/UpdateUserCommunityActivitiesByHeadTeacher`
+  const config = { params: { userId, year } }
+  const response = await requestHandler.patch(url, config)
+  return await response.data
+}
+
+export const callApiUpdateClassCommunityActivitiesByHeadTeacher = async (
+  classId,
+  year,
+) => {
+  const url = `${baseApiCommunityActivity}/UpdateClassCommunityActivitiesByHeadTeacher`
+  const config = { params: { classId, year } }
+  const response = await requestHandler.patch(url, config)
   return await response.data
 }

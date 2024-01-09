@@ -25,6 +25,7 @@ const HEADER_TABLE = [
   { className: 'w-15%', title: 'Mã sinh viên' },
   { className: '', title: 'Họ tên' },
   { className: 'w-10%', title: 'Đổi mật khẩu' },
+  { className: 'w-10%', title: 'Xoá' },
   { className: 'w-10%', title: 'Khoá tài khoản' },
   { className: 'w-10%', title: 'Chọn lớp trưởng' },
 ]
