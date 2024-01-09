@@ -1,46 +1,59 @@
-import React from 'react'
-import Swal from 'sweetalert2'
+import React, { useEffect, useState } from 'react'
 import Button from '../Button'
 import InputCheckbox from '../Input/InputCheckbox'
+import DialogChangePassword from '../DialogCustom/DialogChangePassword'
+import { useNavigate } from 'react-router-dom'
+import { STATUS_USER, callApiUpdateUserStatus, handleError } from '../../utils'
 
 export default function ItemRowTableDanhSachGiaoVienAdmin({ stt, data }) {
-  const onClickDoiMatKhau = () => {
-    Swal.fire({
-      title: 'Nhập mật khẩu mới',
-      input: 'text',
-      showCancelButton: true,
-      cancelButtonText: 'huỷ',
-      confirmButtonText: 'Xác nhận',
-      showLoaderOnConfirm: true,
-      preConfirm: async valuePassword => {
-        if (!valuePassword) {
-          return Swal.showValidationMessage('bạn chưa nhập mật khẩu')
-        }
-      },
-    }).then(result => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          icon: 'success',
-          title: `Thay đổi mật khẩu thành công!`,
-          showConfirmButton: false,
-          timer: 1500,
-        })
-      }
-    })
+  const [isShowDialog, setShowDialog] = useState(false)
+  const [user, setUser] = useState(data)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    setUser(data)
+  }, [data])
+
+  const changeStatusAccountUser = async () => {
+    try {
+      const dataRequest = { userId: user.id, status: revertStatus(user.status) }
+      const data = await callApiUpdateUserStatus(dataRequest)
+      setUser(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
   }
 
+  const revertStatus = status => {
+    return status === STATUS_USER.ACCOUNT_LOCKED
+      ? STATUS_USER.ACCOUNT_UNLOCK
+      : STATUS_USER.ACCOUNT_LOCKED
+  }
   return (
     <tr>
-      <td className='border border-primary p-1 text-center'>{stt}</td>
       <td className='border border-primary p-1 text-center'>
-        {data.maGiaoVien}
+        {stt + 1}
+        <DialogChangePassword
+          userId={user.id}
+          isShowDialog={isShowDialog}
+          setShowDialog={setShowDialog}
+        />
       </td>
-      <td className='border border-primary p-1'>{data.hoVaTen}</td>
       <td className='border border-primary p-1 text-center'>
-        <Button type='edit' label='sửa' onClick={onClickDoiMatKhau} />
+        {data.teacherId}
+      </td>
+      <td className='border border-primary p-1'>
+        {data.firstName + ' ' + data.lastName}
       </td>
       <td className='border border-primary p-1 text-center'>
-        <InputCheckbox value={data.disabled} onChange={() => {}} />
+        <Button type='edit' label='sửa' onClick={() => setShowDialog(true)} />
+      </td>
+      <td className='border border-primary p-1 text-center'>
+        <InputCheckbox
+          value={user.status === STATUS_USER.ACCOUNT_LOCKED}
+          onChange={changeStatusAccountUser}
+        />
       </td>
     </tr>
   )

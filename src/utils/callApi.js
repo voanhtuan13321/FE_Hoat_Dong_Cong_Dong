@@ -132,6 +132,12 @@ export const callApiGetTeachersList = async () => {
   return await response.data
 }
 
+export const callApiGetTeachersPaginationList = async (ItemPerPage,Page) => {
+  const url = `api/User/GetTeachersPaginationList?time=${new Date().getTime()}`
+  const config = {params: {ItemPerPage , Page}}
+  const response = await requestHandler.get(url,config)
+  return await response.data
+}
 // Announcement
 const baseApiAnnouncement = 'api/Announcement'
 
