@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import Title from '../components/Title'
 import Table from '../components/Table'
+import {
+  COMMUNITY_ACTIVITY_STATUS,
+  callApiGetUserCommunityActivitiesNoneYear,
+  getUserId,
+  handleError,
+} from '../utils'
+import { useNavigate } from 'react-router-dom'
+import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 
 const dataTable = {
   header: [
@@ -10,50 +18,67 @@ const dataTable = {
     { className: 'w-10%', title: 'Điểm' },
     { className: 'w-20%', title: 'Ghi chú' },
   ],
-  value: [
-    { stt: 1, year: '2012-2013', name: 'Hiển máu', point: '10', note: '' },
-    { stt: 1, year: '2012-2013', name: 'Hiển máu', point: '10', note: '' },
-    { stt: 1, year: '2012-2013', name: 'Hiển máu', point: '10', note: '' },
-    { stt: 1, year: '2012-2013', name: 'Hiển máu', point: '10', note: '' },
-    { stt: 1, year: '2012-2013', name: 'Hiển máu', point: '10', note: '' },
-    { stt: 1, year: '2012-2013', name: 'Hiển máu', point: '10', note: '' },
-  ],
 }
 
 export default function KetQuaPhucVuCongDong() {
   const [data, setData] = useState([])
+  const [totalScore,setTotalScore] = useState()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    setData(dataTable.value)
+    fetchCommunityActivities()
   }, [])
 
+  const fetchCommunityActivities = async () => {
+    const userId = getUserId()
+
+    if (!userId) return
+
+    try {
+      const data = await callApiGetUserCommunityActivitiesNoneYear(userId)
+      console.log(data)
+      const showData = data.filter(item => {
+        return item.status === COMMUNITY_ACTIVITY_STATUS.majorHeadConfirmed
+      })
+      const score = showData.reduce((acc, item) => {
+        return acc + item.classPresidentEvaluationScore;
+      }, 0);
+      setTotalScore(score)
+      setData(showData)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
+
+
   const renderBodyTable = () => {
-    let arrJsx = data.map((dt, index) => {
-      return (
-        <tr key={index}>
-          <td className='border border-primary p-1 text-center text-main'>
-            {dt.stt}
-          </td>
-          <td className='border border-primary p-1 text-center  text-main'>
-            {dt.year}
-          </td>
-          <td className='border border-primary p-1 text-center  text-main'>
-            {dt.name}
-          </td>
-          <td className='border border-primary p-1 text-center  text-main'>
-            {dt.point}
-          </td>
-          <td className='border border-primary p-1  text-main'>{dt.note}</td>
-        </tr>
-      )
-    })
-    return arrJsx
+    return data?.length === 0
+      ? [<ItemRowNoData key={-1} colSpan={5} />]
+      : data?.map((dt, index) => (
+          <tr key={index}>
+            <td className='border border-primary p-1 text-center text-main'>
+              {++index}
+            </td>
+            <td className='border border-primary p-1 text-center  text-main'>
+              {dt.year}
+            </td>
+            <td className='border border-primary p-1 text-center  text-main'>
+              {dt.name}
+            </td>
+            <td className='border border-primary p-1 text-center  text-main'>
+              {dt.classPresidentEvaluationScore}
+            </td>
+            <td className='border border-primary p-1  text-main'></td>
+          </tr>
+        ))
   }
 
   return (
     <>
       <div className='container justify-center m-auto p-2'>
         <Title title={'Kết quả phục vụ cộng đồng'}></Title>
+        <p className='font-semibold text-primary'>Tổng điểm HĐCĐ của cả khóa học: {totalScore} </p>
         <div className='my-2'>
           <Table header={dataTable.header}>{renderBodyTable()}</Table>
         </div>

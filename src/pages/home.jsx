@@ -1,48 +1,41 @@
 import React, { useEffect, useState } from 'react'
 import Title from '../components/Title'
-
-const data = {
-  value: [
-    {
-      date: '20/11/2023',
-      content:
-        'Lịch thi chính thức cuối kỳ 1/2023-2024 và Lịch đăng ký bổ sung (cho các Sinh viên hoãn thi)',
-    },
-    {
-      date: '20/11/2023',
-      content:
-        'Lịch thi chính thức cuối kỳ 1/2023-2024 và Lịch đăng ký bổ sung (cho các Sinh viên hoãn thi)',
-    },
-  ],
-}
+import { format } from 'date-fns'
+import Pagination from '../components/Pagination'
+import { callApiGetAnnouncementsPaginationList } from '../utils'
 
 export default function Home() {
-  const [listThongBao, setListThongBao] = useState([])
+  const [listThongBao, setListThongBao] = useState({})
 
   useEffect(() => {
-    fetchListThongBao()
+    fetchListThongBao(0)
   }, [])
 
-  const fetchListThongBao = () => {
-    setListThongBao(data.value)
+  const fetchListThongBao = async page => {
+    try {
+      const response = await callApiGetAnnouncementsPaginationList(5, page)
+      const data = response
+      setListThongBao(data)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const renderBody = () => {
-    let arrJsx = listThongBao.map((dt, index) => {
+    let arrJsx = listThongBao?.data?.map((dt, index) => {
       return (
         <div
           key={index}
           className='flex flex-col text-main border-b-2 px-3 pb-2 my-4 gap-2'
         >
           <div className='flex flex-row gap-8'>
-            <p className='text-red-text font-bold'>{dt.date}</p>
-            <p className='text-primary font-bold'>{dt.content}</p>
+            <p className='text-red-text font-bold'>
+              {format(new Date(dt.createdAt), 'dd/MM/yyyy')}
+            </p>
+            <p className='text-primary font-bold'>{dt.title}</p>
           </div>
 
-          <p className=''>
-            Sinh viên xem thông báo{' '}
-            <span className='cursor-pointer underline'>tại đây</span>
-          </p>
+          <p className=''>{dt.content}</p>
         </div>
       )
     })
@@ -55,6 +48,15 @@ export default function Home() {
         <Title title='Thông báo' />
         {renderBody()}
       </div>
+      <Pagination
+        totalItems={listThongBao.totalItems}
+        totalPages={listThongBao.totalPages}
+        itemPerPage={listThongBao.itemPerPage}
+        currentPage={listThongBao.currentPage}
+        isNextPage={listThongBao.isNextPage}
+        isPreviousPage={listThongBao.isPreviousPage}
+        onPageChange={fetchListThongBao}
+      />
     </>
   )
 }
