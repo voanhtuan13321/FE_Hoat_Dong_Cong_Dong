@@ -1,46 +1,94 @@
-import React from 'react'
-import Swal from 'sweetalert2'
+import React, { useEffect, useState } from 'react'
 import Button from '../Button'
 import InputCheckbox from '../Input/InputCheckbox'
+import DialogChangePassword from '../DialogCustom/DialogChangePassword'
+import { useNavigate } from 'react-router-dom'
+import {
+  STATUS_USER,
+  callApiDeleteUser,
+  callApiUpdateUserStatus,
+  handleError,
+} from '../../utils'
+import Swal from 'sweetalert2'
 
-export default function ItemRowTableDanhSachGiaoVienAdmin({ stt, data }) {
-  const onClickDoiMatKhau = () => {
-    Swal.fire({
-      title: 'Nhập mật khẩu mới',
-      input: 'text',
+export default function ItemRowTableDanhSachGiaoVienAdmin({
+  stt,
+  data,
+  refresh,
+}) {
+  const [isShowDialog, setShowDialog] = useState(false)
+  const [user, setUser] = useState(data)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    setUser(data)
+  }, [data])
+
+  const changeStatusAccountUser = async () => {
+    try {
+      const dataRequest = { userId: user.id, status: revertStatus(user.status) }
+      const data = await callApiUpdateUserStatus(dataRequest)
+      setUser(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
+
+  const revertStatus = status => {
+    return status === STATUS_USER.ACCOUNT_LOCKED
+      ? STATUS_USER.ACCOUNT_UNLOCK
+      : STATUS_USER.ACCOUNT_LOCKED
+  }
+
+  const handleDelete = async () => {
+    const { isDenied } = await Swal.fire({
+      title: 'Bạn có chắc muốn xoá không?',
+      showConfirmButton: false,
+      showDenyButton: true,
+      denyButtonText: 'Xoá',
       showCancelButton: true,
-      cancelButtonText: 'huỷ',
-      confirmButtonText: 'Xác nhận',
-      showLoaderOnConfirm: true,
-      preConfirm: async valuePassword => {
-        if (!valuePassword) {
-          return Swal.showValidationMessage('bạn chưa nhập mật khẩu')
-        }
-      },
-    }).then(result => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          icon: 'success',
-          title: `Thay đổi mật khẩu thành công!`,
-          showConfirmButton: false,
-          timer: 1500,
-        })
-      }
+      cancelButtonText: 'Huỷ',
     })
+
+    if (isDenied) {
+      try {
+        const data = await callApiDeleteUser(user.id)
+        refresh()
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
+    }
   }
 
   return (
     <tr>
-      <td className='border border-primary p-1 text-center'>{stt}</td>
-      <td className='border border-primary p-1 text-center'>
-        {data.maGiaoVien}
+      <td className='border border-primary p-1 text-center text-main'>
+        {stt + 1}
+        <DialogChangePassword
+          userId={user.id}
+          isShowDialog={isShowDialog}
+          setShowDialog={setShowDialog}
+        />
       </td>
-      <td className='border border-primary p-1'>{data.hoVaTen}</td>
-      <td className='border border-primary p-1 text-center'>
-        <Button type='edit' label='sửa' onClick={onClickDoiMatKhau} />
+      <td className='border border-primary p-1 text-center text-main'>
+        {data.teacherId}
+      </td>
+      <td className='border border-primary p-1 text-main'>
+        {data.firstName + ' ' + data.lastName}
+      </td>
+      <td className='border border-primary px-1 text-center'>
+        <Button type='edit' label='sửa' onClick={() => setShowDialog(true)} />
+      </td>
+      <td className='border border-primary px-1 text-center'>
+        <Button type='delete' label='xoá' onClick={handleDelete} />
       </td>
       <td className='border border-primary p-1 text-center'>
-        <InputCheckbox value={data.disabled} onChange={() => {}} />
+        <InputCheckbox
+          value={user.status === STATUS_USER.ACCOUNT_LOCKED}
+          onClick={changeStatusAccountUser}
+        />
       </td>
     </tr>
   )

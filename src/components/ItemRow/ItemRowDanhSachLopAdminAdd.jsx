@@ -24,10 +24,11 @@ export default function ItemRowDanhSachLopAdd({
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetchListGiaoVien()
+    fetchListTeacher()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchListGiaoVien = async () => {
+  const fetchListTeacher = async () => {
     try {
       const data = await callApiGetTeachersList()
       const result = data.map(item => ({

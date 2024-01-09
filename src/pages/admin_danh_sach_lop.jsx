@@ -8,13 +8,17 @@ import Table from '../components/Table'
 import ItemRowDanhSachLop from '../components/ItemRow/ItemRowDanhSachLopAdmin'
 import ItemRowDanhSachLopAdd from '../components/ItemRow/ItemRowDanhSachLopAdminAdd'
 import Pagination from '../components/Pagination'
+import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 
 import {
   ITEM_PER_PAGE,
+  ROLES,
   callApiGetClassesPaginationList,
   callApiGetMajorsList,
   checkAndHandleLogined,
+  checkPermissionToAccessThePage,
   generateAcademyYearOptions,
+  getUserRole,
   handleError,
 } from '../utils'
 
@@ -41,6 +45,7 @@ export default function AdminDanhSachLop() {
 
   useEffect(() => {
     checkAndHandleLogined(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.admin], navigate)
     fetchMajors()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -53,12 +58,13 @@ export default function AdminDanhSachLop() {
   const fetchClasses = async (page = 0) => {
     try {
       const data = await callApiGetClassesPaginationList(
-        ITEM_PER_PAGE,
+        9999,
         page,
         selectedAcademyYear.value,
         selectedMajor.value,
       )
       setObjectClasses(data)
+      console.log(data)
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -70,7 +76,6 @@ export default function AdminDanhSachLop() {
       const data = await callApiGetMajorsList()
       const result = data.map(item => ({
         ...item,
-        name: item.name,
         value: item.id,
       }))
       // console.log(data)
@@ -83,20 +88,23 @@ export default function AdminDanhSachLop() {
   }
 
   const renderBodyTable = () => {
-    let arrJsx = objectClasses.data?.map((dt, index) => (
-      <ItemRowDanhSachLop
-        key={index}
-        dt={dt}
-        index={index}
-        refresh={fetchClasses}
-        objectClasses={objectClasses}
-      />
-    ))
+    let arrJsx =
+      objectClasses.data?.length === 0
+        ? [<ItemRowNoData key={-1} colSpan={6} />]
+        : objectClasses.data?.map((dt, index) => (
+            <ItemRowDanhSachLop
+              key={index}
+              dt={dt}
+              index={index}
+              refresh={fetchClasses}
+              objectClasses={objectClasses}
+            />
+          ))
     isAddNew &&
       (arrJsx = [
         ...arrJsx,
         <ItemRowDanhSachLopAdd
-          key={-1}
+          key={-2}
           setIsAddNew={setIsAddNew}
           majorId={selectedMajor.id}
           academicYear={selectedAcademyYear.value}
@@ -145,15 +153,17 @@ export default function AdminDanhSachLop() {
       <div className='my-2'>
         <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
       </div>
-      <Pagination
-        totalItems={objectClasses.totalItems}
-        totalPages={objectClasses.totalPages}
-        itemPerPage={objectClasses.itemPerPage}
-        currentPage={objectClasses.currentPage}
-        isNextPage={objectClasses.isNextPage}
-        isPreviousPage={objectClasses.isPreviousPage}
-        onPageChange={fetchClasses}
-      />
+      {objectClasses.totalPages > 1 && (
+        <Pagination
+          totalItems={objectClasses.totalItems}
+          totalPages={objectClasses.totalPages}
+          itemPerPage={objectClasses.itemPerPage}
+          currentPage={objectClasses.currentPage}
+          isNextPage={objectClasses.isNextPage}
+          isPreviousPage={objectClasses.isPreviousPage}
+          onPageChange={fetchClasses}
+        />
+      )}
     </div>
   )
 }

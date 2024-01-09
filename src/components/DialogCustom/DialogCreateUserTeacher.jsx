@@ -19,19 +19,18 @@ import {
 } from '../../utils'
 
 const initialValues = {
-  classId: '',
+  classId: null,
   firstName: '',
   lastName: '',
   gender: true,
   dateOfBirth: new Date(),
   identificationCardId: '',
-  isStudent: true,
+  isStudent: false,
 }
 
-export default function DialogCreateUserStudent({
+export default function DialogCreateUserTeacher({
   isShowDialog,
   setShowDialog,
-  classId,
   refresh,
 }) {
   const navigate = useNavigate()
@@ -51,16 +50,15 @@ export default function DialogCreateUserStudent({
 
   const onSubmit = async values => {
     try {
-      const dataRequest = { ...values, classId }
+      const dataRequest = { ...values}
+      console.log(dataRequest);
       const data = await callApiCreateUser(dataRequest)
-      // console.log(data)
       toast.success('Thêm mới thành công')
       setShowDialog(false)
       formik.setValues(initialValues)
       refresh()
     } catch (error) {
       console.error(error)
-      formik.setFieldError('identificationCardId', 'CCCD bị trùng')
       handleError(error, navigate)
     }
   }
@@ -79,11 +77,8 @@ export default function DialogCreateUserStudent({
   }
 
   return (
-    <DialogCustom isOpen={isShowDialog} title='thêm mới sinh viên'>
-      <form
-        className='grid grid-cols-2 gap-2 w-[500px]'
-        onSubmit={formik.handleSubmit}
-      >
+    <DialogCustom isOpen={isShowDialog} title='thêm mới giáo viên'>
+      <form className='grid grid-cols-2 gap-2' onSubmit={formik.handleSubmit}>
         <div>
           <InputText label='Họ' {...generatedProperties('firstName')} />
           <ErrorLabel formik={formik} keyFormik='firstName' />

@@ -20,13 +20,13 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
   refresh,
   objectAnnouncements,
 }) {
-  const [dataEdit, setDataEdit] = useState({ ...data })
+  const [dataEdit, setDataEdit] = useState(data)
   const [isShowEdit, setShowEdit] = useState(false)
   const navigate = useNavigate()
 
   const onClickHuy = () => {
     setShowEdit(false)
-    setDataEdit({ ...data })
+    setDataEdit(data)
   }
 
   const onClickLuu = async () => {
@@ -72,27 +72,27 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
     <>
       {isShowEdit ? (
         <tr>
-          <td className='border border-primary p-1 text-center text-main'>
+          <td className='border border-primary text-center text-main'>
             {caculateIndex(objectAnnouncements, index)}
           </td>
-          <td className='border border-primary p-1 text-center text-main'>
+          <td className='border border-primary text-center text-main'>
             <InputText
               name='title'
               value={dataEdit.title}
               onChange={onChangeInput}
             />
           </td>
-          <td className='border border-primary p-1 text-main'>
+          <td className='border border-primary text-main'>
             {format(new Date(data.createdAt), 'dd/MM/yyyy')}
           </td>
-          <td className='border border-primary p-1 text-center text-main'>
+          <td className='border border-primary text-center text-main'>
             <InputText
               name='content'
               value={dataEdit.content}
               onChange={onChangeInput}
             />
           </td>
-          <td className='border border-primary p-1'>
+          <td className='border border-primary'>
             <div className='flex justify-center gap-3'>
               <Button label='lưu' onClick={onClickLuu} />
               <Button type='outline' label='huỷ' onClick={onClickHuy} />
@@ -101,18 +101,18 @@ export default function ItemRowTableDanhSachThongBaoAdmin({
         </tr>
       ) : (
         <tr>
-          <td className='border border-primary p-1 text-center text-main'>
+          <td className='border border-primary text-center text-main p-2'>
             {caculateIndex(objectAnnouncements, index)}
           </td>
-          <td className='border border-primary p-1 text-main'>{data.title}</td>
-          <td className='border border-primary p-1 text-main'>
+          <td className='border border-primary text-main p-2'>{data.title}</td>
+          <td className='border border-primary text-main p-2'>
             {format(new Date(data.createdAt), 'dd/MM/yyyy')}
           </td>
-          <td className='border border-primary p-1 text-main'>
+          <td className='border border-primary text-main p-2'>
             {data.content}
           </td>
-          <td className='border border-primary p-1 text-main'>
-            <div className='flex justify-center gap-3'>
+          <td className='border border-primary text-main px-1'>
+            <div className='flex justify-center gap-1'>
               <Button
                 type='edit'
                 label='sửa'

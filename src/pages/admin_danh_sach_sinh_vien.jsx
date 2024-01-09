@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-// import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import Table from '../components/Table'
@@ -7,24 +6,28 @@ import Title from '../components/Title'
 import Button from '../components/Button'
 import InputSelect from '../components/Input/InputSelect'
 import ItemRowDanhSachSinhVienAdmin from '../components/ItemRow/ItemRowDanhSachSinhVienAdmin'
+import DialogCreateUserStudent from '../components/DialogCustom/DialogCreateUserStudent'
+import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 
 import {
+  ROLES,
   callApiGetClassesList,
   callApiGetMajorsList,
   callApiGetStudentsListByClassId,
   checkAndHandleLogined,
+  checkPermissionToAccessThePage,
+  getUserRole,
   handleError,
 } from '../utils'
-import DialogCreateUserStudent from '../components/DialogCustom/DialogCreateUserStudent'
-import DialogChangePassword from '../components/DialogCustom/DialogCreateUserStudent'
 
 const HEADER_TABLE = [
   { className: 'w-5%', title: 'stt' },
   { className: 'w-15%', title: 'Mã sinh viên' },
   { className: '', title: 'Họ tên' },
-  { className: 'w-15%', title: 'Đổi mật khẩu' },
-  { className: 'w-15%', title: 'Khoá tài khoản' },
-  { className: 'w-15%', title: 'Chọn lớp trưởng' },
+  { className: 'w-10%', title: 'Đổi mật khẩu' },
+  { className: 'w-10%', title: 'Xoá' },
+  { className: 'w-10%', title: 'Khoá tài khoản' },
+  { className: 'w-10%', title: 'Chọn lớp trưởng' },
 ]
 
 export default function AdminDanhSachSinhVien() {
@@ -39,15 +42,19 @@ export default function AdminDanhSachSinhVien() {
 
   useEffect(() => {
     checkAndHandleLogined(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.admin], navigate)
     fetchMajors()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     fetchClasses()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMajor])
 
   useEffect(() => {
     fetchStudents()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClasse, selectedMajor])
 
   const fetchMajors = async () => {
@@ -55,7 +62,6 @@ export default function AdminDanhSachSinhVien() {
       const data = await callApiGetMajorsList()
       const result = data.map(item => ({
         ...item,
-        name: item.name,
         value: item.id,
       }))
       // console.log(data)
@@ -93,8 +99,12 @@ export default function AdminDanhSachSinhVien() {
     if (classId) {
       try {
         const data = await callApiGetStudentsListByClassId(classId)
-        // console.log(data)
-        setStudents(data)
+        console.log(data)
+        setStudents(
+          data.sort((stu1, stu2) =>
+            stu1.studentId.localeCompare(stu2.studentId),
+          ),
+        )
       } catch (error) {
         console.error(error)
         handleError(error, navigate)
@@ -113,15 +123,17 @@ export default function AdminDanhSachSinhVien() {
   }
 
   const renderBodyTable = () => {
-    return students?.map((data, index) => (
-      <ItemRowDanhSachSinhVienAdmin
-        key={index}
-        data={data}
-        index={index}
-        classPresidentId={selectedClasse?.classPresidentId}
-        refresh={fetchClasses}
-      />
-    ))
+    return students?.length === 0
+      ? [<ItemRowNoData key={-1} colSpan={6} />]
+      : students?.map((data, index) => (
+          <ItemRowDanhSachSinhVienAdmin
+            key={index}
+            data={data}
+            index={index}
+            classPresidentId={selectedClasse?.classPresidentId}
+            refresh={fetchClasses}
+          />
+        ))
   }
 
   return (

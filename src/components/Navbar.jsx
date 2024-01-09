@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { routers, checkRoles } from '../utils'
+import { routers } from '../utils'
 
 export default function Navbar() {
   const role = useSelector(state => state.role)
@@ -19,7 +19,7 @@ export default function Navbar() {
 
   const renderNavs = () => {
     return routers
-      .filter(({ roles }) => roles && checkRoles(roles, role))
+      .filter(({ roles }) => roles && roles.includes(role))
       .map((router, index) => {
         return (
           <div

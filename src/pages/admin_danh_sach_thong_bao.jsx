@@ -7,19 +7,23 @@ import Table from '../components/Table'
 import Pagination from '../components/Pagination'
 import ItemRowTableDanhSachThongBaoAdmin from '../components/ItemRow/ItemRowTableDanhSachThongBaoAdmin'
 import ItemRowTableDanhSachThongBaoAdminAdd from '../components/ItemRow/ItemRowTableDanhSachThongBaoAdminAdd'
+import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 
 import {
   ITEM_PER_PAGE,
+  ROLES,
   callApiGetAnnouncementsPaginationList,
   checkAndHandleLogined,
+  checkPermissionToAccessThePage,
+  getUserRole,
 } from '../utils'
 
 const HEADER_TABLE = [
   { className: 'w-5%', title: 'stt' },
   { className: 'w-20%', title: 'tiêu đề' },
-  { className: 'w-20%', title: 'thời gian' },
+  { className: 'w-10%', title: 'thời gian' },
   { className: '', title: 'nội dung' },
-  { className: 'w-20%', title: '' },
+  { className: 'w-10%', title: '' },
 ]
 
 export default function AdminDanhSachThongBao() {
@@ -29,6 +33,7 @@ export default function AdminDanhSachThongBao() {
 
   useEffect(() => {
     checkAndHandleLogined(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.admin], navigate)
     fetchAnnouncements()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -47,26 +52,27 @@ export default function AdminDanhSachThongBao() {
   }
 
   const renderBodyTable = () => {
-    let arrJsx = objectAnnouncements.data?.map((dt, index) => (
-      <ItemRowTableDanhSachThongBaoAdmin
-        key={index}
-        index={index}
-        data={dt}
-        refresh={fetchAnnouncements}
-        objectAnnouncements={objectAnnouncements}
-      />
-    ))
-
+    let arrJsx =
+      objectAnnouncements.data?.length === 0
+        ? [<ItemRowNoData key={-1} colSpan={5} />]
+        : objectAnnouncements.data?.map((dt, index) => (
+            <ItemRowTableDanhSachThongBaoAdmin
+              key={index}
+              index={index}
+              data={dt}
+              refresh={fetchAnnouncements}
+              objectAnnouncements={objectAnnouncements}
+            />
+          ))
     isShowAddNew &&
       (arrJsx = [
         ...arrJsx,
         <ItemRowTableDanhSachThongBaoAdminAdd
-          key={-1}
+          key={-2}
           setShowAddNew={setShowAddNew}
           refresh={fetchAnnouncements}
         />,
       ])
-
     return arrJsx
   }
 
@@ -86,15 +92,17 @@ export default function AdminDanhSachThongBao() {
         <div>
           <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
         </div>
-        <Pagination
-          totalItems={objectAnnouncements.totalItems}
-          totalPages={objectAnnouncements.totalPages}
-          itemPerPage={objectAnnouncements.itemPerPage}
-          currentPage={objectAnnouncements.currentPage}
-          isNextPage={objectAnnouncements.isNextPage}
-          isPreviousPage={objectAnnouncements.isPreviousPage}
-          onPageChange={fetchAnnouncements}
-        />
+        {objectAnnouncements.totalPages > 1 && (
+          <Pagination
+            totalItems={objectAnnouncements.totalItems}
+            totalPages={objectAnnouncements.totalPages}
+            itemPerPage={objectAnnouncements.itemPerPage}
+            currentPage={objectAnnouncements.currentPage}
+            isNextPage={objectAnnouncements.isNextPage}
+            isPreviousPage={objectAnnouncements.isPreviousPage}
+            onPageChange={fetchAnnouncements}
+          />
+        )}
       </div>
     </div>
   )

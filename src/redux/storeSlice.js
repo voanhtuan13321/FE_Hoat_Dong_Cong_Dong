@@ -1,9 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { ROLES } from '../utils'
+import { ROLES, getHighestRole } from '../utils'
 
 const initialState = {
-  role: ROLES.client,
-  isLoading: false,
+  role: ROLES.admin,
 }
 
 export const storeSlice = createSlice({
@@ -12,20 +11,7 @@ export const storeSlice = createSlice({
   reducers: {
     setRole: (state, actions) => {
       const roles = actions.payload || []
-
-      const condition = {
-        DEFAULT: 1,
-        SINHVIEN: 2,
-        LOPTRUONG: 3,
-        GIAOVIEN: 4,
-        TRUONGKHOA: 5,
-        ADMIN: 6,
-      }
-
-      state.role = roles.reduce((mainIdRole, role) => {
-        const temptIdRole = condition[role] || 0
-        return Math.max(mainIdRole, temptIdRole)
-      }, condition.DEFAULT)
+      state.role = getHighestRole(roles)
     },
     setLoading: (state, actions) => {
       const isLoading = actions.payload || false

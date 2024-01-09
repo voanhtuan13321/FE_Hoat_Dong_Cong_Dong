@@ -1,75 +1,60 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+import queryString from 'query-string'
+import { useLocation, useNavigate } from 'react-router-dom'
+
 import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
 import Table from '../components/Table'
-import ItemRowTableTuDanhGia from '../components/ItemRow/ItemRowTableTuDanhGia'
 import Title from '../components/Title'
-import { ROLES, checkRoles } from '../utils'
+import ItemRowTableTuDanhGia from '../components/ItemRow/ItemRowTableTuDanhGia'
+import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
+import ItemRowTableTuDanhGiaAdd from '../components/ItemRow/ItemRowTableTuDanhGiaAdd'
 
-const optionsDotDanhGia = [
-  { name: '2022-2023', value: 1 },
-  { name: '2021-2022', value: 2 },
-]
-
-const dataTable = {
-  header: [
-    { className: 'w-5%', title: 'stt' },
-    { className: 'w-20%', title: 'loại hoạt động' },
-    { className: 'w-10%', title: 'khung điểm' },
-    { className: 'w-10%', title: 'điểm tự đánh giá' },
-    { className: 'w-10%', title: 'điểm ban cán sự đánh giá' },
-    { className: '', title: 'link minh chứng' },
-    { className: 'w-5%', title: '' },
-  ],
-  value: [
-    {
-      loaiHoatDong: 1,
-      diemTuDanhGia: 150,
-      diemBanCanSuDanhGia: 110,
-      linkMinhChung: 'facebook.com',
-    },
-    {
-      loaiHoatDong: 2,
-      diemTuDanhGia: 150,
-      diemBanCanSuDanhGia: 110,
-      linkMinhChung: 'facebook.com',
-    },
-  ],
-}
+import {
+  ROLES,
+  callApiGetUserCommunityActivities,
+  checkIsCurrentYear,
+  checkRoles2,
+  generateAcademyYearOptions,
+  getUserId,
+  handleError,
+} from '../utils'
 
 export default function TuDanhGia() {
   const role = useSelector(state => state.role)
-  const [selected, setSelected] = useState(optionsDotDanhGia[0])
-  const [listTuDanhGia, setListTuDanhGia] = useState(dataTable.value)
+  const academyYearOptions = generateAcademyYearOptions()
 
-  const onClickThem = () => {
-    setListTuDanhGia([
-      ...listTuDanhGia,
-      {
-        loaiHoatDong: 2,
-        diemTuDanhGia: 0,
-        diemBanCanSuDanhGia: 0,
-        linkMinhChung: '',
-      },
-    ])
-  }
+  const [isShowAddNew, setShowAddNew] = useState(false)
+  const [communityActivities, setCommunityActivities] = useState([])
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
+    academyYearOptions[0],
+  )
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const onClickDeleteItem = index => {
-    console.log(index)
-    const cloneStates = [...listTuDanhGia]
-    cloneStates.splice(index, 1)
-    setListTuDanhGia(cloneStates)
-  }
+  useEffect(() => {
+    const { studentId } = queryString.parse(location.search)
+    console.log('param', studentId)
+    fetchCommunityActivities(studentId)
+  }, [])
 
-  const onChangeStateItemRowTable = (index, rowData) => {
-    const cloneStates = [...listTuDanhGia]
-    cloneStates[index] = rowData
-    setListTuDanhGia(cloneStates)
-  }
+  const fetchCommunityActivities = async id => {
+    const userId = id || getUserId()
 
-  const onClickXacNhan = () => {
-    console.log(listTuDanhGia)
+    if (!userId) return
+
+    try {
+      const data = await callApiGetUserCommunityActivities(
+        userId,
+        selectedAcademyYear.value,
+      )
+      // console.log(data)
+      setCommunityActivities(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
   }
 
   const onClickXacNhanThamGia = () => {
@@ -79,31 +64,42 @@ export default function TuDanhGia() {
   const genHeaderByRole = () => {
     const header = [
       { className: 'w-5%', title: 'stt' },
-      { className: 'w-20%', title: 'loại hoạt động' },
-      { className: 'w-10%', title: 'khung điểm' },
-      { className: 'w-10%', title: 'điểm tự đánh giá' },
-      { className: 'w-10%', title: 'điểm ban cán sự đánh giá' },
+      { className: 'w-10%', title: 'loại hoạt động' },
+      { className: 'w-20%', title: 'tên hoạt động' },
+      { className: 'w-5%', title: 'khung điểm' },
+      { className: 'w-5%', title: 'điểm tự đánh giá' },
+      { className: 'w-5%', title: 'điểm ban cán sự đánh giá' },
       { className: '', title: 'link minh chứng' },
     ]
-
-    if (checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role)) {
+    if (checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role])) {
       return [...header, { className: 'w-5%', title: 'xác nhận' }]
     }
     return [...header, { className: 'w-5%', title: '' }]
   }
 
   const renderBodyTable = () => {
-    return listTuDanhGia.map((dt, index) => {
-      return (
-        <ItemRowTableTuDanhGia
-          key={index}
-          index={index}
-          data={dt}
-          onChangeStateItemRowTable={onChangeStateItemRowTable}
-          onClickDeleteItem={onClickDeleteItem}
-        />
-      )
-    })
+    let arrJsx =
+      communityActivities.length === 0
+        ? [<ItemRowNoData key={-1} colSpan={10} />]
+        : communityActivities.map((data, index) => (
+            <ItemRowTableTuDanhGia
+              key={index}
+              index={index}
+              data={data}
+              refresh={fetchCommunityActivities}
+              academyYear={selectedAcademyYear.value}
+            />
+          ))
+    isShowAddNew &&
+      (arrJsx = [
+        ...arrJsx,
+        <ItemRowTableTuDanhGiaAdd
+          key={-2}
+          setShowAddNew={setShowAddNew}
+          refresh={fetchCommunityActivities}
+        />,
+      ])
+    return arrJsx
   }
 
   return (
@@ -116,9 +112,9 @@ export default function TuDanhGia() {
           </span>
           <div className='w-48'>
             <InputSelect
-              options={optionsDotDanhGia}
-              value={selected}
-              onChange={setSelected}
+              options={academyYearOptions}
+              value={selectedAcademyYear}
+              onChange={setSelectedAcademyYear}
             />
           </div>
         </div>
@@ -130,20 +126,29 @@ export default function TuDanhGia() {
         <div className='flex justify-between items-center'>
           <h3 className='uppercase font-bold'>nội dung tự đánh giá</h3>
           <div>
-            {!checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role) && (
-              <Button label='thêm' type='add' onClick={onClickThem} />
-            )}
+            {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) &&
+              !isShowAddNew &&
+              checkIsCurrentYear(selectedAcademyYear.value) && (
+                <Button
+                  label='thêm'
+                  type='add'
+                  onClick={() => setShowAddNew(true)}
+                />
+              )}
           </div>
         </div>
         <div className='my-2'>
           <Table header={genHeaderByRole()}>{renderBodyTable()}</Table>
         </div>
-        {!checkRoles([ROLES.giaoVien, ROLES.truongKhoa], role) && (
-          <div className='flex justify-end gap-2'>
-            <Button label='lưu' onClick={onClickXacNhan} />
-            <Button label='xác nhận tham gia' onClick={onClickXacNhanThamGia} />
-          </div>
-        )}
+        {/* {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) &&
+          checkIsCurrentYear(selectedAcademyYear.value) && (
+            <div className='flex justify-end gap-2'>
+              <Button
+                label='xác nhận tham gia'
+                onClick={onClickXacNhanThamGia}
+              />
+            </div>
+          )} */}
       </div>
     </div>
   )

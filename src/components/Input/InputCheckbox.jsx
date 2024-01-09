@@ -14,6 +14,7 @@ export default function InputCheckbox({
   name,
   value,
   onChange,
+  onClick,
   disabled,
 }) {
   const id = useId()
@@ -27,6 +28,7 @@ export default function InputCheckbox({
         checked={value}
         className='w-4 h-4 bg-gray-100 border-normal cursor-pointer '
         onChange={onChange}
+        onClick={onClick}
         disabled={disabled}
       />
       {label && (
