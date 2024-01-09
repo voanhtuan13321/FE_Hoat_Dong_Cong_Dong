@@ -9,6 +9,7 @@ import InputNumber from '../Input/InputNumber'
 
 import {
   COMMUNITY_ACTIVITY_STATUS,
+  REGEX,
   ROLES,
   callApiGetCommunityActivityTypesList,
   callApiUpdateCommunityActivity,
@@ -16,16 +17,21 @@ import {
   handleError,
 } from '../../utils'
 
-export default function ItemRowTableDetailHoatDong({ index, data, refresh }) {
+export default function ItemRowTableDetailHoatDong({
+  index,
+  data,
+  refresh,
+  refresh2,
+}) {
   const role = useSelector(state => state.role)
-
-  console.log(data)
 
   const [isShowEdit, setShowEdit] = useState(false)
   const [rowData, setRowData] = useState(data)
   const [selectedCommunityActivityTypes, setSelectedCommunityActivityTypes] =
     useState({})
   const navigate = useNavigate()
+
+  console.log(data)
 
   useEffect(() => {
     fetchCommunityActivityTypies()
@@ -54,15 +60,14 @@ export default function ItemRowTableDetailHoatDong({ index, data, refresh }) {
     setShowEdit(false)
   }
 
-  const onClickSave = async () => {
-    const dataRequest = {
-      ...rowData,
-      status: COMMUNITY_ACTIVITY_STATUS.classPresidentConfirmed,
-    }
+  // lop truong confirmed
+  const onClickFonfirme = async status => {
     try {
+      const dataRequest = { ...rowData, status: status }
       const data = await callApiUpdateCommunityActivity(dataRequest)
       setRowData(data)
       refresh()
+      refresh2()
       toast.success('cập nhật thành công')
       setShowEdit(false)
     } catch (error) {
@@ -102,29 +107,63 @@ export default function ItemRowTableDetailHoatDong({ index, data, refresh }) {
           rowData.classPresidentEvaluationScore
         )}
       </td>
-      <td className='border border-primary p-1'>{rowData.evidentLink}</td>
-      <td className='border border-primary p-1 flex justify-center gap-1'>
-        {isShowEdit ? (
-          <>
-            <Button label='lưu' onClick={onClickSave} />
-            <Button label='huỷ' type='outline' onClick={onClickCancel} />
-          </>
+      <td className='border border-primary p-1'>
+        {REGEX.link.test(rowData.evidentLink) ? (
+          <a
+            className='text-blue-500'
+            target='_blank'
+            href={rowData.evidentLink}
+          >
+            {rowData.evidentLink}
+          </a>
         ) : (
-          <Button
-            label={`${
-              rowData.status ===
-              COMMUNITY_ACTIVITY_STATUS.classPresidentConfirmed
-                ? 'sửa'
-                : 'đánh giá'
-            }`}
-            type='edit'
-            onClick={() => setShowEdit(true)}
-          />
+          rowData.evidentLink
         )}
       </td>
+      {checkRoles2([ROLES.lopTruong], [role]) && (
+        <td className='border border-primary px-1 flex justify-center gap-1'>
+          {isShowEdit ? (
+            <>
+              <Button
+                label='lưu'
+                onClick={() =>
+                  onClickFonfirme(
+                    COMMUNITY_ACTIVITY_STATUS.classPresidentConfirmed,
+                  )
+                }
+              />
+              <Button label='huỷ' type='outline' onClick={onClickCancel} />
+            </>
+          ) : rowData.status <
+            COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed ? (
+            <Button
+              label={`${
+                rowData.status ===
+                COMMUNITY_ACTIVITY_STATUS.classPresidentConfirmed
+                  ? 'sửa'
+                  : 'đánh giá'
+              }`}
+              type='edit'
+              onClick={() => setShowEdit(true)}
+            />
+          ) : (
+            <span className='p-2 text-white'>dà</span>
+          )}
+        </td>
+      )}
       {checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
         <td className='border border-primary px-1 text-center'>
-          <InputCheckbox />
+          {rowData.status !== COMMUNITY_ACTIVITY_STATUS.studentConfirmed && (
+            <InputCheckbox
+              value={
+                rowData.status ===
+                COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed
+              }
+              onClick={() =>
+                onClickFonfirme(COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed)
+              }
+            />
+          )}
         </td>
       )}
     </tr>

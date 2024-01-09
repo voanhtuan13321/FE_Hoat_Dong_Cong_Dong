@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx'
 import { localStorages } from './localStorage'
 import { requestHandler } from './requestHandler'
 import { jwtDecode } from 'jwt-decode'
-import { KEY_ROLE_TOKEN, ROLES } from './properties'
+import { COMMUNITY_ACTIVITY_STATUS, KEY_ROLE_TOKEN, ROLES } from './properties'
 import Swal from 'sweetalert2'
 
 const condition = {
@@ -150,7 +150,42 @@ export const generateAcademyYearOptions = (length = 8) => {
   }))
 }
 
+export const generateYearOptions = year => {
+  const currentYear = new Date().getFullYear()
+  const length = currentYear - year + 1
+  return Array.from({ length }, (_, i) => ({
+    name: currentYear - i,
+    value: currentYear - i,
+  }))
+}
+
 export const caculateIndex = (data, inđex) =>
   data.itemPerPage * (data.currentPage - 1) + inđex + 1
 
 export const checkIsCurrentYear = year => year === new Date().getFullYear()
+
+export const determineActivityOutcome = (
+  sumScoreClassPresidentConfirmed,
+  sumScoreHeadTeacherConfirmed,
+  sumScoreMajorHeadConfirmed,
+) => {
+  const scores = [
+    sumScoreClassPresidentConfirmed,
+    sumScoreHeadTeacherConfirmed,
+    sumScoreMajorHeadConfirmed,
+  ]
+
+  const maxScore = Math.max(...scores)
+
+  return {
+    score: maxScore < 0 ? 0 : maxScore,
+    status:
+      maxScore < 0
+        ? COMMUNITY_ACTIVITY_STATUS.rejected
+        : maxScore === sumScoreClassPresidentConfirmed
+          ? COMMUNITY_ACTIVITY_STATUS.classPresidentConfirmed
+          : maxScore === sumScoreHeadTeacherConfirmed
+            ? COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed
+            : COMMUNITY_ACTIVITY_STATUS.majorHeadConfirmed,
+  }
+}

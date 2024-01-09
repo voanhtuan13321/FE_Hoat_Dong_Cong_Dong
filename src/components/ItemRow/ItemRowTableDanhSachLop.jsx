@@ -1,25 +1,33 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import InputCheckbox from '../Input/InputCheckbox'
 import DialogDetailCommunityActivityStudent from '../DialogCustom/DialogDetailCommunityActivityStudent'
 
 import {
+  COMMUNITY_ACTIVITY_STATUS,
   ROLES,
   callApiUpdateClassPresident,
   checkRoles,
+  determineActivityOutcome,
   getUserRole,
   handleError,
 } from '../../utils'
-import { useState } from 'react'
 
 export default function ItemRowTableDanhSachLop({
   dt,
   index,
   classPresidentId,
   refresh,
+  refresh2,
 }) {
   const [isShowDialog, setShowDialog] = useState(false)
   const navigate = useNavigate()
+  const determineActivity = determineActivityOutcome(
+    dt.sumScoreClassPresidentConfirmed,
+    dt.sumScoreHeadTeacherConfirmed,
+    dt.sumScoreMajorHeadConfirmed,
+  )
 
   const changeClassPresident = async () => {
     try {
@@ -53,12 +61,18 @@ export default function ItemRowTableDanhSachLop({
         {dt.email}
       </td>
       <td className='border border-primary text-main p-2 text-left'>
-        {dt.facebook}
+        {determineActivity.status ===
+          COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed && (
+          <span className='text-red-500'>Giáo viên đã duyệt</span>
+        )}
+
+        {determineActivity.status ===
+          COMMUNITY_ACTIVITY_STATUS.majorHeadConfirmed && (
+          <span className='text-green-500'>Trưởng khoa đã duyệt</span>
+        )}
       </td>
-      <td className='border border-primary text-main p-2 text-left'>
-        {`${dt.street || ''} ${dt.ward || ''} ${dt.district || ''} ${
-          dt.city || ''
-        }`}
+      <td className='border border-primary text-main p-2 text-center'>
+        {determineActivity.score}
       </td>
       {checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa]) && (
         <td className='border border-primary text-main p-2'>
@@ -79,6 +93,9 @@ export default function ItemRowTableDanhSachLop({
             userId={dt.id}
             isShowDialog={isShowDialog}
             setShowDialog={setShowDialog}
+            studentName={`${dt.firstName} ${dt.lastName}`}
+            refresh={refresh}
+            refresh2={refresh2}
           />
         </td>
       )}

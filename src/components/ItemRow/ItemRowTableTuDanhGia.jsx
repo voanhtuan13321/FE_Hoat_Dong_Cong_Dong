@@ -8,6 +8,7 @@ import InputCheckbox from '../Input/InputCheckbox'
 import Button from '../Button'
 
 import {
+  COMMUNITY_ACTIVITY_STATUS,
   ROLES,
   callApiDeleteCommunityActivity,
   callApiGetCommunityActivityTypesList,
@@ -174,7 +175,8 @@ export default function ItemRowTableTuDanhGia({
           <td className='border border-primary p-1'>{rowData.evidentLink}</td>
           {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
             <td className='border border-primary px-1 text-center flex gap-1'>
-              {checkIsCurrentYear(academyYear) ? (
+              {checkIsCurrentYear(academyYear) &&
+              rowData.status === COMMUNITY_ACTIVITY_STATUS.studentConfirmed ? (
                 <>
                   <Button
                     type='edit'

@@ -3,9 +3,19 @@ import Button from '../Button'
 import InputCheckbox from '../Input/InputCheckbox'
 import DialogChangePassword from '../DialogCustom/DialogChangePassword'
 import { useNavigate } from 'react-router-dom'
-import { STATUS_USER, callApiUpdateUserStatus, handleError } from '../../utils'
+import {
+  STATUS_USER,
+  callApiDeleteUser,
+  callApiUpdateUserStatus,
+  handleError,
+} from '../../utils'
+import Swal from 'sweetalert2'
 
-export default function ItemRowTableDanhSachGiaoVienAdmin({ stt, data }) {
+export default function ItemRowTableDanhSachGiaoVienAdmin({
+  stt,
+  data,
+  refresh,
+}) {
   const [isShowDialog, setShowDialog] = useState(false)
   const [user, setUser] = useState(data)
   const navigate = useNavigate()
@@ -30,9 +40,31 @@ export default function ItemRowTableDanhSachGiaoVienAdmin({ stt, data }) {
       ? STATUS_USER.ACCOUNT_UNLOCK
       : STATUS_USER.ACCOUNT_LOCKED
   }
+
+  const handleDelete = async () => {
+    const { isDenied } = await Swal.fire({
+      title: 'Bạn có chắc muốn xoá không?',
+      showConfirmButton: false,
+      showDenyButton: true,
+      denyButtonText: 'Xoá',
+      showCancelButton: true,
+      cancelButtonText: 'Huỷ',
+    })
+
+    if (isDenied) {
+      try {
+        const data = await callApiDeleteUser(user.id)
+        refresh()
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
+    }
+  }
+
   return (
     <tr>
-      <td className='border border-primary p-1 text-center'>
+      <td className='border border-primary p-1 text-center text-main'>
         {stt + 1}
         <DialogChangePassword
           userId={user.id}
@@ -40,19 +72,22 @@ export default function ItemRowTableDanhSachGiaoVienAdmin({ stt, data }) {
           setShowDialog={setShowDialog}
         />
       </td>
-      <td className='border border-primary p-1 text-center'>
+      <td className='border border-primary p-1 text-center text-main'>
         {data.teacherId}
       </td>
-      <td className='border border-primary p-1'>
+      <td className='border border-primary p-1 text-main'>
         {data.firstName + ' ' + data.lastName}
       </td>
-      <td className='border border-primary p-1 text-center'>
+      <td className='border border-primary px-1 text-center'>
         <Button type='edit' label='sửa' onClick={() => setShowDialog(true)} />
+      </td>
+      <td className='border border-primary px-1 text-center'>
+        <Button type='delete' label='xoá' onClick={handleDelete} />
       </td>
       <td className='border border-primary p-1 text-center'>
         <InputCheckbox
           value={user.status === STATUS_USER.ACCOUNT_LOCKED}
-          onChange={changeStatusAccountUser}
+          onClick={changeStatusAccountUser}
         />
       </td>
     </tr>

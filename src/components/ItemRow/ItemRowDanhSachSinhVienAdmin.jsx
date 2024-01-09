@@ -7,10 +7,12 @@ import DialogChangePassword from '../DialogCustom/DialogChangePassword'
 
 import {
   STATUS_USER,
+  callApiDeleteUser,
   callApiUpdateClassPresident,
   callApiUpdateUserStatus,
   handleError,
 } from '../../utils'
+import Swal from 'sweetalert2'
 
 export default function ItemRowDanhSachSinhVienAdmin({
   data,
@@ -27,6 +29,7 @@ export default function ItemRowDanhSachSinhVienAdmin({
   }, [data])
 
   const changeStatusAccountUser = async () => {
+    console.log('changeStatusAccountUser')
     try {
       const dataRequest = { userId: user.id, status: revertStatus(user.status) }
       const data = await callApiUpdateUserStatus(dataRequest)
@@ -35,6 +38,26 @@ export default function ItemRowDanhSachSinhVienAdmin({
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
+    }
+  }
+
+  const handleDelete = async () => {
+    const { isDenied } = await Swal.fire({
+      title: 'Bạn có chắc muốn xoá?',
+      showConfirmButton: false,
+      showDenyButton: true,
+      denyButtonText: 'Xoá',
+      showCancelButton: true,
+      cancelButtonText: 'Huỷ',
+    })
+    if (isDenied) {
+      try {
+        const data = await callApiDeleteUser(user.id)
+        refresh()
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
     }
   }
 
@@ -70,11 +93,10 @@ export default function ItemRowDanhSachSinhVienAdmin({
       </td>
       <td className='border border-primary px-3 text-main'>{`${user.firstName} ${user.lastName}`}</td>
       <td className='border border-primary text-center'>
-        <Button
-          type={'edit'}
-          label={'sửa'}
-          onClick={() => setShowDialog(true)}
-        />
+        <Button type='edit' label='sửa' onClick={() => setShowDialog(true)} />
+      </td>
+      <td className='border border-primary text-center'>
+        <Button type='delete' label='xoá' onClick={handleDelete} />
       </td>
       <td className='border border-primary'>
         <InputCheckbox

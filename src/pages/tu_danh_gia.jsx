@@ -140,7 +140,7 @@ export default function TuDanhGia() {
         <div className='my-2'>
           <Table header={genHeaderByRole()}>{renderBodyTable()}</Table>
         </div>
-        {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) &&
+        {/* {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) &&
           checkIsCurrentYear(selectedAcademyYear.value) && (
             <div className='flex justify-end gap-2'>
               <Button
@@ -148,7 +148,7 @@ export default function TuDanhGia() {
                 onClick={onClickXacNhanThamGia}
               />
             </div>
-          )}
+          )} */}
       </div>
     </div>
   )
