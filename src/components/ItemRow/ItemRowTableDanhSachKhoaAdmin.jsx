@@ -1,151 +1,160 @@
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
-import Button from '../Button'
-import InputSelect from '../Input/InputSelect'
+import Button from './Button'
+import InputSelect from './InputSelect'
+import InputText from './InputText'
+import {
+  callApiDeleteMajor,
+  callApiGetTeachersList,
+  callApiUpdateMajor,
+  handleError,
+  requestHandler,
+} from '../utils'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
-const dataTable = {
-  khoa: [
-    { name: 'Khoa A', value: 1 },
-    { name: 'Khoa B', value: 2 },
-    { name: 'Khoa C', value: 3 },
-    { name: 'Khoa D', value: 4 },
-  ],
-  ten: [
-    { name: 'Nguyễn Văn A', value: 1 },
-    { name: 'Nguyễn Văn B', value: 2 },
-    { name: 'Nguyễn Văn C', value: 3 },
-    { name: 'Nguyễn Văn D', value: 4 },
-  ],
-}
-
-export default function ItemRowTableDanhSachKhoaAdmin({ stt, data }) {
+export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
   const [isShowEdit, setShowEdit] = useState(false)
-  const [listDanhSachKhoa, setListDanhSachKhoa] = useState([])
-  const [selectedTen, setSelectedTen] = useState({})
-  const [selectedKhoa, setSelectedKhoa] = useState({})
-  const [rowData, setRowData] = useState({
-    khoa: data.khoa,
-    ten: data.ten,
-  })
+  const [listGiaoVien, setListGiaoVien] = useState([{}])
+  const [selectedGiaoVien, setSelectedGiaoVien] = useState({})
+  const [dataKhoa, setDataKhoa] = useState({ ...data })
+  const navigate = useNavigate()
 
   const onClickEdit = () => {
     setShowEdit(!isShowEdit)
   }
 
   useEffect(() => {
-    fetchListDanhSachKhoa()
+    fetchListDanhSachGiaoVien()
   }, [])
 
-  const fetchListDanhSachKhoa = () => {
-    const khoaData = dataTable.khoa
-    const tenData = dataTable.ten
+  useEffect(() => {
+    setDataKhoa(data)
+  }, [data])
 
-    setListDanhSachKhoa({
-      khoa: khoaData,
-      ten: tenData,
+  const fetchListDanhSachGiaoVien = async () => {
+    try {
+      const dataList = await callApiGetTeachersList()
+      const result = dataList.map(item => ({
+        ...item,
+        name: item.firstName + ' ' + item.lastName,
+        value: item.id,
+      }))
+      setListGiaoVien(result)
+      const dataSelectSet = getDanhSachGiaoVien(data.majorHeadId, dataList)
+      setSelectedGiaoVien({
+        name: dataSelectSet.firstName + ' ' + dataSelectSet.lastName,
+        value: dataSelectSet.id,
+      })
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
+
+  const getDanhSachGiaoVien = (value, tenData) => {
+    return !value ? tenData[0] : tenData.find(item => item.id === value)
+  }
+
+  const onChangeInput = event => {
+    const { name, value } = event.target
+    setDataKhoa({
+      ...dataKhoa,
+      [name]: value,
     })
-
-    setSelectedTen(getDanhSachTen(data.ten, tenData))
-    setSelectedKhoa(getDanhSachKhoa(data.khoa, khoaData))
-    setRowData({
-      ...rowData,
-      khoa: getDanhSachKhoa(data.khoa, khoaData).name,
-      ten: getDanhSachTen(data.ten, tenData).name,
-    })
   }
 
-  const getDanhSachKhoa = (value, khoaData) => {
-    return !value
-      ? khoaData[0]
-      : khoaData.find(item => item.value === value) || khoaData[0]
+  const onClickLuu = async () => {
+    const dataEdit = {
+      id: dataKhoa.id,
+      majorHeadId: selectedGiaoVien.id,
+      name: dataKhoa.name,
+    }
+    try {
+      await callApiUpdateMajor(dataEdit)
+      toast.success('Cập nhật thành công')
+      setShowEdit(false)
+      refresh()
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
   }
 
-  const getDanhSachTen = (value, tenData) => {
-    return !value
-      ? tenData[0]
-      : tenData.find(item => item.value === value) || tenData[0]
-  }
-
-  const onSelectOptionTen = selected => {
-    setSelectedTen(selected)
-    setRowData({ ...rowData, ten: selected.name })
-  }
-
-  const onSelectOptionKhoa = selected => {
-    setSelectedKhoa(selected)
-    setRowData({ ...rowData, khoa: selected.name })
-  }
-
-  const onClickLuu = () => {
-    console.log(rowData)
-  }
-
-  const handleDeleteButtonClick = () => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
+  const handleDeleteButtonClick = async id => {
+    await Swal.fire({
+      title: 'Bạn có chắc chắn muốn xóa?',
+      text: 'Xóa khoa sẽ xóa toàn bộ lớp và sinh viên thuộc khoa',
       icon: 'warning',
       showCancelButton: true,
+      cancelButtonText: 'Hủy',
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
-    }).then(result => {
+      confirmButtonText: 'Có, tôi chắc chắn!',
+    }).then(async result => {
       if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'Your file has been deleted.',
-          icon: 'success',
-        })
+        try {
+          await callApiDeleteMajor(id)
+          console.log('Xóa')
+          toast.success('Xóa thành công')
+          refresh()
+        } catch (error) {
+          alert(error.message)
+        }
       }
     })
   }
 
-  const renderContent = (value, name) =>
-    isShowEdit ? (
-      name === 'ten' ? (
-        <InputSelect
-          name={name}
-          options={listDanhSachKhoa.ten}
-          value={selectedTen}
-          onChange={onSelectOptionTen}
-        />
-      ) : (
-        <InputSelect
-          name={name}
-          options={listDanhSachKhoa.khoa}
-          value={selectedKhoa}
-          onChange={onSelectOptionKhoa}
-        />
-      )
-    ) : (
-      value
-    )
-
   return (
-    <tr className='text-main'>
-      <td className='border border-primary p-1 text-center'>{stt + 1}</td>
-      <td className='border border-primary p-1 text-center'>
-        {renderContent(rowData.khoa, 'khoa')}
-      </td>
-      <td className='border border-primary p-1 text-center'>
-        {renderContent(rowData.ten, 'ten')}
-      </td>
-      <td className='border border-primary p-1 flex'>
-        <div className='w-1/2 flex justify-center'>
-          <Button
-            label={isShowEdit ? 'lưu' : 'sửa'}
-            type={isShowEdit ? '' : 'edit'}
-            onClick={isShowEdit ? onClickLuu : onClickEdit}
-          />
-        </div>
-        <div className='w-1/2 flex justify-center'>
-          <Button
-            label={isShowEdit ? 'hủy' : 'Xóa'}
-            type={isShowEdit ? 'outline' : 'delete'}
-            onClick={isShowEdit ? onClickEdit : handleDeleteButtonClick}
-          />
-        </div>
-      </td>
-    </tr>
+    <>
+      {isShowEdit ? (
+        <tr className='text-main'>
+          <td className='border border-primary p-1 text-center'>{stt + 1}</td>
+          <td className='border border-primary p-1 text-center'>
+            <InputText
+              name='name'
+              value={dataKhoa.name}
+              onChange={onChangeInput}
+            />
+          </td>
+          <td className='border border-primary p-1 text-center'>
+            <InputSelect
+              name='giaoVien'
+              value={selectedGiaoVien}
+              onChange={setSelectedGiaoVien}
+              options={listGiaoVien}
+            />
+          </td>
+          <td className='border border-primary p-1 flex'>
+            <div className='w-1/2 flex justify-center'>
+              <Button label='lưu' type='' onClick={onClickLuu} />
+            </div>
+            <div className='w-1/2 flex justify-center'>
+              <Button label='hủy' type='outline' onClick={onClickEdit} />
+            </div>
+          </td>
+        </tr>
+      ) : (
+        <tr className='text-main'>
+          <td className='border border-primary p-1 text-center'>{stt + 1}</td>
+          <td className='border border-primary p-1 text-center'>{data.name}</td>
+          <td className='border border-primary p-1 text-center'>
+            {data.majorHeadFullName}
+          </td>
+          <td className='border border-primary p-1 flex'>
+            <div className='w-1/2 flex justify-center'>
+              <Button label='sửa' type='edit' onClick={onClickEdit} />
+            </div>
+            <div className='w-1/2 flex justify-center'>
+              <Button
+                label='Xóa'
+                type='delete'
+                onClick={() => handleDeleteButtonClick(data.id)}
+              />
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   )
 }

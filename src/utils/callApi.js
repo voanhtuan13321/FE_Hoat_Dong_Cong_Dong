@@ -87,6 +87,26 @@ export const callApiGetMajorsList = async () => {
   return await response.data
 }
 
+export const callApiGetMajorsPaginationList = async(ItemPerPage, Page) =>{
+  const url = `api/Major/GetMajorsPaginationList`
+  const config = { params: { ItemPerPage, Page }}
+  const response = await requestHandler.get(url,config)
+  return await response.data
+}
+
+export const callApiUpdateMajor = async dataEdit =>{
+  const url = `api/Major/UpdateMajor`
+  const repsonse = await requestHandler.put(url,dataEdit)
+  return await repsonse.data
+}
+
+export const callApiDeleteMajor = async majorId =>{
+  const url = `api/Major/DeleteMajor`
+  const config = {params: {majorId}}
+  const repsonse = await requestHandler.delete(url,config)
+  return await repsonse.data
+}
+
 // user
 const baseApiUser = 'api/User'
 
