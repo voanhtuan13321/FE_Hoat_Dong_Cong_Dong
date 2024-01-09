@@ -5,7 +5,7 @@ import { store } from '../redux/store'
 
 const requestHandler = axios.create({
   baseURL:
-    'https://be8f-2405-4802-6ea4-6950-81dd-2e66-c103-fde0.ngrok-free.app/',
+    'https://d909-2401-d800-7186-48e3-d028-3714-9fee-333e.ngrok-free.app/',
   timeout: 10000,
   headers: { 'ngrok-skip-browser-warning': 'true' },
 })

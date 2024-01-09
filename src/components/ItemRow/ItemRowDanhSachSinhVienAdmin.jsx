@@ -30,7 +30,7 @@ export default function ItemRowDanhSachSinhVienAdmin({
     try {
       const dataRequest = { userId: user.id, status: revertStatus(user.status) }
       const data = await callApiUpdateUserStatus(dataRequest)
-      // console.log(data)
+      console.log(data)
       setUser(data)
     } catch (error) {
       console.error(error)

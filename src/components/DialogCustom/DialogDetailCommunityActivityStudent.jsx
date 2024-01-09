@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import DialogCustom from '.'
 import Button from '../Button'
+import ItemRowNoData from '../ItemRow/ItemRowNoData'
+import ItemRowTableDetailHoatDong from '../ItemRow/ItemRowTableDetailHoatDong'
+import Table from '../Table'
 
 import {
   ROLES,
   callApiGetUserCommunityActivities,
-  checkIsCurrentYear,
   checkRoles2,
   generateAcademyYearOptions,
-  getUserId,
   handleError,
 } from '../../utils'
-import { useSelector } from 'react-redux'
-import queryString from 'query-string'
-import ItemRowNoData from '../ItemRow/ItemRowNoData'
-import ItemRowTableDetailHoatDong from '../ItemRow/ItemRowTableDetailHoatDong'
-import Table from '../Table'
 
 export default function DialogDetailCommunityActivityStudent({
   userId,
@@ -32,12 +29,10 @@ export default function DialogDetailCommunityActivityStudent({
     academyYearOptions[0],
   )
   const navigate = useNavigate()
-  const location = useLocation()
 
   useEffect(() => {
-    const { studentId } = queryString.parse(location.search)
-    console.log('param', studentId)
-    fetchCommunityActivities(studentId)
+    fetchCommunityActivities()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchCommunityActivities = async () => {
@@ -56,10 +51,6 @@ export default function DialogDetailCommunityActivityStudent({
     }
   }
 
-  const onClickXacNhanThamGia = () => {
-    alert('Xac Nhan tham gia')
-  }
-
   const genHeaderByRole = () => {
     const header = [
       { className: 'w-5%', title: 'stt' },
@@ -73,7 +64,7 @@ export default function DialogDetailCommunityActivityStudent({
     if (checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role])) {
       return [...header, { className: 'w-5%', title: 'xác nhận' }]
     }
-    return [...header, { className: 'w-5%', title: '' }]
+    return [...header, { className: 'w-10%', title: '' }]
   }
 
   const renderBodyTable = () => {
@@ -89,6 +80,7 @@ export default function DialogDetailCommunityActivityStudent({
           />
         ))
   }
+
   return (
     <DialogCustom isOpen={isShowDialog} title='chi tiết hoạt động'>
       <div className='mx-auto w-[1600px]'>

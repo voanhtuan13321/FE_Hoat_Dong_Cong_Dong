@@ -19,6 +19,8 @@ import {
 export default function ItemRowTableDetailHoatDong({ index, data, refresh }) {
   const role = useSelector(state => state.role)
 
+  console.log(data)
+
   const [isShowEdit, setShowEdit] = useState(false)
   const [rowData, setRowData] = useState(data)
   const [selectedCommunityActivityTypes, setSelectedCommunityActivityTypes] =
@@ -108,7 +110,16 @@ export default function ItemRowTableDetailHoatDong({ index, data, refresh }) {
             <Button label='huỷ' type='outline' onClick={onClickCancel} />
           </>
         ) : (
-          <Button label='sửa' type='edit' onClick={() => setShowEdit(true)} />
+          <Button
+            label={`${
+              rowData.status ===
+              COMMUNITY_ACTIVITY_STATUS.classPresidentConfirmed
+                ? 'sửa'
+                : 'đánh giá'
+            }`}
+            type='edit'
+            onClick={() => setShowEdit(true)}
+          />
         )}
       </td>
       {checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
