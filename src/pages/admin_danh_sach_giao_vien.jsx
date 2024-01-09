@@ -3,9 +3,13 @@ import Table from '../components/Table'
 import Title from '../components/Title'
 import Button from '../components/Button'
 import ItemRowTableDanhSachGiaoVienAdmin from '../components/ItemRow/ItemRowTableDanhSachGiaoVienAdmin'
-import ItemRowTableDanhSachGiaoVienAdminAdd from '../components/ItemRow/ItemRowTableDanhSachGiaoVienAdminAdd'
-import { checkAndHandleLogined } from '../utils'
+import {
+  ITEM_PER_PAGE,
+  callApiGetTeachersPaginationList,
+  checkAndHandleLogined,
+} from '../utils'
 import { useNavigate } from 'react-router-dom'
+import DialogCreateUserTeacher from '../components/DialogCustom/DialogCreateUserTeacher'
 
 const dataTable = {
   header: [
@@ -15,17 +19,12 @@ const dataTable = {
     { className: 'w-20%', title: 'đổi mật khẩu' },
     { className: 'w-20%', title: 'khoá tài khoản' },
   ],
-  value: [
-    { maGiaoVien: 'gv001', hoVaTen: 'vo anh tuan 1', disabled: true },
-    { maGiaoVien: 'gv002', hoVaTen: 'vo anh tuan 2', disabled: false },
-    { maGiaoVien: 'gv003', hoVaTen: 'vo anh tuan 3', disabled: true },
-    { maGiaoVien: 'gv004', hoVaTen: 'vo anh tuan 4', disabled: false },
-  ],
 }
 
 export default function AdminDanhSachGiaoVien() {
-  const [listGiaoVien, setListGiaoVien] = useState([])
-  const [isShowAddNew, setShowAddNew] = useState(false)
+  const [objectTeacher, setObjectTeacher] = useState({})
+  const [isShowDialog, setShowDialog] = useState(false)
+
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -33,46 +32,54 @@ export default function AdminDanhSachGiaoVien() {
     fetchListGiaoVien()
   }, [])
 
-  const fetchListGiaoVien = () => {
-    setListGiaoVien(dataTable.value)
+  const fetchListGiaoVien = async (page = 0) => {
+    try {
+      const data = await callApiGetTeachersPaginationList(ITEM_PER_PAGE, page)
+      setObjectTeacher(data)
+      console.log(data)
+    } catch (error) {
+      alert(error.message)
+    }
   }
 
-  const onClickThem = () => {
-    setShowAddNew(true)
+  const onClickCreateUser = () => {
+    setShowDialog(true)
   }
 
   const renderBodyTable = () => {
-    let arrJsx = listGiaoVien.map((dt, index) => {
+    let arrJsx = objectTeacher.data?.map((dt, index) => {
       return (
-        <ItemRowTableDanhSachGiaoVienAdmin key={index} stt={index} data={dt} />
+        <ItemRowTableDanhSachGiaoVienAdmin
+          key={index}
+          stt={index}
+          data={dt}
+          refresh={fetchListGiaoVien}
+          objectTeacher={objectTeacher}
+        />
       )
     })
-
-    isShowAddNew &&
-      (arrJsx = [
-        ...arrJsx,
-        <ItemRowTableDanhSachGiaoVienAdminAdd
-          key={-1}
-          setShowAddNew={setShowAddNew}
-        />,
-      ])
 
     return arrJsx
   }
 
   return (
-    <div className='container mx-auto'>
-      <Title title='danh sách giao viên' />
-      <div>
-        <div className='py-2 text-end'>
-          {!isShowAddNew && (
-            <Button type='add' label='thêm' onClick={onClickThem} />
-          )}
-        </div>
+    <>
+      <DialogCreateUserTeacher
+        isShowDialog={isShowDialog}
+        setShowDialog={setShowDialog}
+        refresh={fetchListGiaoVien}
+      />
+      <div className='container mx-auto'>
+        <Title title='danh sách giao viên' />
         <div>
-          <Table header={dataTable.header}>{renderBodyTable()}</Table>
+          <div className='py-2 text-end'>
+            <Button type='add' label='thêm' onClick={onClickCreateUser} />
+          </div>
+          <div>
+            <Table header={dataTable.header}>{renderBodyTable()}</Table>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
