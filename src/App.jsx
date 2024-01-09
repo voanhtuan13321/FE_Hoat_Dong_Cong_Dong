@@ -38,7 +38,7 @@ export default function App() {
     <div className='relative'>
       <Header />
       <Navbar />
-      <div className='min-h-[600px]'>
+      <div className='min-h-[600px] relative'>
         <Routes>{renderRoutes()}</Routes>
       </div>
       <Footer />
