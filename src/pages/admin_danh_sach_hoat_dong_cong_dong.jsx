@@ -5,7 +5,7 @@ import Title from '../components/Title'
 import Table from '../components/Table'
 import Button from '../components/Button'
 import Pagination from '../components/Pagination'
-import ItemRowDanhSachHoatDongCongDongAdmin from '../components/ItemRow/ItemRowDanhSachHoatDongCongDongAdmin'
+import ItemRowDanhSachHoatDongCongDongAdmin from '../components/ItemRow/ItemRowRowDanhSachHoatDongCongDongAdmin'
 import ItemRowDanhSachHoatDongCongDongAdminAdd from '../components/ItemRow/ItemRowDanhSachHoatDongCongDongAdminAdd'
 import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 

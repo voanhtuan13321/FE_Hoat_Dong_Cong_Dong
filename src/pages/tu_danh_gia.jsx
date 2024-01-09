@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import queryString from 'query-string'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
@@ -13,10 +12,13 @@ import ItemRowTableTuDanhGiaAdd from '../components/ItemRow/ItemRowTableTuDanhGi
 
 import {
   ROLES,
+  callApiGetClassById,
+  callApiGetUserByUserId,
   callApiGetUserCommunityActivities,
   checkIsCurrentYear,
   checkRoles2,
   generateAcademyYearOptions,
+  generateYearOptions,
   getUserId,
   handleError,
 } from '../utils'
@@ -27,38 +29,59 @@ export default function TuDanhGia() {
 
   const [isShowAddNew, setShowAddNew] = useState(false)
   const [communityActivities, setCommunityActivities] = useState([])
+  const [academicYearOptions, setAcademicYearOption] = useState([])
   const [selectedAcademyYear, setSelectedAcademyYear] = useState(
     academyYearOptions[0],
   )
   const navigate = useNavigate()
-  const location = useLocation()
 
   useEffect(() => {
-    const { studentId } = queryString.parse(location.search)
-    console.log('param', studentId)
-    fetchCommunityActivities(studentId)
+    fetchCommunityActivities()
+    fetchInfoUser()
   }, [])
 
-  const fetchCommunityActivities = async id => {
-    const userId = id || getUserId()
-
-    if (!userId) return
-
-    try {
-      const data = await callApiGetUserCommunityActivities(
-        userId,
-        selectedAcademyYear.value,
-      )
-      // console.log(data)
-      setCommunityActivities(data)
-    } catch (error) {
-      console.error(error)
-      handleError(error, navigate)
+  const fetchCommunityActivities = async () => {
+    const userId = getUserId()
+    if (userId) {
+      try {
+        const data = await callApiGetUserCommunityActivities(
+          userId,
+          selectedAcademyYear.value,
+        )
+        // console.log(data)
+        setCommunityActivities(data)
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
     }
   }
 
-  const onClickXacNhanThamGia = () => {
-    alert('Xac Nhan tham gia')
+  const fetchInfoUser = async () => {
+    const userId = getUserId()
+    if (userId) {
+      try {
+        const data = await callApiGetUserByUserId(userId)
+        // console.log('classId', data)
+        fetchInfoClass(data.classId)
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
+    }
+  }
+
+  const fetchInfoClass = async classId => {
+    if (classId) {
+      try {
+        const data = await callApiGetClassById(classId)
+        const option = generateYearOptions(data.academicYear)
+        setAcademicYearOption(option)
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
+    }
   }
 
   const genHeaderByRole = () => {
@@ -112,7 +135,7 @@ export default function TuDanhGia() {
           </span>
           <div className='w-48'>
             <InputSelect
-              options={academyYearOptions}
+              options={academicYearOptions}
               value={selectedAcademyYear}
               onChange={setSelectedAcademyYear}
             />

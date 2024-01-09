@@ -10,6 +10,7 @@ import ItemRowTableDanhSachLop from '../components/ItemRow/ItemRowTableDanhSachL
 
 import {
   ROLES,
+  callApiApproveClassCommunityActivitiesByHeadTeacher,
   callApiGetClassesByTeacherId,
   callApiGetStudentsListByClassId,
   callApiGetUserByUserId,
@@ -22,6 +23,7 @@ import {
   getUserRole,
   handleError,
 } from '../utils'
+import Swal from 'sweetalert2'
 
 export default function DanhSachLop() {
   const academyYearOptions = generateAcademyYearOptions()
@@ -98,7 +100,7 @@ export default function DanhSachLop() {
           classId,
           selectedYear.value,
         )
-        console.log('student', data)
+        // console.log('student', data)
         setStudents(
           data.sort((stu1, stu2) =>
             stu1.studentId.localeCompare(stu2.studentId),
@@ -113,8 +115,29 @@ export default function DanhSachLop() {
     }
   }
 
-  const handleXacNhan = () => {
-    console.log(students)
+  const handleXacNhan = async () => {
+    const classId = selectedClasses?.value
+    if (!classId) return
+
+    const { isConfirmed } = await Swal.fire({
+      title: 'Bạn có chắc muốn xác nhận không',
+      icon: 'info',
+      confirmButtonText: 'Xác nhận',
+      showCancelButton: true,
+      cancelButtonText: 'Huỷ',
+    })
+
+    if (isConfirmed) {
+      try {
+        const data = await callApiApproveClassCommunityActivitiesByHeadTeacher(
+          classId,
+          new Date().getFullYear(),
+        )
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
+    }
   }
 
   const renderBodyTable = () => {

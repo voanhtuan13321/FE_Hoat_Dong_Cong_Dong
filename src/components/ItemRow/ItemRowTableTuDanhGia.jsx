@@ -123,7 +123,9 @@ export default function ItemRowTableTuDanhGia({
             />
           </td>
           <td className='border border-primary text-center'>
-            {`${selectedCommunityActivityTypes.minScore} - ${selectedCommunityActivityTypes.maxScore}`}
+            {`${selectedCommunityActivityTypes.minScore || ''} - ${
+              selectedCommunityActivityTypes.maxScore || ''
+            }`}
           </td>
           <td className='border border-primary'>
             <InputNumber

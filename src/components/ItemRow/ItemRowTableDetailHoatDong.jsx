@@ -156,8 +156,7 @@ export default function ItemRowTableDetailHoatDong({
           {rowData.status !== COMMUNITY_ACTIVITY_STATUS.studentConfirmed && (
             <InputCheckbox
               value={
-                rowData.status ===
-                COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed
+                rowData.status >= COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed
               }
               onClick={() =>
                 onClickFonfirme(COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed)

@@ -39,26 +39,18 @@ export default function InputSelect({
       <Listbox.Option
         key={index}
         className={({ active }) =>
-          `relative cursor-pointer select-none p-2 pl-10 ${
-            active ? 'bg-primary text-white' : 'text-gray-900'
-          }`
+          `relative cursor-pointer select-none p-2
+           ${active ? 'bg-primary text-white' : 'text-gray-900'}`
         }
         value={option}
       >
         {({ selected }) => (
-          <>
-            <span
-              className={`block truncate text-main
+          <span
+            className={`block truncate text-main
                 ${selected ? 'font-medium' : 'font-normal'}`}
-            >
-              {option.name}
-            </span>
-            {selected && (
-              <span className='absolute inset-y-0 left-0 flex items-center pl-3 text-primary'>
-                <FaCheck />
-              </span>
-            )}
-          </>
+          >
+            {option.name}
+          </span>
         )}
       </Listbox.Option>
     ))

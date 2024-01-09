@@ -10,6 +10,7 @@ import Table from '../Table'
 
 import {
   ROLES,
+  callApiApproveUserCommunityActivitiesByHeadTeacher,
   callApiGetUserCommunityActivities,
   checkRoles,
   checkRoles2,
@@ -17,7 +18,7 @@ import {
   getUserRole,
   handleError,
 } from '../../utils'
-import { getRoles } from '@testing-library/react'
+import Swal from 'sweetalert2'
 
 export default function DialogDetailCommunityActivityStudent({
   userId,
@@ -88,7 +89,29 @@ export default function DialogDetailCommunityActivityStudent({
         ))
   }
 
-  const handleAcceptAll = () => {}
+  const handleAcceptAll = async () => {
+    const { isConfirmed } = await Swal.fire({
+      title: 'Bạn có chắc là muốn xác nhận',
+      icon: 'info',
+      confirmButtonText: 'Xác nhận',
+      showCancelButton: true,
+      cancelButtonText: 'huỷ',
+    })
+
+    if (isConfirmed) {
+      try {
+        const data = await callApiApproveUserCommunityActivitiesByHeadTeacher(
+          userId,
+          new Date().getFullYear(),
+        )
+        refresh()
+        refresh2()
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
+    }
+  }
 
   return (
     <DialogCustom
@@ -108,10 +131,7 @@ export default function DialogDetailCommunityActivityStudent({
             onClick={() => setShowDialog(false)}
           />
           {checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa]) && (
-            <Button
-              label='xác nhận toàn bộ'
-              onClick={() => setShowDialog(false)}
-            />
+            <Button label='xác nhận toàn bộ' onClick={handleAcceptAll} />
           )}
         </div>
       </div>
