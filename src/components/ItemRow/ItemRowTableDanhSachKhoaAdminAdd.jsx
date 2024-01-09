@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import Button from './Button'
-import InputSelect from './InputSelect'
-import { callApiGetTeachersList, handleError, requestHandler } from '../utils'
-import InputText from './InputText'
+import Button from '../Button'
+import {
+  callApiGetTeachersList,
+  handleError,
+  requestHandler,
+} from '../../utils'
 import { useNavigate } from 'react-router-dom'
+import InputSelect from '../Input/InputSelect'
+import InputText from '../Input/InputText'
 
 export default function ItemRowTableDanhSachKhoaAdminAdd({
   setShowAddNew,
