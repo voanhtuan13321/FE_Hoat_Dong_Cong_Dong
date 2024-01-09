@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Title from '../components/Title'
-import { requestHandler } from '../utils'
 import { format } from 'date-fns'
 import Pagination from '../components/Pagination'
+import { callApiGetAnnouncementsPaginationList } from '../utils'
 
 export default function Home() {
   const [listThongBao, setListThongBao] = useState({})
@@ -13,16 +13,8 @@ export default function Home() {
 
   const fetchListThongBao = async page => {
     try {
-      const response = await requestHandler.get(
-        '/api/Announcement/GetAnnouncementsPaginationList',
-        {
-          params: {
-            ItemPerPage: 5,
-            Page: page,
-          },
-        },
-      )
-      const data = response.data
+      const response = await callApiGetAnnouncementsPaginationList(5, page)
+      const data = response
       setListThongBao(data)
     } catch (error) {
       console.error(error)
