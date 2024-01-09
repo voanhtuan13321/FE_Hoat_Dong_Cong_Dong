@@ -1,54 +1,153 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { jwtDecode } from 'jwt-decode'
+
+// component
 import Title from '../components/Title'
-import InputText from '../components/InputText'
-import InputDate from '../components/InputDate'
-import InputAvatar from '../components/InputAvatar'
-import InputTextArea from '../components/InputTextArea'
+import InputText from '../components/Input/InputText'
+import InputDate from '../components/Input/InputDate'
+import InputAvatar from '../components/Input/InputAvatar'
+import InputTextArea from '../components/Input/InputTextArea'
+import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
 
+// function
+import {
+  KEY_ROLE_TOKEN,
+  REGEX,
+  ROLES,
+  callApiGetUserByUserId,
+  callApiUpdateUser,
+  checkRoles,
+  convertObjectToFormData,
+  convertToObjectFormFormik,
+  handleError,
+  localStorages,
+  optionsGender,
+} from '../utils'
+import ErrorLabel from '../components/ErrorLabel'
+import { setRole } from '../redux/storeSlice'
+
 const initInfoUser = {
+  id: '',
+  classId: '',
   avatar: '',
-  hoVaTen: 'afasdf',
-  gioiTinh: '',
-  ngaySinh: new Date(),
-  noiSinh: '',
+  firstName: '',
+  lastName: '',
+  dateOfBirth: new Date('0001-01-01T00:00:00'),
+  placeOfBirth: '',
+  gender: true,
+  ethnic: '',
+  nationality: '',
+  identificationCardId: '',
+  identificationCardIssueDate: new Date('0001-01-01T00:00:00'),
+  identificationCardIssuePlace: '',
+  religion: '',
+  phone: '',
   email: '',
-  soDienThoai: '',
-  danToc: '',
-  quocTich: '',
+  status: 0,
   facebook: '',
-  tonGiao: '',
-  cccd: '',
-  ngayCap: new Date(),
-  noiCap: '',
-  thanhPho: '',
-  quan: '',
-  phuong: '',
-  tenDuong: '',
+  city: '',
+  district: '',
+  ward: '',
+  street: '',
 }
 
 export default function ThongTinCaNhan() {
   const [isShowEdit, setShowEdit] = useState(false)
-  const [infoUser, setInputUser] = useState(initInfoUser)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    fetchInfoUser()
+    const token = localStorages.getToken()
+
+    if (token) {
+      const decoded = jwtDecode(token)
+      const role = decoded[KEY_ROLE_TOKEN]
+      dispatch(setRole(role))
+
+      if (checkRoles([ROLES.client], role)) {
+        alert('bạn phải đăng nhập')
+        navigate('/login')
+      }
+      fetchInfoUser()
+    } else {
+      alert('bạn phải đăng nhập')
+      navigate('/login')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchInfoUser = () => {
-    setInputUser(initInfoUser)
+  const fetchInfoUser = async () => {
+    const token = localStorages.getToken()
+    const decoded = jwtDecode(token)
+    const userId = decoded['UserId']
+    if (userId) {
+      try {
+        const data = await callApiGetUserByUserId(userId)
+
+        const newValueFormik = await convertToObjectFormFormik(data)
+        // console.log('newValueFormik', newValueFormik)
+        formik.setValues(newValueFormik)
+      } catch (error) {
+        console.error('Failed to get user', error)
+        // handleError(error, navigate)
+      }
+    }
   }
 
-  const onSubmit = (values, { resetForm }) => {
+  const onSubmit = async values => {
     // Thực hiện xử lý submit ở đây
-    console.log(values)
+    const formData = await convertObjectToFormData(values)
+
+    try {
+      const data = await callApiUpdateUser(formData)
+      // console.log(data)
+      const newValueFormik = await convertToObjectFormFormik(data)
+      formik.setValues(newValueFormik)
+      setShowEdit(false)
+    } catch (error) {
+      console.error('Failed to update user', error)
+      handleError(error, navigate)
+    }
   }
 
   const formik = useFormik({
-    initialValues: infoUser,
-    validationSchema: Yup.object({}),
+    initialValues: initInfoUser,
+    validationSchema: Yup.object({
+      firstName: Yup.string()
+        .required('Bắt buộc nhập')
+        .max(20, 'Không được quá 20 ký tự'),
+      lastName: Yup.string()
+        .required('Tên bắt buộc phải nhập')
+        .max(20, 'Tên không được quá 20 ký tự'),
+      placeOfBirth: Yup.string().max(30, 'Nơi sinh không được quá 30 ký tự'),
+      ethnic: Yup.string()
+        .max(20, 'Dân tộc không được quá 20 k')
+        .matches(REGEX.textOnly, 'Dân tộc không được chứa số'),
+      nationality: Yup.string()
+        .max(25, 'Quốc tịch không được quá 25 ký tự')
+        .matches(REGEX.textOnly, 'Dân tộc không được chứa số'),
+      identificationCardId: Yup.string().max(
+        20,
+        'CCCD không được quá 20 ký tự',
+      ),
+      identificationCardIssueDate: Yup.date().max(
+        new Date(),
+        'Ngày không được lớn hơn ngày hiện tại',
+      ),
+      identificationCardIssuePlace: Yup.string().max(
+        30,
+        'Nơi cấp CCCD không được quá 30 ký tự',
+      ),
+      religion: Yup.string().max(50, 'religion không được quá 50 ký tự'),
+      phone: Yup.string().matches(REGEX.phoneNum, 'Số điện thoại không hợp lệ'),
+      email: Yup.string().email('Email không hợp lệ'),
+      facebook: Yup.string().matches(REGEX.link, 'facebook không hợp lệ'),
+    }),
     onSubmit: onSubmit,
   })
 
@@ -59,8 +158,8 @@ export default function ThongTinCaNhan() {
     value: formik.values[name],
   })
 
-  const onClickHuy = () => {
-    fetchInfoUser()
+  const onClickHuy = async () => {
+    await fetchInfoUser()
     setShowEdit(false)
   }
 
@@ -80,76 +179,119 @@ export default function ThongTinCaNhan() {
           />
         </div>
         <div>
-          <InputText label='Tên' {...generatedProperties('hoVaTen')} />
+          <InputText
+            label='Họ'
+            {...generatedProperties('firstName')}
+            disabled={true}
+          />
+          <ErrorLabel formik={formik} keyFormik='firstName' />
         </div>
         <div>
-          <InputText label='Giới tính' {...generatedProperties('gioiTinh')} />
+          <InputText
+            label='Tên'
+            {...generatedProperties('lastName')}
+            disabled={true}
+          />
+          <ErrorLabel formik={formik} keyFormik='lastName' />
         </div>
         <div>
           <InputDate
             label='Ngày sinh'
-            name='ngaySinh'
-            disabled={!isShowEdit}
-            onChange={date => formik.setFieldValue('ngaySinh', date)}
-            value={formik.values.ngaySinh}
+            name='dateOfBirth'
+            disabled={true}
+            onChange={formik.onChange}
+            value={formik.values.dateOfBirth}
           />
-        </div>
-        <div>
-          <InputText label='Nơi sinh' {...generatedProperties('noiSinh')} />
-        </div>
-        <div className='col-span-2'>
-          <InputText label='Email' {...generatedProperties('email')} />
         </div>
         <div>
           <InputText
-            label='Số điện thoại'
-            {...generatedProperties('soDienThoai')}
+            label='Nơi sinh'
+            {...generatedProperties('placeOfBirth')}
+          />
+          <ErrorLabel formik={formik} keyFormik='placeOfBirth' />
+        </div>
+        <div>
+          <InputSelect
+            label='Giới tính'
+            options={optionsGender}
+            value={optionsGender.find(
+              item => item.value === formik.values.gender,
+            )}
+            onChange={({ value }) => formik.setFieldValue('gender', value)}
+            disabled={true}
           />
         </div>
         <div>
-          <InputText label='Dân tộc' {...generatedProperties('danToc')} />
+          <InputText label='Email' {...generatedProperties('email')} />
+          <ErrorLabel formik={formik} keyFormik='email' />
         </div>
         <div>
-          <InputText label='Quốc tịch' {...generatedProperties('quocTich')} />
+          <InputText label='Dân tộc' {...generatedProperties('ethnic')} />
+          <ErrorLabel formik={formik} keyFormik='ethnic' />
+        </div>
+        <div>
+          <InputText label='Số điện thoại' {...generatedProperties('phone')} />
+          <ErrorLabel formik={formik} keyFormik='phone' />
+        </div>
+        <div>
+          <InputText
+            label='Quốc tịch'
+            {...generatedProperties('nationality')}
+          />
+          <ErrorLabel formik={formik} keyFormik='nationality' />
         </div>
         <div className='col-span-2'>
           <InputText label='Facebook' {...generatedProperties('facebook')} />
+          <ErrorLabel formik={formik} keyFormik='facebook' />
         </div>
         <div>
-          <InputText label='Tôn giáo' {...generatedProperties('tonGiao')} />
+          <InputText label='Tôn giáo' {...generatedProperties('religion')} />
+          <ErrorLabel formik={formik} keyFormik='religion' />
         </div>
         <div>
-          <InputText label='CCCD' {...generatedProperties('cccd')} />
+          <InputText
+            label='CCCD'
+            {...generatedProperties('identificationCardId')}
+            disabled={true}
+          />
+          <ErrorLabel formik={formik} keyFormik='identificationCardId' />
         </div>
         <div>
           <InputDate
             label='Ngày cấp'
+            name='identificationCardIssueDate'
+            onChange={event =>
+              formik.setFieldValue(
+                'identificationCardIssueDate',
+                new Date(event.target.value),
+              )
+            }
+            value={formik.values.identificationCardIssueDate}
             disabled={!isShowEdit}
-            onChange={date => formik.setFieldValue('ngayCap', date)}
-            onBlur={date => formik.setFieldValue('ngayCap', date)}
-            value={formik.values.ngayCap}
           />
-        </div>
-        <div>
-          <InputText label='Nơi cấp' {...generatedProperties('noiCap')} />
+          <ErrorLabel formik={formik} keyFormik='identificationCardIssueDate' />
         </div>
         <div>
           <InputText
-            label='Thành phố/Tỉnh'
-            {...generatedProperties('thanhPho')}
+            label='Nơi cấp'
+            {...generatedProperties('identificationCardIssuePlace')}
+          />
+          <ErrorLabel
+            formik={formik}
+            keyFormik='identificationCardIssuePlace'
           />
         </div>
         <div>
-          <InputText label='Quận/Huyện' {...generatedProperties('quan')} />
+          <InputText label='Thành phố/Tỉnh' {...generatedProperties('city')} />
         </div>
         <div>
-          <InputText label='Phường/Xã' {...generatedProperties('phuong')} />
+          <InputText label='Quận/Huyện' {...generatedProperties('district')} />
+        </div>
+        <div>
+          <InputText label='Phường/Xã' {...generatedProperties('ward')} />
         </div>
         <div className='col-span-3'>
-          <InputTextArea
-            label='Tên đường'
-            {...generatedProperties('tenDuong')}
-          />
+          <InputTextArea label='Tên đường' {...generatedProperties('street')} />
         </div>
         <div className='col-span-3 flex justify-end gap-4'>
           {isShowEdit && (

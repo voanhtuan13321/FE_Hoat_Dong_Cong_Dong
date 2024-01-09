@@ -1,10 +1,9 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Title from '../components/Title'
-import InputSelect from '../components/InputSelect'
+import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
-import ItemRowTableDanhSachLop from '../components/ItemRowTableDanhSachLop'
+import ItemRowTableDanhSachLop from '../components/ItemRow/ItemRowTableDanhSachLop'
 import Table from '../components/Table'
-
 
 const apiClassList = [
   { name: 'Chọn Lớp', value: 0 },
@@ -39,7 +38,8 @@ const dataTable = {
       sdt: '0905123123',
       email: 'NeVan@Gmail.com',
       fb: 'http://www.fb.com',
-      diaChi: 'Số 34, Đường Nguyễn Thị Cận, Phường Hoà Minh, Quân Liên chiểu, TP Đà Nẵng',
+      diaChi:
+        'Số 34, Đường Nguyễn Thị Cận, Phường Hoà Minh, Quân Liên chiểu, TP Đà Nẵng',
       chonLopTruong: false,
     },
     {
@@ -48,82 +48,81 @@ const dataTable = {
       sdt: '0905123123',
       email: 'NeVan@Gmail.com',
       fb: 'http://www.fb.com',
-      diaChi: 'Số 34, Đường Nguyễn Thị Cận, Phường Hoà Minh, Quân Liên chiểu, TP Đà Nẵng',
+      diaChi:
+        'Số 34, Đường Nguyễn Thị Cận, Phường Hoà Minh, Quân Liên chiểu, TP Đà Nẵng',
       chonLopTruong: true,
     },
   ],
 }
+
 export default function DanhSachLop() {
-  const [listHocSinh,setListHocSinh] = useState([])
-  const [danhSachLop,setDanhSachLop] = useState([])
-  const [danhSachNam,setDanhSachNam] = useState([])
-  const [selectClass,setSelectClass] = useState(apiClassList[0])
-  const [selectYear,setSelectYear] = useState(apiNamHocList[0])
-  useEffect(()=>{
+  const [listHocSinh, setListHocSinh] = useState([])
+  const [danhSachLop, setDanhSachLop] = useState([])
+  const [danhSachNam, setDanhSachNam] = useState([])
+  const [selectClass, setSelectClass] = useState(apiClassList[0])
+  const [selectYear, setSelectYear] = useState(apiNamHocList[0])
+
+  useEffect(() => {
     fetchListHocSinh()
     fetchListLop()
     fetchListNamHoc()
-  },[])
-  const fetchListHocSinh = () =>{
+  }, [])
+
+  const fetchListHocSinh = () => {
     setListHocSinh(dataTable.value)
   }
-  const fetchListLop = () =>{
+
+  const fetchListLop = () => {
     setDanhSachLop(apiClassList)
   }
-  const fetchListNamHoc = () =>{
+
+  const fetchListNamHoc = () => {
     setDanhSachNam(apiNamHocList)
   }
-  const handleXacNhan = () =>{
-    console.log(listHocSinh);
-  }
-  const renderBodyTable = () => {
-   let tableRow = listHocSinh.map((dt, index) => {
-      return (
-        <ItemRowTableDanhSachLop
-          key={index}
-          dt={dt}
-          index={index}
-        />
-      )
-    })
-  return tableRow
 
+  const handleXacNhan = () => {
+    console.log(listHocSinh)
+  }
+
+  const renderBodyTable = () => {
+    return listHocSinh.map((dt, index) => (
+      <ItemRowTableDanhSachLop key={index} dt={dt} index={index} />
+    ))
   }
 
   return (
     <div className='container mx-auto'>
-    <Title title='danh sách lớp' />
-    <div className='mt-3'>
-      <div className='flex items-center justify-between gap-2 '>
-        <div className='flex items-center gap-2'>
-          <span className='font-bold text-primary text-main'>
-            Thuộc khoa:
-          </span>
-          <div className='w-48'>
-            <InputSelect
-              options={danhSachLop}
-              value={selectClass}
-              onChange={setSelectClass}
-            />
+      <Title title='danh sách lớp' />
+      <div className='mt-3'>
+        <div className='flex items-center justify-between gap-2 '>
+          <div className='flex items-center gap-2'>
+            <span className='font-bold text-primary text-main'>
+              Thuộc khoa:
+            </span>
+            <div className='w-48'>
+              <InputSelect
+                options={danhSachLop}
+                value={selectClass}
+                onChange={setSelectClass}
+              />
+            </div>
+            <span className='font-bold text-primary text-main'>Khoá:</span>
+            <div className='w-48'>
+              <InputSelect
+                options={danhSachNam}
+                value={selectYear}
+                onChange={setSelectYear}
+              />
+            </div>
           </div>
-          <span className='font-bold text-primary text-main'>Khoá:</span>
-          <div className='w-48'>
-            <InputSelect
-              options={danhSachNam}
-              value={selectYear}
-              onChange={setSelectYear}
-            />
-          </div>
-        </div>
           <div className=''>
             <Button label='Xác nhận' type='primary' onClick={handleXacNhan} />
           </div>
-      
+        </div>
+      </div>
+      <div className='my-2'>
+        <Table header={dataTable.header}>{renderBodyTable()}</Table>
       </div>
     </div>
-    <div className='my-2'>
-      <Table header={dataTable.header}>{renderBodyTable()}</Table>
-    </div>
-  </div>
   )
 }

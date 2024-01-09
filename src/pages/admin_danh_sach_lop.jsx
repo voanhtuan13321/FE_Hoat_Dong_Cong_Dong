@@ -1,85 +1,107 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import Title from '../components/Title'
-import InputSelect from '../components/InputSelect'
+import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
 import Table from '../components/Table'
-import ItemRowDanhSachLop from '../components/ItemRowDanhSachLopAdmin'
-import ItemRowDanhSachLopAdd from '../components/ItemRowDanhSachLopAdminAdd'
+import ItemRowDanhSachLop from '../components/ItemRow/ItemRowDanhSachLopAdmin'
+import ItemRowDanhSachLopAdd from '../components/ItemRow/ItemRowDanhSachLopAdminAdd'
+import Pagination from '../components/Pagination'
 
-const optionsNamHoc = [
-  { name: '2022-2023', value: 1 },
-  { name: '2021-2022', value: 2 },
+import {
+  ITEM_PER_PAGE,
+  callApiGetClassesPaginationList,
+  callApiGetMajorsList,
+  checkAndHandleLogined,
+  generateAcademyYearOptions,
+  handleError,
+} from '../utils'
+
+const HEADER_TABLE = [
+  { className: 'w-5%', title: 'stt' },
+  { className: 'w-20%', title: 'Khoa quản lý' },
+  { className: 'w-10%', title: 'Lớp' },
+  { className: 'w-10%', title: 'Giáo viên chủ nhiệm' },
+  { className: 'w-10%', title: 'khóa' },
+  { className: 'w-20%', title: '' },
 ]
-
-const optionsKhoa = [
-  { name: 'K.Cơ Khí', value: 1 },
-  { name: 'K.Công nghệ thông tin', value: 2 },
-]
-
-const dataTable = {
-  header: [
-    { className: 'w-5%', title: 'stt' },
-    { className: 'w-20%', title: 'Khoa quản lý' },
-    { className: 'w-10%', title: 'Lớp' },
-    { className: 'w-10%', title: 'Giáo viên chủ nhiệm' },
-    { className: 'w-10%', title: 'khóa' },
-    { className: 'w-20%', title: '' },
-  ],
-  value: [
-    {
-      khoaQuanLy: 1,
-      lop: '20C1A',
-      giaoVienChuNhiem: 'Nguyễn Văn A',
-      khoa: '2021-2022',
-    },
-    {
-      khoaQuanLy: 2,
-      lop: '20C1A',
-      giaoVienChuNhiem: 'Nguyễn Văn B',
-      khoa: '2021-2022',
-    },
-  ],
-}
 
 export default function AdminDanhSachLop() {
-  const [listClass, setListClass] = useState([])
-  const [selectedKhoa, setSelectedKhoa] = useState(optionsKhoa[0])
-  const [selectedNamHoc, setSelectedNamHoc] = useState(optionsNamHoc[0])
+  const academyYearOptions = generateAcademyYearOptions()
+
+  const [objectClasses, setObjectClasses] = useState({})
+  const [majorOptions, setMajorOptions] = useState([])
+  const [selectedMajor, setSelectedMajor] = useState({})
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
+    academyYearOptions[0],
+  )
   const [isAddNew, setIsAddNew] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
-    fetchListClass()
+    checkAndHandleLogined(navigate)
+    fetchMajors()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchListClass = () => {
-    setListClass(dataTable.value)
+  useEffect(() => {
+    fetchClasses()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAcademyYear, selectedMajor])
+
+  const fetchClasses = async (page = 0) => {
+    try {
+      const data = await callApiGetClassesPaginationList(
+        ITEM_PER_PAGE,
+        page,
+        selectedAcademyYear.value,
+        selectedMajor.value,
+      )
+      setObjectClasses(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
   }
 
-  const onClickThem = () => {
-    setIsAddNew(true)
-  }
-
-  const onClickDeleteItem = index => {
-    const cloneStates = [...listClass]
-    cloneStates.splice(index, 1)
-    setListClass(cloneStates)
+  const fetchMajors = async () => {
+    try {
+      const data = await callApiGetMajorsList()
+      const result = data.map(item => ({
+        ...item,
+        name: item.name,
+        value: item.id,
+      }))
+      // console.log(data)
+      setMajorOptions(result)
+      setSelectedMajor(result[0])
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
   }
 
   const renderBodyTable = () => {
-    let arrJsx = listClass.map((dt, index) => {
-      return (
-        <ItemRowDanhSachLop
-          key={index}
-          dt={dt}
-          index={index}
-          onClickDeleteItem={onClickDeleteItem}
-        />
-      )
-    })
+    let arrJsx = objectClasses.data?.map((dt, index) => (
+      <ItemRowDanhSachLop
+        key={index}
+        dt={dt}
+        index={index}
+        refresh={fetchClasses}
+        objectClasses={objectClasses}
+      />
+    ))
     isAddNew &&
       (arrJsx = [
         ...arrJsx,
-        <ItemRowDanhSachLopAdd key={-1} setIsAddNew={setIsAddNew} />,
+        <ItemRowDanhSachLopAdd
+          key={-1}
+          setIsAddNew={setIsAddNew}
+          majorId={selectedMajor.id}
+          academicYear={selectedAcademyYear.value}
+          refresh={fetchClasses}
+        />,
       ])
     return arrJsx
   }
@@ -88,37 +110,50 @@ export default function AdminDanhSachLop() {
     <div className='container mx-auto'>
       <Title title='danh sách lớp' />
       <div className='mt-3'>
-        <div className='flex items-center justify-between gap-2 '>
+        <div className='flex items-center justify-between gap-2'>
           <div className='flex items-center gap-2'>
             <span className='font-bold text-primary text-main'>
               Thuộc khoa:
             </span>
             <div className='w-48'>
               <InputSelect
-                options={optionsKhoa}
-                value={selectedKhoa}
-                onChange={setSelectedKhoa}
+                options={majorOptions}
+                value={selectedMajor}
+                onChange={setSelectedMajor}
               />
             </div>
             <span className='font-bold text-primary text-main'>Khoá:</span>
             <div className='w-48'>
               <InputSelect
-                options={optionsNamHoc}
-                value={selectedNamHoc}
-                onChange={setSelectedNamHoc}
+                options={academyYearOptions}
+                value={selectedAcademyYear}
+                onChange={setSelectedAcademyYear}
               />
             </div>
           </div>
           {!isAddNew && (
             <div className=''>
-              <Button label='thêm' type='add' onClick={onClickThem} />
+              <Button
+                label='thêm'
+                type='add'
+                onClick={() => setIsAddNew(true)}
+              />
             </div>
           )}
         </div>
       </div>
       <div className='my-2'>
-        <Table header={dataTable.header}>{renderBodyTable()}</Table>
+        <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
       </div>
+      <Pagination
+        totalItems={objectClasses.totalItems}
+        totalPages={objectClasses.totalPages}
+        itemPerPage={objectClasses.itemPerPage}
+        currentPage={objectClasses.currentPage}
+        isNextPage={objectClasses.isNextPage}
+        isPreviousPage={objectClasses.isPreviousPage}
+        onPageChange={fetchClasses}
+      />
     </div>
   )
 }

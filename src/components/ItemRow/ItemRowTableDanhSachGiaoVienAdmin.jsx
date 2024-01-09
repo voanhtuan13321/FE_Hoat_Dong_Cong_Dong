@@ -1,7 +1,7 @@
 import React from 'react'
 import Swal from 'sweetalert2'
-import Button from './Button'
-import InputCheckbox from './InputCheckbox'
+import Button from '../Button'
+import InputCheckbox from '../Input/InputCheckbox'
 
 export default function ItemRowTableDanhSachGiaoVienAdmin({ stt, data }) {
   const onClickDoiMatKhau = () => {

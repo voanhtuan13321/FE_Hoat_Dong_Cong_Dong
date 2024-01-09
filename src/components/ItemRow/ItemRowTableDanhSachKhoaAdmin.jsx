@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
-import Button from './Button'
-import InputSelect from './InputSelect'
+import Button from '../Button'
+import InputSelect from '../Input/InputSelect'
 
 const dataTable = {
   khoa: [

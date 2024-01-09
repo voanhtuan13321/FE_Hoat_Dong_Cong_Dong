@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react'
 import Table from '../components/Table'
 import Title from '../components/Title'
 import Button from '../components/Button'
-import ItemRowTableDanhSachGiaoVienAdmin from '../components/ItemRowTableDanhSachGiaoVienAdmin'
-import ItemRowTableDanhSachGiaoVienAdminAdd from '../components/ItemRowTableDanhSachGiaoVienAdminAdd'
+import ItemRowTableDanhSachGiaoVienAdmin from '../components/ItemRow/ItemRowTableDanhSachGiaoVienAdmin'
+import ItemRowTableDanhSachGiaoVienAdminAdd from '../components/ItemRow/ItemRowTableDanhSachGiaoVienAdminAdd'
+import { checkAndHandleLogined } from '../utils'
+import { useNavigate } from 'react-router-dom'
 
 const dataTable = {
   header: [
@@ -24,8 +26,10 @@ const dataTable = {
 export default function AdminDanhSachGiaoVien() {
   const [listGiaoVien, setListGiaoVien] = useState([])
   const [isShowAddNew, setShowAddNew] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
+    checkAndHandleLogined(navigate)
     fetchListGiaoVien()
   }, [])
 

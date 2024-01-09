@@ -25,7 +25,7 @@ export default function InputCheckbox({
         type='checkbox'
         name={name}
         checked={value}
-        className='w-4 h-4 bg-gray-100 border-normal'
+        className='w-4 h-4 bg-gray-100 border-normal cursor-pointer '
         onChange={onChange}
         disabled={disabled}
       />

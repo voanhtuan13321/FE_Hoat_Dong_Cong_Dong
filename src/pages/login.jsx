@@ -8,8 +8,8 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 // component
-import InputText from '../components/InputText'
-import InputPassword from '../components/InputPassword'
+import InputText from '../components/Input/InputText'
+import InputPassword from '../components/Input/InputPassword'
 import Button from '../components/Button'
 import ErrorLabel from '../components/ErrorLabel'
 
@@ -17,8 +17,8 @@ import ErrorLabel from '../components/ErrorLabel'
 import User_login from '../assets/images/User_login.png'
 
 // function
-import { KEY_ROLE_TOKEN, localStorages, requestHandler } from '../utils'
-import { setRole, setUserId } from '../redux/storeSlice'
+import { KEY_ROLE_TOKEN, callApiLogin, localStorages } from '../utils'
+import { setRole } from '../redux/storeSlice'
 
 const initialFormLogin = { accountId: '', password: '' }
 
@@ -35,14 +35,12 @@ export default function Login() {
   const onSubmit = async values => {
     // Thực hiện xử lý submit ở đây
     try {
-      const response = await requestHandler.post('/api/Auth/Login', values)
-      const { token } = await response.data
+      const { token } = await callApiLogin(values)
       toast.success('Đăng nhập thành công')
       localStorages.setToken(token)
 
       const decoded = jwtDecode(token)
       dispatch(setRole(decoded[KEY_ROLE_TOKEN]))
-      dispatch(setUserId(decoded['UserId']))
       navigate('/')
     } catch (error) {
       handleLoginError(error)
@@ -61,6 +59,7 @@ export default function Login() {
         Swal.fire('Tài khoản của bạn đã bị khoá', '', 'error')
         break
       default:
+        console.error(error)
         alert(error.message)
     }
   }

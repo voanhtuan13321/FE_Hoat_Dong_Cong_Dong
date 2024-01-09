@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Button from './Button'
-import InputText from './InputText'
+import Button from '../Button'
+import InputText from '../Input/InputText'
 
 export default function ItemRowDanhSachHoatDongCongDongAdmin({
   data,

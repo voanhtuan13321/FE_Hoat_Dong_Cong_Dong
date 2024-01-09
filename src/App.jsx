@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { jwtDecode } from 'jwt-decode'
 import { Toaster } from 'react-hot-toast'
 
@@ -11,10 +11,12 @@ import Navbar from './components/Navbar'
 
 // function
 import { KEY_ROLE_TOKEN, localStorages, routers } from './utils'
-import { setRole, setUserId } from './redux/storeSlice'
+import { setRole } from './redux/storeSlice'
+import Loading from './components/Loading'
 
 export default function App() {
   const dispatch = useDispatch()
+  const isLoading = useSelector(state => state.isLoading)
 
   useEffect(() => {
     const token = localStorages.getToken()
@@ -22,7 +24,6 @@ export default function App() {
     if (token) {
       const decoded = jwtDecode(token)
       dispatch(setRole(decoded[KEY_ROLE_TOKEN]))
-      dispatch(setUserId(decoded['UserId']))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -34,7 +35,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <div className='relative'>
       <Header />
       <Navbar />
       <div className='min-h-[600px]'>
@@ -42,6 +43,7 @@ export default function App() {
       </div>
       <Footer />
       <Toaster position='top-right' reverseOrder={false} />
-    </>
+      {isLoading && <Loading />}
+    </div>
   )
 }
