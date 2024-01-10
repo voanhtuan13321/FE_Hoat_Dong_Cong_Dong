@@ -60,10 +60,7 @@ export default function AdminDanhSachSinhVien() {
   const fetchMajors = async () => {
     try {
       const data = await callApiGetMajorsList()
-      const result = data.map(item => ({
-        ...item,
-        value: item.id,
-      }))
+      const result = data.map(item => ({ ...item, value: item.id }))
       // console.log(data)
       setMajorOptions(result)
       setSelectedMajor(result[0])
@@ -77,10 +74,7 @@ export default function AdminDanhSachSinhVien() {
     try {
       const data = await callApiGetClassesList()
       const result = data
-        .map(item => ({
-          ...item,
-          value: item.id,
-        }))
+        .map(item => ({ ...item, value: item.id }))
         .filter(item => item.majorId === selectedMajor.value)
       // console.log(result)
       // console.log(selectedMajor)

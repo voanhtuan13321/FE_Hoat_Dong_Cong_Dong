@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import Swal from 'sweetalert2'
 
 import DialogCustom from '.'
 import Button from '../Button'
@@ -18,7 +19,6 @@ import {
   getUserRole,
   handleError,
 } from '../../utils'
-import Swal from 'sweetalert2'
 
 export default function DialogDetailCommunityActivityStudent({
   userId,
@@ -43,23 +43,23 @@ export default function DialogDetailCommunityActivityStudent({
   }, [])
 
   const fetchCommunityActivities = async () => {
-    if (!userId) return
-
-    try {
-      const data = await callApiGetUserCommunityActivities(
-        userId,
-        selectedAcademyYear.value,
-      )
-      // console.log(data)
-      setCommunityActivities(data)
-    } catch (error) {
-      console.error(error)
-      handleError(error, navigate)
+    if (userId) {
+      try {
+        const data = await callApiGetUserCommunityActivities(
+          userId,
+          selectedAcademyYear.value,
+        )
+        // console.log(data)
+        setCommunityActivities(data)
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
     }
   }
 
   const genHeaderByRole = () => {
-    const header = [
+    const baseHeader = [
       { className: 'w-5%', title: 'stt' },
       { className: 'w-10%', title: 'loại hoạt động' },
       { className: 'w-20%', title: 'tên hoạt động' },
@@ -68,10 +68,15 @@ export default function DialogDetailCommunityActivityStudent({
       { className: 'w-5%', title: 'điểm ban cán sự đánh giá' },
       { className: '', title: 'link minh chứng' },
     ]
-    if (checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role])) {
-      return [...header, { className: 'w-5%', title: 'xác nhận' }]
-    }
-    return [...header, { className: 'w-10%', title: '' }]
+
+    const additionalHeader = checkRoles2(
+      [ROLES.giaoVien, ROLES.truongKhoa],
+      [role],
+    )
+      ? [{ className: 'w-5%', title: 'xác nhận' }]
+      : [{ className: 'w-10%', title: '' }]
+
+    return [...baseHeader, ...additionalHeader]
   }
 
   const renderBodyTable = () => {

@@ -64,38 +64,38 @@ export default function ItemRowTableTuDanhGiaAdd({ setShowAddNew, refresh }) {
 
   const handleSave = async () => {
     const userId = getUserId()
-    if (!userId) {
-      return
-    }
-    const dataRequest = {
-      ...dataSubmit,
-      userId,
-      activityTypeId: selectedCommunityActivityTypes.value,
-      status: COMMUNITY_ACTIVITY_STATUS.studentConfirmed,
-    }
+    if (userId) {
+      const dataRequest = {
+        ...dataSubmit,
+        userId,
+        activityTypeId: selectedCommunityActivityTypes.value,
+        status: COMMUNITY_ACTIVITY_STATUS.studentConfirmed,
+      }
 
-    if (
-      dataRequest.selfEvaluationScore <
-        selectedCommunityActivityTypes.minScore ||
-      dataRequest.selfEvaluationScore > selectedCommunityActivityTypes.maxScore
-    ) {
-      Swal.fire(
-        `Bạn phải nhập điểm trong khoản ${selectedCommunityActivityTypes.minScore} đến ${selectedCommunityActivityTypes.maxScore}`,
-        '',
-        'error',
-      )
-      return
-    }
+      if (
+        dataRequest.selfEvaluationScore <
+          selectedCommunityActivityTypes.minScore ||
+        dataRequest.selfEvaluationScore >
+          selectedCommunityActivityTypes.maxScore
+      ) {
+        Swal.fire(
+          `Bạn phải nhập điểm trong khoản ${selectedCommunityActivityTypes.minScore} đến ${selectedCommunityActivityTypes.maxScore}`,
+          '',
+          'error',
+        )
+        return
+      }
 
-    try {
-      const data = await callApiCreateCommunityActivity(dataRequest)
-      // console.log(data)
-      setShowAddNew(false)
-      toast.success('Thêm thành công')
-      refresh()
-    } catch (error) {
-      console.error(error)
-      handleError(error, navigate)
+      try {
+        const data = await callApiCreateCommunityActivity(dataRequest)
+        // console.log(data)
+        setShowAddNew(false)
+        toast.success('Thêm thành công')
+        refresh()
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
+      }
     }
   }
 

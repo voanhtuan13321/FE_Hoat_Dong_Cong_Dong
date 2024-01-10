@@ -17,6 +17,14 @@ export const callApiGetUserCommunityActivitiesSumScoreHeadTeachersConfirmed =
     return await response.data
   }
 
+export const callApiGetUserCommunityActivitiesSumScoreMajorHeadsConfimed =
+  async year => {
+    const url = `${baseApiCommunityActivity}/GetUserCommunityActivitiesSumScoreMajorHeadsConfimed`
+    const config = { params: { year, time: new Date().getTime() } }
+    const response = await requestHandler.get(url, config)
+    return await response.data
+  }
+
 export const callApiCreateCommunityActivity = async data => {
   const url = `${baseApiCommunityActivity}/CreateCommunityActivity`
   const response = await requestHandler.post(url, data)
@@ -33,6 +41,13 @@ export const callApiDeleteCommunityActivity = async caId => {
   const url = `${baseApiCommunityActivity}/DeleteCommunityActivity`
   const config = { params: { caId } }
   const response = await requestHandler.delete(url, config)
+  return await response.data
+}
+
+export const callApiGetUserCommunityActivitiesNoneYear = async userId => {
+  const url = `${baseApiCommunityActivity}/GetUserCommunityActivities`
+  const config = { params: { userId, time: new Date().getTime() } }
+  const response = await requestHandler.get(url, config)
   return await response.data
 }
 

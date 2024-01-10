@@ -7,7 +7,7 @@ import InputText from '../Input/InputText'
 
 import { callApiCreateCommunityActivityType, handleError } from '../../utils'
 
-const initState = { name: '', minScore: '', maxScore: ''}
+const initState = { name: '', minScore: '', maxScore: '' }
 
 export default function ItemRowDanhSachHoatDongCongDongAdmin({
   setAddButtonDisabled,
@@ -26,7 +26,9 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
 
   const handleSaveClick = async () => {
     try {
-      const data = await callApiCreateCommunityActivityType(dataCommunityActivity)
+      const data = await callApiCreateCommunityActivityType(
+        dataCommunityActivity,
+      )
       toast.success('Thêm mới thành công')
       setDataCommunityActivity(initState)
       setAddButtonDisabled(false)
@@ -39,35 +41,35 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
 
   return (
     <tr>
-      <td className='border border-primary p-1 text-center'>0</td>
+      <td className='border border-primary p-1 text-center'></td>
       <td className='border border-primary p-1 text-center'>
-          <InputText
-            name='name'
-            value={dataCommunityActivity.name}
-            onChange={onChangeInput}
-          />
+        <InputText
+          name='name'
+          value={dataCommunityActivity.name}
+          onChange={onChangeInput}
+        />
       </td>
       <td className='border border-primary p-1 text-center'>
-          <InputText
-            name='minScore'
-            value={dataCommunityActivity.minScore}
-            onChange={onChangeInput}
-          />
+        <InputText
+          name='minScore'
+          value={dataCommunityActivity.minScore}
+          onChange={onChangeInput}
+        />
       </td>
       <td className='border border-primary p-1 text-center'>
-          <InputText
-            name='maxScore'
-            value={dataCommunityActivity.maxScore}
-            onChange={onChangeInput}
-          />
+        <InputText
+          name='maxScore'
+          value={dataCommunityActivity.maxScore}
+          onChange={onChangeInput}
+        />
       </td>
       <td className='border border-primary p-1 flex gap-3 justify-center'>
-          <Button type='add' label='lưu' onClick={handleSaveClick} />
-          <Button
-            type='outline'
-            label='Huỷ'
-            onClick={() => setAddButtonDisabled(false)}
-          />
+        <Button type='add' label='lưu' onClick={handleSaveClick} />
+        <Button
+          type='outline'
+          label='Huỷ'
+          onClick={() => setAddButtonDisabled(false)}
+        />
       </td>
     </tr>
   )

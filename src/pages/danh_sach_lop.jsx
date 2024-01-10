@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 import Title from '../components/Title'
 import Button from '../components/Button'
@@ -23,7 +24,6 @@ import {
   getUserRole,
   handleError,
 } from '../utils'
-import Swal from 'sweetalert2'
 
 export default function DanhSachLop() {
   const academyYearOptions = generateAcademyYearOptions()
@@ -86,56 +86,57 @@ export default function DanhSachLop() {
   const fetchStudents = async () => {
     const roles = getUserRole()
     const userId = getUserId()
-    if (!userId) return
+    if (userId) {
+      const user = await callApiGetUserByUserId(userId)
 
-    const user = await callApiGetUserByUserId(userId)
+      const classId = checkRoles(roles, [ROLES.sinhVien])
+        ? user.classId
+        : selectedClasses?.value ?? ''
 
-    const classId = checkRoles(roles, [ROLES.sinhVien])
-      ? user.classId
-      : selectedClasses?.value ?? ''
-
-    if (classId) {
-      try {
-        const data = await callApiGetStudentsListByClassId(
-          classId,
-          selectedYear.value,
-        )
-        // console.log('student', data)
-        setStudents(
-          data.sort((stu1, stu2) =>
-            stu1.studentId.localeCompare(stu2.studentId),
-          ),
-        )
-      } catch (error) {
-        console.error(error)
-        handleError(error, navigate)
+      if (classId) {
+        try {
+          const data = await callApiGetStudentsListByClassId(
+            classId,
+            selectedYear.value,
+          )
+          // console.log('student', data)
+          setStudents(
+            data.sort((stu1, stu2) =>
+              stu1.studentId.localeCompare(stu2.studentId),
+            ),
+          )
+        } catch (error) {
+          console.error(error)
+          handleError(error, navigate)
+        }
+      } else {
+        setStudents([])
       }
-    } else {
-      setStudents([])
     }
   }
 
   const handleXacNhan = async () => {
     const classId = selectedClasses?.value
-    if (!classId) return
+    if (classId) {
+      const { isConfirmed } = await Swal.fire({
+        title: 'Bạn có chắc muốn xác nhận không',
+        icon: 'info',
+        confirmButtonText: 'Xác nhận',
+        showCancelButton: true,
+        cancelButtonText: 'Huỷ',
+      })
 
-    const { isConfirmed } = await Swal.fire({
-      title: 'Bạn có chắc muốn xác nhận không',
-      icon: 'info',
-      confirmButtonText: 'Xác nhận',
-      showCancelButton: true,
-      cancelButtonText: 'Huỷ',
-    })
-
-    if (isConfirmed) {
-      try {
-        const data = await callApiApproveClassCommunityActivitiesByHeadTeacher(
-          classId,
-          new Date().getFullYear(),
-        )
-      } catch (error) {
-        console.error(error)
-        handleError(error, navigate)
+      if (isConfirmed) {
+        try {
+          const data =
+            await callApiApproveClassCommunityActivitiesByHeadTeacher(
+              classId,
+              new Date().getFullYear(),
+            )
+        } catch (error) {
+          console.error(error)
+          handleError(error, navigate)
+        }
       }
     }
   }

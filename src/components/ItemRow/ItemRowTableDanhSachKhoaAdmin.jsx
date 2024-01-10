@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+
 import InputText from '../Input/InputText'
 import InputSelect from '../Input/InputSelect'
 import Button from '../Button'
+
 import {
   callApiDeleteMajor,
   callApiGetTeachersList,
@@ -14,24 +16,20 @@ import {
 
 export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
   const [isShowEdit, setShowEdit] = useState(false)
-  const [listGiaoVien, setListGiaoVien] = useState([{}])
-  const [selectedGiaoVien, setSelectedGiaoVien] = useState({})
-  const [dataKhoa, setDataKhoa] = useState({ ...data })
+  const [listTeachers, setListTeachers] = useState([{}])
+  const [selectedTeacher, setSelectedTeacher] = useState({})
+  const [major, setMajor] = useState({ ...data })
   const navigate = useNavigate()
 
-  const onClickEdit = () => {
-    setShowEdit(!isShowEdit)
-  }
-
   useEffect(() => {
-    fetchListDanhSachGiaoVien()
+    fetchListTeachers()
   }, [])
 
   useEffect(() => {
-    setDataKhoa(data)
+    setMajor(data)
   }, [data])
 
-  const fetchListDanhSachGiaoVien = async () => {
+  const fetchListTeachers = async () => {
     try {
       const dataList = await callApiGetTeachersList()
       const result = dataList.map(item => ({
@@ -39,9 +37,9 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
         name: item.firstName + ' ' + item.lastName,
         value: item.id,
       }))
-      setListGiaoVien(result)
-      const dataSelectSet = getDanhSachGiaoVien(data.majorHeadId, dataList)
-      setSelectedGiaoVien({
+      setListTeachers(result)
+      const dataSelectSet = getListTeachers(data.majorHeadId, dataList)
+      setSelectedTeacher({
         name: dataSelectSet.firstName + ' ' + dataSelectSet.lastName,
         value: dataSelectSet.id,
       })
@@ -51,23 +49,20 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
     }
   }
 
-  const getDanhSachGiaoVien = (value, tenData) => {
-    return !value ? tenData[0] : tenData.find(item => item.id === value)
+  const getListTeachers = (value, data) => {
+    return !value ? data[0] : data.find(item => item.id === value)
   }
 
   const onChangeInput = event => {
     const { name, value } = event.target
-    setDataKhoa({
-      ...dataKhoa,
-      [name]: value,
-    })
+    setMajor({ ...major, [name]: value })
   }
 
-  const onClickLuu = async () => {
+  const onClickSave = async () => {
     const dataEdit = {
-      id: dataKhoa.id,
-      majorHeadId: selectedGiaoVien.id,
-      name: dataKhoa.name,
+      id: major.id,
+      majorHeadId: selectedTeacher.id,
+      name: major.name,
     }
     try {
       await callApiUpdateMajor(dataEdit)
@@ -81,7 +76,7 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
   }
 
   const handleDeleteButtonClick = async id => {
-    await Swal.fire({
+    const { isConfirmed } = await Swal.fire({
       title: 'Bạn có chắc chắn muốn xóa?',
       text: 'Xóa khoa sẽ xóa toàn bộ lớp và sinh viên thuộc khoa',
       icon: 'warning',
@@ -90,18 +85,18 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Có, tôi chắc chắn!',
-    }).then(async result => {
-      if (result.isConfirmed) {
-        try {
-          await callApiDeleteMajor(id)
-          console.log('Xóa')
-          toast.success('Xóa thành công')
-          refresh()
-        } catch (error) {
-          alert(error.message)
-        }
-      }
     })
+
+    if (isConfirmed) {
+      try {
+        await callApiDeleteMajor(id)
+        // console.log('Xóa')
+        toast.success('Xóa thành công')
+        refresh()
+      } catch (error) {
+        alert(error.message)
+      }
+    }
   }
 
   return (
@@ -112,24 +107,28 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
           <td className='border border-primary p-1 text-center'>
             <InputText
               name='name'
-              value={dataKhoa.name}
+              value={major.name}
               onChange={onChangeInput}
             />
           </td>
           <td className='border border-primary p-1 text-center'>
             <InputSelect
               name='giaoVien'
-              value={selectedGiaoVien}
-              onChange={setSelectedGiaoVien}
-              options={listGiaoVien}
+              value={selectedTeacher}
+              onChange={setSelectedTeacher}
+              options={listTeachers}
             />
           </td>
           <td className='border border-primary p-1 flex'>
             <div className='w-1/2 flex justify-center'>
-              <Button label='lưu' type='' onClick={onClickLuu} />
+              <Button label='lưu' type='' onClick={onClickSave} />
             </div>
             <div className='w-1/2 flex justify-center'>
-              <Button label='hủy' type='outline' onClick={onClickEdit} />
+              <Button
+                label='hủy'
+                type='outline'
+                onClick={() => setShowEdit(!isShowEdit)}
+              />
             </div>
           </td>
         </tr>
@@ -142,7 +141,11 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
           </td>
           <td className='border border-primary p-1 flex'>
             <div className='w-1/2 flex justify-center'>
-              <Button label='sửa' type='edit' onClick={onClickEdit} />
+              <Button
+                label='sửa'
+                type='edit'
+                onClick={() => setShowEdit(!isShowEdit)}
+              />
             </div>
             <div className='w-1/2 flex justify-center'>
               <Button

@@ -11,7 +11,6 @@ import Pagination from '../components/Pagination'
 import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 
 import {
-  ITEM_PER_PAGE,
   ROLES,
   callApiGetClassesPaginationList,
   callApiGetMajorsList,
@@ -64,7 +63,7 @@ export default function AdminDanhSachLop() {
         selectedMajor.value,
       )
       setObjectClasses(data)
-      console.log(data)
+      // console.log(data)
     } catch (error) {
       console.error(error)
       handleError(error, navigate)

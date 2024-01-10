@@ -31,7 +31,7 @@ export default function ItemRowTableDetailHoatDong({
     useState({})
   const navigate = useNavigate()
 
-  console.log(data)
+  // console.log(data)
 
   useEffect(() => {
     fetchCommunityActivityTypies()
@@ -60,7 +60,6 @@ export default function ItemRowTableDetailHoatDong({
     setShowEdit(false)
   }
 
-  // lop truong confirmed
   const onClickFonfirme = async status => {
     try {
       const dataRequest = { ...rowData, status: status }

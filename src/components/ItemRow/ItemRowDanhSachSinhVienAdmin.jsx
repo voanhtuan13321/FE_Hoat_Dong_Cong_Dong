@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 import Button from '../Button'
 import InputCheckbox from '../Input/InputCheckbox'
@@ -12,7 +13,6 @@ import {
   callApiUpdateUserStatus,
   handleError,
 } from '../../utils'
-import Swal from 'sweetalert2'
 
 export default function ItemRowDanhSachSinhVienAdmin({
   data,
@@ -29,11 +29,11 @@ export default function ItemRowDanhSachSinhVienAdmin({
   }, [data])
 
   const changeStatusAccountUser = async () => {
-    console.log('changeStatusAccountUser')
+    // console.log('changeStatusAccountUser')
     try {
       const dataRequest = { userId: user.id, status: revertStatus(user.status) }
       const data = await callApiUpdateUserStatus(dataRequest)
-      console.log(data)
+      // console.log(data)
       setUser(data)
     } catch (error) {
       console.error(error)

@@ -30,10 +30,6 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
     setDataCommunityActivity({ ...dataCommunityActivity, [name]: value })
   }
 
-  const handleEditClick = () => {
-    setIsEditing(true)
-  }
-
   const handleSaveClick = async () => {
     try {
       const data = await callApiUpdateCommunityActivityType(
@@ -65,7 +61,8 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
         setIsEditing(false)
         refresh()
       } catch (e) {
-        alert(e.message)
+        console.error(e)
+        handleError(e, navigate)
       }
     }
   }
@@ -117,7 +114,7 @@ export default function ItemRowDanhSachHoatDongCongDongAdmin({
         {isEditing ? (
           <Button type='add' label='lưu' onClick={() => handleSaveClick()} />
         ) : (
-          <Button type='edit' label='sửa' onClick={() => handleEditClick()} />
+          <Button type='edit' label='sửa' onClick={() => setIsEditing(true)} />
         )}
         {isEditing ? (
           <Button label='Huỷ' onClick={e => handleCancelButton()} />

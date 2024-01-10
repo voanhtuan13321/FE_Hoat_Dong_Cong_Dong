@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+
 import Title from '../components/Title'
 import Table from '../components/Table'
 import InputSelect from '../components/Input/InputSelect'
 import Button from '../components/Button'
-import { useSelector } from 'react-redux'
+import ItemRowHoatDongCongDongCuaKhoa from '../components/ItemRow/ItemRowHoatDongCongDongCuaKhoa'
+import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
+
 import {
   ROLES,
   callApiApproveMajorCommunityActivitiesByMajorHead,
@@ -14,9 +19,6 @@ import {
   getUserId,
   handleError,
 } from '../utils'
-import { useNavigate } from 'react-router-dom'
-import ItemRowHoatDongCongDongCuaKhoa from '../components/ItemRow/ItemRowHoatDongCongDongCuaKhoa'
-import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 
 const HEADER_TABE = [
   { className: 'w-5%', title: 'stt' },

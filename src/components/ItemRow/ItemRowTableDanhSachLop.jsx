@@ -31,10 +31,7 @@ export default function ItemRowTableDanhSachLop({
 
   const changeClassPresident = async () => {
     try {
-      const dataRequest = {
-        classId: dt.classId,
-        classPresidentId: dt.id,
-      }
+      const dataRequest = { classId: dt.classId, classPresidentId: dt.id }
       // console.log(dataRequest)
       const data = await callApiUpdateClassPresident(dataRequest)
       // console.log(data)
@@ -43,10 +40,6 @@ export default function ItemRowTableDanhSachLop({
       console.error(error)
       handleError(error, navigate)
     }
-  }
-
-  const onClickDetails = () => {
-    setShowDialog(true)
   }
 
   return (
@@ -88,7 +81,7 @@ export default function ItemRowTableDanhSachLop({
         ROLES.truongKhoa,
       ]) && (
         <td className='border border-primary text-main p-2 underline text-primary cursor-pointer'>
-          <span onClick={onClickDetails}>Xem chi tiết</span>
+          <span onClick={() => setShowDialog(true)}>Xem chi tiết</span>
           <DialogDetailCommunityActivityStudent
             userId={dt.id}
             isShowDialog={isShowDialog}

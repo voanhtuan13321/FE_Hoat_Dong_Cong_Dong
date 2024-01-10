@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react'
+import Swal from 'sweetalert2'
+import { useNavigate } from 'react-router-dom'
+
 import Button from '../Button'
 import InputCheckbox from '../Input/InputCheckbox'
 import DialogChangePassword from '../DialogCustom/DialogChangePassword'
-import { useNavigate } from 'react-router-dom'
+
 import {
   STATUS_USER,
   callApiDeleteUser,
   callApiUpdateUserStatus,
   handleError,
 } from '../../utils'
-import Swal from 'sweetalert2'
 
 export default function ItemRowTableDanhSachGiaoVienAdmin({
   stt,
@@ -35,11 +37,10 @@ export default function ItemRowTableDanhSachGiaoVienAdmin({
     }
   }
 
-  const revertStatus = status => {
-    return status === STATUS_USER.ACCOUNT_LOCKED
+  const revertStatus = status =>
+    status === STATUS_USER.ACCOUNT_LOCKED
       ? STATUS_USER.ACCOUNT_UNLOCK
       : STATUS_USER.ACCOUNT_LOCKED
-  }
 
   const handleDelete = async () => {
     const { isDenied } = await Swal.fire({

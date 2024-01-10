@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+
 import Title from '../components/Title'
 import Table from '../components/Table/index'
 import Button from '../components/Button'
 import ItemRowTableDanhSachKhoaAdmin from '../components/ItemRow/ItemRowTableDanhSachKhoaAdmin'
 import ItemRowTableDanhSachKhoaAdminAdd from '../components/ItemRow/ItemRowTableDanhSachKhoaAdminAdd'
+import Pagination from '../components/Pagination'
 
 import { ITEM_PER_PAGE, callApiGetMajorsPaginationList } from '../utils'
 import { setLoading } from '../redux/storeSlice'
-import { useDispatch } from 'react-redux'
-import Pagination from '../components/Pagination'
-const dataTable = {
-  header: [
-    { className: 'w-5%', title: 'stt' },
-    { className: 'w-25%', title: 'Tên khoa' },
-    { className: '', title: 'Trưởng khoa' },
-    { className: 'w-15%', title: '' },
-  ],
-}
+
+const HEADER_TABLE = [
+  { className: 'w-5%', title: 'stt' },
+  { className: 'w-25%', title: 'Tên khoa' },
+  { className: '', title: 'Trưởng khoa' },
+  { className: 'w-15%', title: '' },
+]
 
 export default function AdminDanhSachKhoa() {
   const [objectMajors, setObjectMajors] = useState({})
@@ -38,22 +38,16 @@ export default function AdminDanhSachKhoa() {
     }
   }
 
-  const onClickThem = () => {
-    setShowAddNew(true)
-  }
-
   const renderBodyTable = () => {
-    let arrJsx = objectMajors.data?.map((dt, index) => {
-      return (
-        <ItemRowTableDanhSachKhoaAdmin
-          key={index}
-          stt={index}
-          data={dt}
-          refresh={fetchListKhoa}
-          objectMajors={objectMajors}
-        />
-      )
-    })
+    let arrJsx = objectMajors.data?.map((dt, index) => (
+      <ItemRowTableDanhSachKhoaAdmin
+        key={index}
+        stt={index}
+        data={dt}
+        refresh={fetchListKhoa}
+        objectMajors={objectMajors}
+      />
+    ))
 
     isShowAddNew &&
       (arrJsx = [
@@ -76,10 +70,14 @@ export default function AdminDanhSachKhoa() {
 
         <div className='flex justify-end my-2'>
           {!isShowAddNew && (
-            <Button label='Thêm' type='add' onClick={onClickThem} />
+            <Button
+              label='Thêm'
+              type='add'
+              onClick={() => setShowAddNew(true)}
+            />
           )}
         </div>
-        <Table header={dataTable.header}>{renderBodyTable()}</Table>
+        <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
         <Pagination
           totalItems={objectMajors.totalItems}
           totalPages={objectMajors.totalPages}

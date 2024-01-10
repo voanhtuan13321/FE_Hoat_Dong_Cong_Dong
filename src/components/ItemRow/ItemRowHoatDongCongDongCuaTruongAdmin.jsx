@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom'
 
 import { callApiGetClassById, handleError } from '../../utils'
 
-export default function ItemRowHoatDongCongDongCuaKhoa({ index, data }) {
+export default function ItemRowHoatDongCongDongCuaTruongAdmin({ index, dt }) {
   const [className, setClassName] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetchClassName(data.classId)
+    fetchClassName(dt.classId)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  }, [dt])
 
   const fetchClassName = async classId => {
     try {
@@ -21,23 +21,20 @@ export default function ItemRowHoatDongCongDongCuaKhoa({ index, data }) {
       handleError(error, navigate)
     }
   }
-
   return (
     <tr>
-      <td className='border border-primary text-main p-1 text-center'>
+      <td className='border border-primary p-1 text-center text-main'>
         {index + 1}
       </td>
-      <td className='border border-primary text-main p-1 text-center'>
-        {data.studentId}
+      <td className='border border-primary p-1 text-center text-main'>
+        {dt.studentId}
       </td>
-      <td className='border border-primary text-main p-1 '>{`${data.firstName} ${data.lastName}`}</td>
-      <td className='border border-primary text-main p-1 text-center'>
+      <td className='border border-primary p-1  text-main'>{`${dt.firstName} ${dt.lastName}`}</td>
+      <td className='border border-primary p-1 text-center text-main'>
         {className}
       </td>
-      <td className='border border-primary text-main p-1 text-center'>
-        {data.sumScoreHeadTeacherConfirmed > 0
-          ? data.sumScoreHeadTeacherConfirmed
-          : data.sumScoreMajorHeadConfirmed}
+      <td className='border border-primary p-1 text-center text-main'>
+        {dt.sumScoreMajorHeadConfirmed}
       </td>
     </tr>
   )
