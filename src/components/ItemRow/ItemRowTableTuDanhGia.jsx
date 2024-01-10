@@ -187,9 +187,9 @@ export default function ItemRowTableTuDanhGia({ index, data, refresh, academyYea
             <td className='border border-primary px-1 text-center flex gap-1'>
               <Button
                 disable={
-                  checkIsCurrentYear(academyYear) ||
-                  setting.status === COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT ||
-                  rowData.status === COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED
+                  !checkIsCurrentYear(academyYear) ||
+                  setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT ||
+                  rowData.status !== COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED
                 }
                 type='edit'
                 label='sửa'
@@ -197,9 +197,9 @@ export default function ItemRowTableTuDanhGia({ index, data, refresh, academyYea
               />
               <Button
                 disable={
-                  checkIsCurrentYear(academyYear) ||
-                  setting.status === COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT ||
-                  rowData.status === COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED
+                  !checkIsCurrentYear(academyYear) ||
+                  setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT ||
+                  rowData.status !== COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED
                 }
                 type='delete'
                 label='xoá'
