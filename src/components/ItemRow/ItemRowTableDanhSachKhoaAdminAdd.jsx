@@ -47,7 +47,7 @@ export default function ItemRowTableDanhSachKhoaAdminAdd({
 
   const onClickSave = async () => {
     const selectedData = {
-      majorHeadId: dataKhoa.giaoVien.value,
+      majorHeadId: selectedTeacher.value,
       name: dataKhoa.tenKhoa,
     }
 

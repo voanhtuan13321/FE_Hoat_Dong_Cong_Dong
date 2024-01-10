@@ -14,7 +14,7 @@ import {
   callApiGetClassesList,
   callApiGetMajorsList,
   callApiGetStudentsListByClassId,
-  checkAndHandleLogined,
+  checkAndHandleLogin,
   checkPermissionToAccessThePage,
   getUserRole,
   handleError,
@@ -28,6 +28,7 @@ const HEADER_TABLE = [
   { className: 'w-10%', title: 'Xoá' },
   { className: 'w-10%', title: 'Khoá tài khoản' },
   { className: 'w-10%', title: 'Chọn lớp trưởng' },
+  { className: 'w-10%', title: 'xem hoạt động' },
 ]
 
 export default function AdminDanhSachSinhVien() {
@@ -35,15 +36,14 @@ export default function AdminDanhSachSinhVien() {
   const [majorOptions, setMajorOptions] = useState([])
   const [classesOptions, setClassesOptions] = useState([])
   const [selectedMajor, setSelectedMajor] = useState({})
-  const [selectedClasse, setSelectedClasse] = useState({})
+  const [selectedClass, setSelectedClass] = useState({})
   const [isShowDialog, setShowDialog] = useState(false)
-  const [isFetchStudent, setFetchStudent] = useState(false)
 
   const navigate = useNavigate()
 
   useEffect(() => {
-    checkAndHandleLogined(navigate)
-    checkPermissionToAccessThePage(getUserRole(), [ROLES.admin], navigate)
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.ADMIN], navigate)
     fetchMajors()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -56,7 +56,7 @@ export default function AdminDanhSachSinhVien() {
   useEffect(() => {
     fetchStudents()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedClasse, selectedMajor])
+  }, [selectedClass])
 
   const fetchMajors = async () => {
     try {
@@ -80,13 +80,9 @@ export default function AdminDanhSachSinhVien() {
       // console.log(result)
       // console.log(selectedMajor)
       setClassesOptions(result)
-      setSelectedClasse(result[0])
+      setSelectedClass(result[0])
       if (result.length === 0) {
-        console.log('fetchClasses')
-        setFetchStudent(false)
         setStudents([])
-      } else {
-        setFetchStudent(true)
       }
     } catch (error) {
       console.error(error)
@@ -95,13 +91,13 @@ export default function AdminDanhSachSinhVien() {
   }
 
   const fetchStudents = async () => {
-    const classId = selectedClasse?.id
+    const classId = selectedClass?.id
 
-    if (classId && isFetchStudent) {
-      console.log('fetchStudents')
+    if (classId) {
+      // console.log('fetchStudents', selectedClass)
       try {
         const data = await callApiGetStudentsListByClassId(classId)
-        console.log(data)
+        // console.log(data)
         setStudents(
           data.sort((stu1, stu2) =>
             stu1.studentId.localeCompare(stu2.studentId),
@@ -112,13 +108,12 @@ export default function AdminDanhSachSinhVien() {
         handleError(error, navigate)
       }
     } else {
-      console.log(classId)
       setStudents([])
     }
   }
 
   const onClickCreateUser = () => {
-    if (!selectedClasse) {
+    if (!selectedClass) {
       alert('Chưa chọn lớp')
       return
     }
@@ -133,8 +128,8 @@ export default function AdminDanhSachSinhVien() {
             key={index}
             data={data}
             index={index}
-            classPresidentId={selectedClasse?.classPresidentId}
-            refresh={fetchClasses}
+            classPresidentId={selectedClass?.classPresidentId}
+            refresh={fetchStudents}
           />
         ))
   }
@@ -144,7 +139,7 @@ export default function AdminDanhSachSinhVien() {
       <DialogCreateUserStudent
         isShowDialog={isShowDialog}
         setShowDialog={setShowDialog}
-        classId={selectedClasse?.id}
+        classId={selectedClass?.id}
         refresh={fetchStudents}
       />
 
@@ -170,8 +165,8 @@ export default function AdminDanhSachSinhVien() {
                 <div className='w-[300px]'>
                   <InputSelect
                     options={classesOptions}
-                    value={selectedClasse}
-                    onChange={setSelectedClasse}
+                    value={selectedClass}
+                    onChange={setSelectedClass}
                   />
                 </div>
               ) : (

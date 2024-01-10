@@ -10,13 +10,19 @@ import ItemRowHoatDongCongDongCuaKhoa from '../components/ItemRow/ItemRowHoatDon
 import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 
 import {
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD,
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS,
   ROLES,
   callApiApproveMajorCommunityActivitiesByMajorHead,
   callApiGetMajorsListByMajorHeadId,
+  callApiGetSettings,
   callApiGetUserCommunityActivitiesSumScoreHeadTeachersConfirmed,
+  checkAndHandleLogin,
+  checkPermissionToAccessThePage,
   checkRoles2,
   generateAcademyYearOptions,
   getUserId,
+  getUserRole,
   handleError,
 } from '../utils'
 
@@ -25,12 +31,14 @@ const HEADER_TABE = [
   { className: 'w-20%', title: 'Mã Sinh Viên' },
   { className: '', title: 'Họ và tên' },
   { className: 'w-20%', title: 'Lớp' },
-  { className: 'w-20%', title: 'Điểm' },
+  { className: 'w-10%', title: 'Điểm' },
+  { className: 'w-10%', title: 'Trạng thái' },
 ]
 
 export default function HoatDongCongDongCuaKhoa() {
   const role = useSelector(state => state.role)
-  const [communitiActivities, setCommunityActivities] = useState([])
+  const [setting, setSetting] = useState({})
+  const [communityActivities, setCommunityActivities] = useState([])
   const academyYearOptions = generateAcademyYearOptions()
   const [selectedAcademyYear, setSelectedAcademyYear] = useState(
     academyYearOptions[0],
@@ -40,16 +48,30 @@ export default function HoatDongCongDongCuaKhoa() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.TRUONG_KHOA], navigate)
     fetchMajors()
+    fetchSettings(COMMUNITY_ACTIVITY_APPROVAL_PERIOD)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
-    fetchCommiunityActivities()
+    fetchCommunityActivities()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectMajor, selectedAcademyYear])
 
-  const fetchCommiunityActivities = async () => {
+  const fetchSettings = async name => {
+    try {
+      const data = await callApiGetSettings(name)
+      setSetting(data)
+      // console.log(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
+
+  const fetchCommunityActivities = async () => {
     if (selectMajor?.value && selectedAcademyYear?.value) {
       try {
         const data =
@@ -94,7 +116,7 @@ export default function HoatDongCongDongCuaKhoa() {
           selectMajor.value,
           new Date().getFullYear(),
         )
-        fetchCommiunityActivities()
+        fetchCommunityActivities()
       } catch (error) {
         console.error(error)
         handleError(error, navigate)
@@ -103,12 +125,12 @@ export default function HoatDongCongDongCuaKhoa() {
   }
 
   const checkAcceptedAll = () =>
-    communitiActivities?.some(item => item.sumScoreHeadTeacherConfirmed > 0)
+    communityActivities?.some(item => item.sumScoreHeadTeacherConfirmed > 0)
 
   const renderBodyTable = () => {
-    return communitiActivities?.length === 0
+    return communityActivities?.length === 0
       ? [<ItemRowNoData key={-1} colSpan={10} />]
-      : communitiActivities?.map((data, index) => (
+      : communityActivities?.map((data, index) => (
           <ItemRowHoatDongCongDongCuaKhoa
             key={index}
             index={index}
@@ -143,13 +165,22 @@ export default function HoatDongCongDongCuaKhoa() {
         </div>
         <Table header={HEADER_TABE}>{renderBodyTable()}</Table>
         <div className='flex  py-2 justify-end gap-4'>
-          {checkRoles2([ROLES.truongKhoa], [role]) &&
+          {checkRoles2([ROLES.TRUONG_KHOA], [role]) &&
             shouldShowButton() &&
             checkAcceptedAll() &&
-            communitiActivities?.length > 0 && (
-              <Button label='Xác nhận' onClick={handleAccept} />
+            communityActivities?.length > 0 && (
+              <>
+                {setting.status ===
+                COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.MAJOR_HEAD ? (
+                  <Button label='Xác nhận' onClick={handleAccept} />
+                ) : (
+                  <span className='font-bold text-main text-red-text my-2'>
+                    Bạn chưa được phép đánh giá
+                  </span>
+                )}
+              </>
             )}
-          {communitiActivities?.length > 0 && <Button label='Xuất file' />}
+          {communityActivities?.length > 0 && <Button label='Xuất file' />}
         </div>
       </div>
     </div>

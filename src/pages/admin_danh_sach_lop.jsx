@@ -14,7 +14,7 @@ import {
   ROLES,
   callApiGetClassesPaginationList,
   callApiGetMajorsList,
-  checkAndHandleLogined,
+  checkAndHandleLogin,
   checkPermissionToAccessThePage,
   generateAcademyYearOptions,
   getUserRole,
@@ -43,8 +43,8 @@ export default function AdminDanhSachLop() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    checkAndHandleLogined(navigate)
-    checkPermissionToAccessThePage(getUserRole(), [ROLES.admin], navigate)
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.ADMIN], navigate)
     fetchMajors()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -114,7 +114,7 @@ export default function AdminDanhSachLop() {
   }
 
   return (
-    <div className='container mx-auto'>
+    <div className='container mx-auto py-2'>
       <Title title='danh sách lớp' />
       <div className='mt-3'>
         <div className='flex items-center justify-between gap-2'>

@@ -10,8 +10,11 @@ import ItemRowTableDetailHoatDong from '../ItemRow/ItemRowTableDetailHoatDong'
 import Table from '../Table'
 
 import {
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD,
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS,
   ROLES,
   callApiApproveUserCommunityActivitiesByHeadTeacher,
+  callApiGetSettings,
   callApiGetUserCommunityActivities,
   checkRoles,
   checkRoles2,
@@ -31,6 +34,7 @@ export default function DialogDetailCommunityActivityStudent({
   const role = useSelector(state => state.role)
   const academyYearOptions = generateAcademyYearOptions()
 
+  const [setting, setSetting] = useState({})
   const [communityActivities, setCommunityActivities] = useState([])
   const [selectedAcademyYear, setSelectedAcademyYear] = useState(
     academyYearOptions[0],
@@ -39,8 +43,20 @@ export default function DialogDetailCommunityActivityStudent({
 
   useEffect(() => {
     fetchCommunityActivities()
+    fetchSettings(COMMUNITY_ACTIVITY_APPROVAL_PERIOD)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const fetchSettings = async name => {
+    try {
+      const data = await callApiGetSettings(name)
+      setSetting(data)
+      // console.log(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
 
   const fetchCommunityActivities = async () => {
     if (userId) {
@@ -61,8 +77,8 @@ export default function DialogDetailCommunityActivityStudent({
   const genHeaderByRole = () => {
     const baseHeader = [
       { className: 'w-5%', title: 'stt' },
-      { className: 'w-10%', title: 'loại hoạt động' },
-      { className: 'w-20%', title: 'tên hoạt động' },
+      { className: 'w-25%', title: 'loại hoạt động' },
+      { className: 'w-25%', title: 'tên hoạt động' },
       { className: 'w-5%', title: 'khung điểm' },
       { className: 'w-5%', title: 'điểm tự đánh giá' },
       { className: 'w-5%', title: 'điểm ban cán sự đánh giá' },
@@ -70,7 +86,7 @@ export default function DialogDetailCommunityActivityStudent({
     ]
 
     const additionalHeader = checkRoles2(
-      [ROLES.giaoVien, ROLES.truongKhoa],
+      [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA],
       [role],
     )
       ? [{ className: 'w-5%', title: 'xác nhận' }]
@@ -118,6 +134,27 @@ export default function DialogDetailCommunityActivityStudent({
     }
   }
 
+  const genCanhBao = () => {
+    const userRole = getUserRole()
+
+    if (
+      (checkRoles(userRole, [ROLES.GIAO_VIEN]) &&
+        setting.status !==
+          COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER) ||
+      (checkRoles(userRole, [ROLES.LOP_TRUONG]) &&
+        setting.status !==
+          COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.CLASS_PRESIDENT)
+    ) {
+      return (
+        <span className='font-bold text-main text-red-text my-2'>
+          Bạn chưa được phép đánh giá
+        </span>
+      )
+    }
+
+    return ''
+  }
+
   return (
     <DialogCustom
       isOpen={isShowDialog}
@@ -130,14 +167,17 @@ export default function DialogDetailCommunityActivityStudent({
           </div>
         </div>
         <div className='col-span-2 mt-4 flex justify-end gap-2'>
+          {genCanhBao()}
           <Button
             label='Huỷ'
             type='outline'
             onClick={() => setShowDialog(false)}
           />
-          {checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa]) && (
-            <Button label='xác nhận toàn bộ' onClick={handleAcceptAll} />
-          )}
+          {checkRoles(getUserRole(), [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA]) &&
+            setting.status ===
+              COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER && (
+              <Button label='xác nhận toàn bộ' onClick={handleAcceptAll} />
+            )}
         </div>
       </div>
     </DialogCustom>

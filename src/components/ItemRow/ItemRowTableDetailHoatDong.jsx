@@ -8,10 +8,13 @@ import Button from '../Button'
 import InputNumber from '../Input/InputNumber'
 
 import {
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD,
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS,
   COMMUNITY_ACTIVITY_STATUS,
   REGEX,
   ROLES,
   callApiGetCommunityActivityTypesList,
+  callApiGetSettings,
   callApiUpdateCommunityActivity,
   checkRoles2,
   handleError,
@@ -25,6 +28,7 @@ export default function ItemRowTableDetailHoatDong({
 }) {
   const role = useSelector(state => state.role)
 
+  const [setting, setSetting] = useState({})
   const [isShowEdit, setShowEdit] = useState(false)
   const [rowData, setRowData] = useState(data)
   const [selectedCommunityActivityTypes, setSelectedCommunityActivityTypes] =
@@ -34,7 +38,8 @@ export default function ItemRowTableDetailHoatDong({
   // console.log(data)
 
   useEffect(() => {
-    fetchCommunityActivityTypies()
+    fetchCommunityActivityTypes()
+    fetchSettings(COMMUNITY_ACTIVITY_APPROVAL_PERIOD)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -42,7 +47,18 @@ export default function ItemRowTableDetailHoatDong({
     setRowData(data)
   }, [data])
 
-  const fetchCommunityActivityTypies = async () => {
+  const fetchSettings = async name => {
+    try {
+      const data = await callApiGetSettings(name)
+      setSetting(data)
+      // console.log(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
+
+  const fetchCommunityActivityTypes = async () => {
     try {
       const data = await callApiGetCommunityActivityTypesList()
       // console.log(data)
@@ -78,8 +94,10 @@ export default function ItemRowTableDetailHoatDong({
   return (
     <tr className='text-main'>
       <td className='border border-primary p-1 text-center'>{index + 1}</td>
-      <td className='border border-primary p-1'>{rowData.activityTypeName}</td>
-      <td className='border border-primary p-1'>{rowData.name}</td>
+      <td className='border border-primary p-1 truncate'>
+        {rowData.activityTypeName}
+      </td>
+      <td className='border border-primary p-1 truncate'>{rowData.name}</td>
       <td className='border border-primary p-1 text-center'>
         {`${selectedCommunityActivityTypes?.minScore || ''} - ${
           selectedCommunityActivityTypes?.maxScore || ''
@@ -106,10 +124,10 @@ export default function ItemRowTableDetailHoatDong({
           rowData.classPresidentEvaluationScore
         )}
       </td>
-      <td className='border border-primary p-1'>
-        {REGEX.link.test(rowData.evidentLink) ? (
+      <td className='border border-primary p-1 truncate'>
+        {REGEX.LINK.test(rowData.evidentLink) ? (
           <a
-            className='text-blue-500'
+            className='text-blue-500 truncate'
             target='_blank'
             href={rowData.evidentLink}
           >
@@ -119,7 +137,7 @@ export default function ItemRowTableDetailHoatDong({
           rowData.evidentLink
         )}
       </td>
-      {checkRoles2([ROLES.lopTruong], [role]) && (
+      {checkRoles2([ROLES.LOP_TRUONG], [role]) && (
         <td className='border border-primary px-1 flex justify-center gap-1'>
           {isShowEdit ? (
             <>
@@ -127,18 +145,20 @@ export default function ItemRowTableDetailHoatDong({
                 label='lưu'
                 onClick={() =>
                   onClickFonfirme(
-                    COMMUNITY_ACTIVITY_STATUS.classPresidentConfirmed,
+                    COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED,
                   )
                 }
               />
               <Button label='huỷ' type='outline' onClick={onClickCancel} />
             </>
           ) : rowData.status <
-            COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed ? (
+              COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED &&
+            setting.status ===
+              COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.CLASS_PRESIDENT ? (
             <Button
               label={`${
                 rowData.status ===
-                COMMUNITY_ACTIVITY_STATUS.classPresidentConfirmed
+                COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED
                   ? 'sửa'
                   : 'đánh giá'
               }`}
@@ -150,15 +170,18 @@ export default function ItemRowTableDetailHoatDong({
           )}
         </td>
       )}
-      {checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
+      {checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && (
         <td className='border border-primary px-1 text-center'>
-          {rowData.status !== COMMUNITY_ACTIVITY_STATUS.studentConfirmed && (
+          {rowData.status !== COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED && (
             <InputCheckbox
               value={
-                rowData.status >= COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed
+                rowData.status >=
+                COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED
               }
               onClick={() =>
-                onClickFonfirme(COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed)
+                onClickFonfirme(
+                  COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED,
+                )
               }
             />
           )}

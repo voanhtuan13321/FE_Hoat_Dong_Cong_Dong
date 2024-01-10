@@ -10,12 +10,15 @@ import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 import ItemRowTableDanhSachLop from '../components/ItemRow/ItemRowTableDanhSachLop'
 
 import {
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD,
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS,
   ROLES,
   callApiApproveClassCommunityActivitiesByHeadTeacher,
   callApiGetClassesByTeacherId,
+  callApiGetSettings,
   callApiGetStudentsListByClassId,
   callApiGetUserByUserId,
-  checkAndHandleLogined,
+  checkAndHandleLogin,
   checkPermissionToAccessThePage,
   checkRoles,
   generateAcademyYearOptions,
@@ -28,6 +31,7 @@ import {
 export default function DanhSachLop() {
   const academyYearOptions = generateAcademyYearOptions()
 
+  const [setting, setSetting] = useState({})
   const [students, setStudents] = useState([])
   const [classesOptions, setClassesOptions] = useState([])
   const [selectedClasses, setSelectedClasses] = useState({})
@@ -39,12 +43,18 @@ export default function DanhSachLop() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    checkAndHandleLogined(navigate)
+    checkAndHandleLogin(navigate)
     checkPermissionToAccessThePage(
       getUserRole(),
-      [ROLES.sinhVien, ROLES.giaoVien],
+      [ROLES.SINH_VIEN, ROLES.LOP_TRUONG, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA],
       navigate,
     )
+    checkPermissionToAccessThePage(
+      getUserRole(),
+      [ROLES.SINH_VIEN, ROLES.GIAO_VIEN],
+      navigate,
+    )
+    fetchSettings(COMMUNITY_ACTIVITY_APPROVAL_PERIOD)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -56,16 +66,28 @@ export default function DanhSachLop() {
   useEffect(() => {
     const yearOps = generateYearOptions(selectedAcademyYear.value)
     setSelectedYear(yearOps[0])
-  }, [selectedClasses, selectedAcademyYear])
+  }, [selectedClasses])
 
   useEffect(() => {
     fetchStudents()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAcademyYear, selectedClasses, selectedYear])
+  }, [selectedYear])
+
+  const fetchSettings = async name => {
+    try {
+      const data = await callApiGetSettings(name)
+      setSetting(data)
+      // console.log(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
 
   const fetchClasses = async () => {
     const roles = getUserRole()
-    if (!checkRoles(roles, [ROLES.giaoVien])) {
+
+    if (!checkRoles(roles, [ROLES.GIAO_VIEN])) {
       return
     }
 
@@ -86,64 +108,65 @@ export default function DanhSachLop() {
   const fetchStudents = async () => {
     const roles = getUserRole()
     const userId = getUserId()
-    if (userId) {
-      const user = await callApiGetUserByUserId(userId)
 
-      const classId = checkRoles(roles, [ROLES.sinhVien])
-        ? user.classId
-        : selectedClasses?.value ?? ''
+    if (!userId) return
 
-      if (classId) {
-        try {
-          const data = await callApiGetStudentsListByClassId(
-            classId,
-            selectedYear.value,
-          )
-          // console.log('student', data)
-          setStudents(
-            data.sort((stu1, stu2) =>
-              stu1.studentId.localeCompare(stu2.studentId),
-            ),
-          )
-        } catch (error) {
-          console.error(error)
-          handleError(error, navigate)
-        }
-      } else {
-        setStudents([])
+    const user = await callApiGetUserByUserId(userId)
+
+    const classId = checkRoles(roles, [ROLES.SINH_VIEN])
+      ? user.classId
+      : selectedClasses?.value ?? ''
+
+    if (classId) {
+      try {
+        const data = await callApiGetStudentsListByClassId(
+          classId,
+          selectedYear.value,
+        )
+        // console.log('student', data)
+        setStudents(
+          data.sort((stu1, stu2) =>
+            stu1.studentId.localeCompare(stu2.studentId),
+          ),
+        )
+      } catch (error) {
+        console.error(error)
+        handleError(error, navigate)
       }
+    } else {
+      setStudents([])
     }
   }
 
-  const handleXacNhan = async () => {
+  const handleAccept = async () => {
     const classId = selectedClasses?.value
-    if (classId) {
-      const { isConfirmed } = await Swal.fire({
-        title: 'Bạn có chắc muốn xác nhận không',
-        icon: 'info',
-        confirmButtonText: 'Xác nhận',
-        showCancelButton: true,
-        cancelButtonText: 'Huỷ',
-      })
 
-      if (isConfirmed) {
-        try {
-          const data =
-            await callApiApproveClassCommunityActivitiesByHeadTeacher(
-              classId,
-              new Date().getFullYear(),
-            )
-        } catch (error) {
-          console.error(error)
-          handleError(error, navigate)
-        }
-      }
+    if (!classId) return
+
+    const { isConfirmed } = await Swal.fire({
+      title: 'Bạn có chắc muốn xác nhận không',
+      icon: 'info',
+      confirmButtonText: 'Xác nhận',
+      showCancelButton: true,
+      cancelButtonText: 'Huỷ',
+    })
+
+    if (!isConfirmed) return
+
+    try {
+      const data = await callApiApproveClassCommunityActivitiesByHeadTeacher(
+        classId,
+        new Date().getFullYear(),
+      )
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
     }
   }
 
   const renderBodyTable = () => {
     if (
-      checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa]) &&
+      checkRoles(getUserRole(), [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA]) &&
       classesOptions.length === 0
     )
       return [<ItemRowNoData key={-1} colSpan={9} />]
@@ -163,12 +186,15 @@ export default function DanhSachLop() {
   }
 
   const genHeaders = () => {
-    const header = checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa])
+    const header = checkRoles(getUserRole(), [
+      ROLES.GIAO_VIEN,
+      ROLES.TRUONG_KHOA,
+    ])
       ? [
           { className: 'w-5%', title: 'Chọn lớp trưởng' },
           { className: 'w-5%', title: 'Xem chi tiết' },
         ]
-      : checkRoles(getUserRole(), [ROLES.lopTruong])
+      : checkRoles(getUserRole(), [ROLES.LOP_TRUONG])
         ? [{ className: 'w-10%', title: 'Xem chi tiết' }]
         : []
 
@@ -188,7 +214,7 @@ export default function DanhSachLop() {
     <div className='container mx-auto'>
       <Title title='danh sách lớp' />
       <div className='mt-3'>
-        {checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa]) && (
+        {checkRoles(getUserRole(), [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA]) && (
           <div className='flex items-center justify-between gap-2 '>
             <div className='flex items-center gap-2'>
               <span className='font-bold text-primary text-main'>Khoá:</span>
@@ -231,7 +257,22 @@ export default function DanhSachLop() {
               )}
             </div>
             <div className=''>
-              <Button label='Xác nhận' type='primary' onClick={handleXacNhan} />
+              {selectedYear.value === new Date().getFullYear() && (
+                <>
+                  {setting.status ===
+                  COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER ? (
+                    <Button
+                      label='Xác nhận'
+                      type='primary'
+                      onClick={handleAccept}
+                    />
+                  ) : (
+                    <span className='font-bold text-main text-red-text my-2'>
+                      Bạn chưa được phép đánh giá
+                    </span>
+                  )}
+                </>
+              )}
             </div>
           </div>
         )}

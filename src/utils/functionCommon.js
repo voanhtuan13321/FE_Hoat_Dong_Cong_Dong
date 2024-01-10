@@ -20,21 +20,11 @@ export const getHighestRole = (roles = []) =>
     return Math.max(mainIdRole, temptIdRole)
   }, condition.DEFAULT)
 
-const convertRolesTextToRolesNumber = roles =>
-  roles.map(role => condition[role])
-
 export const checkRoles = (roles = [], targetRoles = []) =>
   roles.some(role => targetRoles.includes(condition[role]))
 
 export const checkRoles2 = (roles = [], targetRoles = []) =>
   roles.some(role => targetRoles.includes(role))
-
-export const checkPermissionToAccessThePageAdmin = (roles = [], navigate) => {
-  if (!checkRoles(convertRolesTextToRolesNumber(roles), [ROLES.admin])) {
-    alert('Bạn không phải là admin nên không được truy cập trang này')
-    navigate('/')
-  }
-}
 
 export const checkPermissionToAccessThePage = (
   roles = [],
@@ -47,7 +37,7 @@ export const checkPermissionToAccessThePage = (
   }
 }
 
-export const checkAndHandleLogined = navigate => {
+export const checkAndHandleLogin = navigate => {
   const token = localStorages.getToken()
   !token && navigate('/login')
 }
@@ -92,7 +82,8 @@ export const handleError = (error, navigate) => {
       navigate('/login')
       break
     default:
-      alert(error.message)
+      console.error(error)
+      Swal.fire('Lỗi không xác định', '', 'error')
   }
 }
 
@@ -181,11 +172,11 @@ export const determineActivityOutcome = (
     score: maxScore < 0 ? 0 : maxScore,
     status:
       maxScore < 0
-        ? COMMUNITY_ACTIVITY_STATUS.rejected
+        ? COMMUNITY_ACTIVITY_STATUS.REJECTED
         : maxScore === sumScoreClassPresidentConfirmed
-          ? COMMUNITY_ACTIVITY_STATUS.classPresidentConfirmed
+          ? COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED
           : maxScore === sumScoreHeadTeacherConfirmed
-            ? COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed
-            : COMMUNITY_ACTIVITY_STATUS.majorHeadConfirmed,
+            ? COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED
+            : COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED,
   }
 }

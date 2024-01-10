@@ -42,19 +42,21 @@ export default function Home() {
 
   return (
     <>
-      <div className='container mx-auto pb-[88px]'>
+      <div className='container mx-auto pb-[88px] py-2'>
         <Title title='Thông báo' />
         {renderBody()}
       </div>
-      <Pagination
-        totalItems={listAnnouncements.totalItems}
-        totalPages={listAnnouncements.totalPages}
-        itemPerPage={listAnnouncements.itemPerPage}
-        currentPage={listAnnouncements.currentPage}
-        isNextPage={listAnnouncements.isNextPage}
-        isPreviousPage={listAnnouncements.isPreviousPage}
-        onPageChange={fetchListAnnouncements}
-      />
+      {listAnnouncements.totalPages > 1 && (
+        <Pagination
+          totalItems={listAnnouncements.totalItems}
+          totalPages={listAnnouncements.totalPages}
+          itemPerPage={listAnnouncements.itemPerPage}
+          currentPage={listAnnouncements.currentPage}
+          isNextPage={listAnnouncements.isNextPage}
+          isPreviousPage={listAnnouncements.isPreviousPage}
+          onPageChange={fetchListAnnouncements}
+        />
+      )}
     </>
   )
 }

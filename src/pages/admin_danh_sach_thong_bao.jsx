@@ -13,7 +13,7 @@ import {
   ITEM_PER_PAGE,
   ROLES,
   callApiGetAnnouncementsPaginationList,
-  checkAndHandleLogined,
+  checkAndHandleLogin,
   checkPermissionToAccessThePage,
   getUserRole,
 } from '../utils'
@@ -32,8 +32,8 @@ export default function AdminDanhSachThongBao() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    checkAndHandleLogined(navigate)
-    checkPermissionToAccessThePage(getUserRole(), [ROLES.admin], navigate)
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.ADMIN], navigate)
     fetchAnnouncements()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -77,7 +77,7 @@ export default function AdminDanhSachThongBao() {
   }
 
   return (
-    <div className='container mx-auto'>
+    <div className='container mx-auto py-2'>
       <Title title='danh sách thông báo' />
       <div>
         <div className='py-2 text-end'>

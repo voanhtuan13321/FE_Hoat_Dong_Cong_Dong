@@ -7,8 +7,12 @@ import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 
 import {
   COMMUNITY_ACTIVITY_STATUS,
+  ROLES,
   callApiGetUserCommunityActivitiesNoneYear,
+  checkAndHandleLogin,
+  checkPermissionToAccessThePage,
   getUserId,
+  getUserRole,
   handleError,
 } from '../utils'
 
@@ -26,6 +30,12 @@ export default function KetQuaPhucVuCongDong() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(
+      getUserRole(),
+      [ROLES.SINH_VIEN, ROLES.LOP_TRUONG],
+      navigate,
+    )
     fetchCommunityActivities()
   }, [])
 
@@ -37,7 +47,8 @@ export default function KetQuaPhucVuCongDong() {
         const data = await callApiGetUserCommunityActivitiesNoneYear(userId)
         console.log(data)
         const showData = data.filter(
-          item => item.status === COMMUNITY_ACTIVITY_STATUS.majorHeadConfirmed,
+          item =>
+            item.status === COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED,
         )
         const score = showData.reduce(
           (acc, item) => acc + item.classPresidentEvaluationScore,
@@ -78,8 +89,9 @@ export default function KetQuaPhucVuCongDong() {
     <>
       <div className='container justify-center m-auto p-2'>
         <Title title={'Kết quả phục vụ cộng đồng'}></Title>
-        <p className='font-semibold text-primary'>
-          Tổng điểm HĐCĐ của cả khóa học: {totalScore}{' '}
+        <p className='font-semibold text-primary py-3'>
+          Tổng điểm HĐCĐ của cả khóa học:{' '}
+          <span className='text-red-text'>{totalScore}</span>
         </p>
         <div className='my-2'>
           <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>

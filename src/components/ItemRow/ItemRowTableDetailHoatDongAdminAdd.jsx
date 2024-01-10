@@ -29,7 +29,11 @@ const initialValues = {
   adminNote: '',
 }
 
-export default function ItemRowTableTuDanhGiaAdd({ setShowAddNew, refresh }) {
+export default function ItemRowTableDetailHoatDongAdminAdd({
+  userId,
+  setShowAddNew,
+  refresh,
+}) {
   const [optionCommunityActivityTypes, setOptionCommunityActivityTypes] =
     useState([])
   const [selectedCommunityActivityTypes, setSelectedCommunityActivityTypes] =
@@ -63,19 +67,19 @@ export default function ItemRowTableTuDanhGiaAdd({ setShowAddNew, refresh }) {
   }
 
   const handleSave = async () => {
-    const userId = getUserId()
     if (userId) {
       const dataRequest = {
         ...dataSubmit,
         userId,
         activityTypeId: selectedCommunityActivityTypes.value,
-        status: COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED,
+        status: COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED,
+        selfEvaluationScore: dataSubmit.classPresidentEvaluationScore,
       }
 
       if (
-        dataRequest.selfEvaluationScore <
+        dataRequest.classPresidentEvaluationScore <
           selectedCommunityActivityTypes.minScore ||
-        dataRequest.selfEvaluationScore >
+        dataRequest.classPresidentEvaluationScore >
           selectedCommunityActivityTypes.maxScore
       ) {
         Swal.fire(
@@ -122,22 +126,22 @@ export default function ItemRowTableTuDanhGiaAdd({ setShowAddNew, refresh }) {
         />
       </td>
       <td className='border border-primary text-center'>{`${selectedCommunityActivityTypes.minScore} - ${selectedCommunityActivityTypes.maxScore}`}</td>
-      <td className='border border-primary'>
+      <td className='border border-primary text-center'>
+        {dataSubmit.classPresidentEvaluationScore}
+      </td>
+      <td className='border border-primary text-center'>
         <InputNumber
-          name='selfEvaluationScore'
-          value={dataSubmit.selfEvaluationScore}
+          name='classPresidentEvaluationScore'
+          value={dataSubmit.classPresidentEvaluationScore}
           min={selectedCommunityActivityTypes.minScore}
           max={selectedCommunityActivityTypes.maxScore}
           onChange={e =>
             setDataSubmit({
               ...dataSubmit,
-              selfEvaluationScore: Number(e.target.value),
+              classPresidentEvaluationScore: Number(e.target.value),
             })
           }
         />
-      </td>
-      <td className='border border-primary p-1 text-center'>
-        {dataSubmit.classPresidentEvaluationScore}
       </td>
       <td className='border border-primary'>
         <InputText

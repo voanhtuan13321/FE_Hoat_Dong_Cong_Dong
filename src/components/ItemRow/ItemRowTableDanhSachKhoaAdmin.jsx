@@ -61,9 +61,10 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
   const onClickSave = async () => {
     const dataEdit = {
       id: major.id,
-      majorHeadId: selectedTeacher.id,
+      majorHeadId: selectedTeacher.value,
       name: major.name,
     }
+    // console.log(dataEdit)
     try {
       await callApiUpdateMajor(dataEdit)
       toast.success('Cập nhật thành công')
@@ -119,7 +120,7 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
               options={listTeachers}
             />
           </td>
-          <td className='border border-primary p-1 flex'>
+          <td className='border border-primary px-1 flex gap-1'>
             <div className='w-1/2 flex justify-center'>
               <Button label='lưu' type='' onClick={onClickSave} />
             </div>
@@ -139,7 +140,7 @@ export default function ItemRowTableDanhSachKhoaAdmin({ stt, data, refresh }) {
           <td className='border border-primary p-1 text-center'>
             {data.majorHeadFullName}
           </td>
-          <td className='border border-primary p-1 flex'>
+          <td className='border border-primary px-1 flex gap-1'>
             <div className='w-1/2 flex justify-center'>
               <Button
                 label='sửa'

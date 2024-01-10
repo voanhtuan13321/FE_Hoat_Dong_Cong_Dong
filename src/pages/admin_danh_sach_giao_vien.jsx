@@ -9,8 +9,11 @@ import DialogCreateUserTeacher from '../components/DialogCustom/DialogCreateUser
 
 import {
   ITEM_PER_PAGE,
+  ROLES,
   callApiGetTeachersPaginationList,
-  checkAndHandleLogined,
+  checkAndHandleLogin,
+  checkPermissionToAccessThePage,
+  getUserRole,
 } from '../utils'
 
 const HEADER_TABLE = [
@@ -29,7 +32,8 @@ export default function AdminDanhSachGiaoVien() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    checkAndHandleLogined(navigate)
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.ADMIN], navigate)
     fetchTeachers()
   }, [])
 
@@ -64,7 +68,7 @@ export default function AdminDanhSachGiaoVien() {
         setShowDialog={setShowDialog}
         refresh={fetchTeachers}
       />
-      <div className='container mx-auto'>
+      <div className='container mx-auto py-2'>
         <Title title='danh sách giáo viên' />
         <div>
           <div className='py-2 text-end'>

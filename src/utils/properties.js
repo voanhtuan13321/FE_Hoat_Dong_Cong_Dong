@@ -18,33 +18,45 @@ import AdminHoatDongCongDongCuaTruong from '../pages/admin_hoat_dong_cong_dong_c
 // functions
 import { setRole } from '../redux/storeSlice'
 import { localStorages } from './localStorage'
+import AdminThoiGianXetDuyet from '../pages/admin_thoi_gian_xet_duyet'
 
 export const ITEM_PER_PAGE = 10
 export const KEY_ROLE_TOKEN =
   'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
 
 export const ROLES = {
-  client: 1,
-  sinhVien: 2,
-  lopTruong: 3,
-  giaoVien: 4,
-  truongKhoa: 5,
-  admin: 6,
+  ANONYMOUS: 1,
+  SINH_VIEN: 2,
+  LOP_TRUONG: 3,
+  GIAO_VIEN: 4,
+  TRUONG_KHOA: 5,
+  ADMIN: 6,
 }
 
+export const COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS = {
+  RESTRICTED: 0,
+  STUDENT: 1,
+  CLASS_PRESIDENT: 2,
+  HEAD_TEACHER: 3,
+  MAJOR_HEAD: 4,
+}
+
+export const COMMUNITY_ACTIVITY_APPROVAL_PERIOD =
+  'CommunityActivityApprovalPeriod'
+
 export const REGEX = {
-  textOnly: /^[a-zA-ZÀ-Ỹà-ỹ ]+$/,
-  dontSpace: /^[a-zA-Z0-9_]+$/,
-  phoneNum: /^(?:\+84|0)(\d{9,10})$/,
-  link: /^(http|https):\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/,
+  TEXT_ONLY: /^[a-zA-ZÀ-Ỹà-ỹ ]+$/,
+  DONT_SPACE: /^[a-zA-Z0-9_]+$/,
+  PHONE_NUMBER: /^(?:\+84|0)(\d{9,10})$/,
+  LINK: /^(http|https):\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/,
 }
 
 export const COMMUNITY_ACTIVITY_STATUS = {
-  rejected: -1,
-  studentConfirmed: 1,
-  classPresidentConfirmed: 2,
-  headTeacherConfirmed: 3,
-  majorHeadConfirmed: 4,
+  REJECTED: -1,
+  STUDENT_CONFIRMED: 1,
+  CLASS_PRESIDENT_CONFIRMED: 2,
+  HEAD_TEACHER_CONFIRMED: 3,
+  MAJOR_HEAD_CONFIRMED: 4,
 }
 
 export const optionsGender = [
@@ -63,12 +75,12 @@ export const routers = [
     label: 'trang chủ',
     element: <Home />,
     roles: [
-      ROLES.client,
-      ROLES.sinhVien,
-      ROLES.lopTruong,
-      ROLES.giaoVien,
-      ROLES.truongKhoa,
-      ROLES.admin,
+      ROLES.ANONYMOUS,
+      ROLES.SINH_VIEN,
+      ROLES.LOP_TRUONG,
+      ROLES.GIAO_VIEN,
+      ROLES.TRUONG_KHOA,
+      ROLES.ADMIN,
     ],
     onClick: function (navigator) {
       navigator(this.path)
@@ -78,7 +90,7 @@ export const routers = [
     path: '/login',
     label: 'đăng nhập',
     element: <Login />,
-    roles: [ROLES.client],
+    roles: [ROLES.ANONYMOUS],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -87,7 +99,12 @@ export const routers = [
     path: '/thong-tin-ca-nhan',
     label: 'thông tin cá nhân',
     element: <ThongTinCaNhan />,
-    roles: [ROLES.sinhVien, ROLES.lopTruong, ROLES.giaoVien, ROLES.truongKhoa],
+    roles: [
+      ROLES.SINH_VIEN,
+      ROLES.LOP_TRUONG,
+      ROLES.GIAO_VIEN,
+      ROLES.TRUONG_KHOA,
+    ],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -96,7 +113,7 @@ export const routers = [
     path: '/tu-danh-gia',
     label: 'tự đánh giá',
     element: <TuDanhGia />,
-    roles: [ROLES.sinhVien, ROLES.lopTruong],
+    roles: [ROLES.SINH_VIEN, ROLES.LOP_TRUONG],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -105,7 +122,12 @@ export const routers = [
     path: '/danh-sach-lop',
     label: 'danh sách lớp',
     element: <DanhSachLop />,
-    roles: [ROLES.sinhVien, ROLES.lopTruong, ROLES.giaoVien, ROLES.truongKhoa],
+    roles: [
+      ROLES.SINH_VIEN,
+      ROLES.LOP_TRUONG,
+      ROLES.GIAO_VIEN,
+      ROLES.TRUONG_KHOA,
+    ],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -114,7 +136,7 @@ export const routers = [
     path: '/ket-qua-phuc-vu-cong-dong',
     label: 'kết quả phục vụ cộng đồng',
     element: <KetQuaPhucVuCongDong />,
-    roles: [ROLES.sinhVien, ROLES.lopTruong],
+    roles: [ROLES.SINH_VIEN, ROLES.LOP_TRUONG],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -123,7 +145,7 @@ export const routers = [
     path: '/hoat-dong-cong-dong-cua-khoa',
     label: 'hoạt động cồng đồng của khoa',
     element: <HoatDongCongDongCuaKhoa />,
-    roles: [ROLES.truongKhoa],
+    roles: [ROLES.TRUONG_KHOA],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -132,7 +154,7 @@ export const routers = [
     path: '/danh-sach-khoa-ad',
     label: 'danh sách khoa',
     element: <AdminDanhSachKhoa />,
-    roles: [ROLES.admin],
+    roles: [ROLES.ADMIN],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -141,7 +163,7 @@ export const routers = [
     path: '/danh-sach-lop-ad',
     label: 'danh sách lớp',
     element: <AdminDanhSachLop />,
-    roles: [ROLES.admin],
+    roles: [ROLES.ADMIN],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -150,7 +172,7 @@ export const routers = [
     path: '/danh-sach-thong-bao-ad',
     label: 'danh sách thông báo',
     element: <AdminDanhSachThongBao />,
-    roles: [ROLES.admin],
+    roles: [ROLES.ADMIN],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -159,7 +181,7 @@ export const routers = [
     path: '/danh-sach-giao-vien-ad',
     label: 'danh sách giáo viên',
     element: <AdminDanhSachGiaoVien />,
-    roles: [ROLES.admin],
+    roles: [ROLES.ADMIN],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -168,7 +190,7 @@ export const routers = [
     path: '/danh-sach-sinh-vien-ad',
     label: 'danh sách sinh viên',
     element: <AdminDanhSachSinhVien />,
-    roles: [ROLES.admin],
+    roles: [ROLES.ADMIN],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -177,7 +199,7 @@ export const routers = [
     path: '/danh-sach-hoat-dong-cong-dong-ad',
     label: 'danh sách hoạt động cộng đồng',
     element: <AdminDanhSachHoatDongCongDong />,
-    roles: [ROLES.admin],
+    roles: [ROLES.ADMIN],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -186,7 +208,16 @@ export const routers = [
     path: '/hoat-dong-cong-dong-cua-truong-ad',
     label: 'hoạt động cộng đồng của trường',
     element: <AdminHoatDongCongDongCuaTruong />,
-    roles: [ROLES.admin],
+    roles: [ROLES.ADMIN],
+    onClick: function (navigator) {
+      navigator(this.path)
+    },
+  },
+  {
+    path: '/thoi-gian-xet-duyet-ad',
+    label: 'Thời gian xét duyệt',
+    element: <AdminThoiGianXetDuyet />,
+    roles: [ROLES.ADMIN],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -194,15 +225,15 @@ export const routers = [
   {
     label: 'đăng xuất',
     roles: [
-      ROLES.sinhVien,
-      ROLES.lopTruong,
-      ROLES.giaoVien,
-      ROLES.truongKhoa,
-      ROLES.admin,
+      ROLES.SINH_VIEN,
+      ROLES.LOP_TRUONG,
+      ROLES.GIAO_VIEN,
+      ROLES.TRUONG_KHOA,
+      ROLES.ADMIN,
     ],
     onClick: function (navigator, dispatch) {
       // handle logout here
-      dispatch(setRole([ROLES.client]))
+      dispatch(setRole([ROLES.ANONYMOUS]))
       localStorages.removeToken()
       navigator('/login')
     },

@@ -5,6 +5,7 @@ import Swal from 'sweetalert2'
 import Button from '../Button'
 import InputCheckbox from '../Input/InputCheckbox'
 import DialogChangePassword from '../DialogCustom/DialogChangePassword'
+import DialogDetailCommunityActivityStudentAdmin from '../DialogCustom/DialogDetailCommunityActivityStudentAdmin'
 
 import {
   STATUS_USER,
@@ -22,6 +23,7 @@ export default function ItemRowDanhSachSinhVienAdmin({
 }) {
   const [user, setUser] = useState(data)
   const [isShowDialog, setShowDialog] = useState(false)
+  const [isShowDialogDetail, setShowDialogDetail] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -44,6 +46,7 @@ export default function ItemRowDanhSachSinhVienAdmin({
   const handleDelete = async () => {
     const { isDenied } = await Swal.fire({
       title: 'Bạn có chắc muốn xoá?',
+      icon: 'warning',
       showConfirmButton: false,
       showDenyButton: true,
       denyButtonText: 'Xoá',
@@ -110,6 +113,16 @@ export default function ItemRowDanhSachSinhVienAdmin({
           value={classPresidentId === user.id}
           onClick={changeClassPresident}
           onChange={() => {}}
+        />
+      </td>
+      <td className='border border-primary text-main text-center p-2 underline text-primary cursor-pointer'>
+        <span onClick={() => setShowDialogDetail(true)}>Xem chi tiết</span>
+        <DialogDetailCommunityActivityStudentAdmin
+          userId={user.id}
+          isShowDialog={isShowDialogDetail}
+          setShowDialog={setShowDialogDetail}
+          studentName={`${user.firstName} ${user.lastName}`}
+          refresh2={refresh}
         />
       </td>
     </tr>

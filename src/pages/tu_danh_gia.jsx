@@ -11,15 +11,21 @@ import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 import ItemRowTableTuDanhGiaAdd from '../components/ItemRow/ItemRowTableTuDanhGiaAdd'
 
 import {
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD,
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS,
   ROLES,
   callApiGetClassById,
+  callApiGetSettings,
   callApiGetUserByUserId,
   callApiGetUserCommunityActivities,
+  checkAndHandleLogin,
   checkIsCurrentYear,
+  checkPermissionToAccessThePage,
   checkRoles2,
   generateAcademyYearOptions,
   generateYearOptions,
   getUserId,
+  getUserRole,
   handleError,
 } from '../utils'
 
@@ -27,6 +33,7 @@ export default function TuDanhGia() {
   const role = useSelector(state => state.role)
   const academyYearOptions = generateAcademyYearOptions()
 
+  const [setting, setSetting] = useState({})
   const [isShowAddNew, setShowAddNew] = useState(false)
   const [communityActivities, setCommunityActivities] = useState([])
   const [academicYearOptions, setAcademicYearOption] = useState([])
@@ -36,9 +43,27 @@ export default function TuDanhGia() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(
+      getUserRole(),
+      [ROLES.SINH_VIEN, ROLES.LOP_TRUONG],
+      navigate,
+    )
     fetchCommunityActivities()
     fetchInfoUser()
+    fetchSettings(COMMUNITY_ACTIVITY_APPROVAL_PERIOD)
   }, [])
+
+  const fetchSettings = async name => {
+    try {
+      const data = await callApiGetSettings(name)
+      setSetting(data)
+      // console.log(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
 
   const fetchCommunityActivities = async () => {
     const userId = getUserId()
@@ -87,14 +112,14 @@ export default function TuDanhGia() {
   const genHeaderByRole = () => {
     const header = [
       { className: 'w-5%', title: 'stt' },
-      { className: 'w-10%', title: 'loại hoạt động' },
-      { className: 'w-20%', title: 'tên hoạt động' },
+      { className: 'w-25%', title: 'loại hoạt động' },
+      { className: 'w-25%', title: 'tên hoạt động' },
       { className: 'w-5%', title: 'khung điểm' },
       { className: 'w-5%', title: 'điểm tự đánh giá' },
       { className: 'w-5%', title: 'điểm ban cán sự đánh giá' },
       { className: '', title: 'link minh chứng' },
     ]
-    if (checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role])) {
+    if (checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role])) {
       return [...header, { className: 'w-5%', title: 'xác nhận' }]
     }
     return [...header, { className: 'w-5%', title: '' }]
@@ -141,29 +166,41 @@ export default function TuDanhGia() {
             />
           </div>
         </div>
-        <p className='font-bold text-main text-red-text my-2'>
-          ** Bạn chưa được phép đánh giá học kỳ này **
-        </p>
       </div>
-      <div>
+      <div className='py-3'>
         <div className='flex justify-between items-center'>
           <h3 className='uppercase font-bold'>nội dung tự đánh giá</h3>
           <div>
-            {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) &&
-              !isShowAddNew &&
-              checkIsCurrentYear(selectedAcademyYear.value) && (
-                <Button
-                  label='thêm'
-                  type='add'
-                  onClick={() => setShowAddNew(true)}
-                />
-              )}
+            {checkIsCurrentYear(selectedAcademyYear.value) && (
+              <>
+                {setting.status ===
+                COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT ? (
+                  <>
+                    {!checkRoles2(
+                      [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA],
+                      [role],
+                    ) &&
+                      !isShowAddNew && (
+                        <Button
+                          label='thêm'
+                          type='add'
+                          onClick={() => setShowAddNew(true)}
+                        />
+                      )}
+                  </>
+                ) : (
+                  <span className='font-bold text-main text-red-text my-2'>
+                    ** Bạn chưa được phép đánh giá học kỳ này **
+                  </span>
+                )}
+              </>
+            )}
           </div>
         </div>
         <div className='my-2'>
           <Table header={genHeaderByRole()}>{renderBodyTable()}</Table>
         </div>
-        {/* {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) &&
+        {/* {!checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) &&
           checkIsCurrentYear(selectedAcademyYear.value) && (
             <div className='flex justify-end gap-2'>
               <Button

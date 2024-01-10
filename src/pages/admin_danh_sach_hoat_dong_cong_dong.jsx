@@ -13,7 +13,7 @@ import {
   ITEM_PER_PAGE,
   ROLES,
   callApiGetCommunityActivityTypesPaginationList,
-  checkAndHandleLogined,
+  checkAndHandleLogin,
   checkPermissionToAccessThePage,
   getUserRole,
 } from '../utils'
@@ -21,8 +21,8 @@ import {
 const HEADER_TABLE = [
   { className: 'w-5%', title: 'stt' },
   { className: '', title: 'Loại hoạt động cộng đồng' },
-  { className: 'w-15%', title: 'Min điểm' },
-  { className: 'w-15%', title: 'Max điểm' },
+  { className: 'w-15%', title: 'Điểm tối thiểu' },
+  { className: 'w-15%', title: 'Điểm tối đa' },
   { className: 'w-20%', title: '' },
 ]
 
@@ -32,8 +32,8 @@ export default function AdminDanhSachHoatDongCongDong() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    checkAndHandleLogined(navigate)
-    checkPermissionToAccessThePage(getUserRole(), [ROLES.admin], navigate)
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.ADMIN], navigate)
     fetchListCommunityActivity()
   }, [])
 
@@ -90,15 +90,17 @@ export default function AdminDanhSachHoatDongCongDong() {
         </div>
         <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
       </div>
-      <Pagination
-        totalItems={listCommunityActivity.totalItems}
-        totalPages={listCommunityActivity.totalPages}
-        itemPerPage={listCommunityActivity.itemPerPage}
-        currentPage={listCommunityActivity.currentPage}
-        isNextPage={listCommunityActivity.isNextPage}
-        isPreviousPage={listCommunityActivity.isPreviousPage}
-        onPageChange={fetchListCommunityActivity}
-      />
+      {listCommunityActivity.totalPages > 1 && (
+        <Pagination
+          totalItems={listCommunityActivity.totalItems}
+          totalPages={listCommunityActivity.totalPages}
+          itemPerPage={listCommunityActivity.itemPerPage}
+          currentPage={listCommunityActivity.currentPage}
+          isNextPage={listCommunityActivity.isNextPage}
+          isPreviousPage={listCommunityActivity.isPreviousPage}
+          onPageChange={fetchListCommunityActivity}
+        />
+      )}
     </div>
   )
 }

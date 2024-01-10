@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit'
 import { ROLES, getHighestRole } from '../utils'
 
 const initialState = {
-  role: ROLES.admin,
+  role: ROLES.ANONYMOUS,
+  isLoading: false,
 }
 
 export const storeSlice = createSlice({

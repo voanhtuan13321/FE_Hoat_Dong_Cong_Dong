@@ -18,7 +18,7 @@ import {
   ROLES,
   callApiGetUserByUserId,
   callApiUpdateUser,
-  checkAndHandleLogined,
+  checkAndHandleLogin,
   checkPermissionToAccessThePage,
   convertObjectToFormData,
   convertToObjectFormFormik,
@@ -29,6 +29,7 @@ import {
 } from '../utils'
 import ErrorLabel from '../components/ErrorLabel'
 import toast from 'react-hot-toast'
+import DialogChangePassword from '../components/DialogCustom/DialogChangePassword'
 
 const initInfoUser = {
   id: '',
@@ -57,12 +58,18 @@ const initInfoUser = {
 
 export default function ThongTinCaNhan() {
   const [isShowEdit, setShowEdit] = useState(false)
+  const [isShowDialog, setShowDialog] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
     // console.log(getUserRole())
-    checkAndHandleLogined(navigate)
-    const targetRoles = [ROLES.client, ROLES.giaoVien, ROLES.truongKhoa]
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(
+      getUserRole(),
+      [ROLES.SINH_VIEN, ROLES.LOP_TRUONG, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA],
+      navigate,
+    )
+    const targetRoles = [ROLES.ANONYMOUS, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA]
     checkPermissionToAccessThePage(getUserRole(), targetRoles, navigate)
     fetchInfoUser()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,10 +119,10 @@ export default function ThongTinCaNhan() {
       placeOfBirth: Yup.string().max(30, 'Nơi sinh không được quá 30 ký tự'),
       ethnic: Yup.string()
         .max(20, 'Dân tộc không được quá 20 k')
-        .matches(REGEX.textOnly, 'Dân tộc không được chứa số'),
+        .matches(REGEX.TEXT_ONLY, 'Dân tộc không được chứa số'),
       nationality: Yup.string()
         .max(25, 'Quốc tịch không được quá 25 ký tự')
-        .matches(REGEX.textOnly, 'Dân tộc không được chứa số'),
+        .matches(REGEX.TEXT_ONLY, 'Dân tộc không được chứa số'),
       identificationCardId: Yup.string().max(
         20,
         'CCCD không được quá 20 ký tự',
@@ -129,9 +136,12 @@ export default function ThongTinCaNhan() {
         'Nơi cấp CCCD không được quá 30 ký tự',
       ),
       religion: Yup.string().max(50, 'religion không được quá 50 ký tự'),
-      phone: Yup.string().matches(REGEX.phoneNum, 'Số điện thoại không hợp lệ'),
+      phone: Yup.string().matches(
+        REGEX.PHONE_NUMBER,
+        'Số điện thoại không hợp lệ',
+      ),
       email: Yup.string().email('Email không hợp lệ'),
-      facebook: Yup.string().matches(REGEX.link, 'facebook không hợp lệ'),
+      facebook: Yup.string().matches(REGEX.LINK, 'facebook không hợp lệ'),
     }),
     onSubmit: onSubmit,
   })
@@ -287,10 +297,22 @@ export default function ThongTinCaNhan() {
           )}
         </div>
       </form>
-      <div className='w-[800px] mx-auto text-end'>
+      <div className='w-[800px] mx-auto flex justify-end gap-4'>
         {!isShowEdit && (
-          <Button label='sửa' onClick={() => setShowEdit(true)} />
+          <>
+            <Button
+              type='edit'
+              label='đổi mật khẩu'
+              onClick={() => setShowDialog(true)}
+            />
+            <Button label='sửa' onClick={() => setShowEdit(true)} />
+          </>
         )}
+        <DialogChangePassword
+          userId={getUserId()}
+          isShowDialog={isShowDialog}
+          setShowDialog={setShowDialog}
+        />
       </div>
     </div>
   )

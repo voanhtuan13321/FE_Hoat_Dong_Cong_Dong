@@ -8,22 +8,34 @@ import ItemRowTableDanhSachKhoaAdmin from '../components/ItemRow/ItemRowTableDan
 import ItemRowTableDanhSachKhoaAdminAdd from '../components/ItemRow/ItemRowTableDanhSachKhoaAdminAdd'
 import Pagination from '../components/Pagination'
 
-import { ITEM_PER_PAGE, callApiGetMajorsPaginationList } from '../utils'
+import {
+  ITEM_PER_PAGE,
+  ROLES,
+  callApiGetMajorsPaginationList,
+  checkAndHandleLogin,
+  checkPermissionToAccessThePage,
+  getUserRole,
+} from '../utils'
 import { setLoading } from '../redux/storeSlice'
+import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
+import { useNavigate } from 'react-router-dom'
 
 const HEADER_TABLE = [
   { className: 'w-5%', title: 'stt' },
   { className: 'w-25%', title: 'Tên khoa' },
   { className: '', title: 'Trưởng khoa' },
-  { className: 'w-15%', title: '' },
+  { className: 'w-10%', title: '' },
 ]
 
 export default function AdminDanhSachKhoa() {
   const [objectMajors, setObjectMajors] = useState({})
   const [isShowAddNew, setShowAddNew] = useState(false)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   useEffect(() => {
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.ADMIN], navigate)
     fetchListKhoa()
   }, [])
 
@@ -39,23 +51,25 @@ export default function AdminDanhSachKhoa() {
   }
 
   const renderBodyTable = () => {
-    let arrJsx = objectMajors.data?.map((dt, index) => (
-      <ItemRowTableDanhSachKhoaAdmin
-        key={index}
-        stt={index}
-        data={dt}
-        refresh={fetchListKhoa}
-        objectMajors={objectMajors}
-      />
-    ))
+    let arrJsx =
+      objectMajors.data?.length === 0
+        ? [<ItemRowNoData key={-1} colSpan={10} />]
+        : objectMajors.data?.map((dt, index) => (
+            <ItemRowTableDanhSachKhoaAdmin
+              key={index}
+              stt={index}
+              data={dt}
+              refresh={() => fetchListKhoa(objectMajors.currentPage)}
+            />
+          ))
 
     isShowAddNew &&
       (arrJsx = [
         ...arrJsx,
         <ItemRowTableDanhSachKhoaAdminAdd
-          key={-1}
+          key={-2}
           setShowAddNew={setShowAddNew}
-          refresh={fetchListKhoa}
+          refresh={() => fetchListKhoa(objectMajors.currentPage)}
           objectMajors={objectMajors}
         />,
       ])
@@ -65,7 +79,7 @@ export default function AdminDanhSachKhoa() {
 
   return (
     <>
-      <div className='container mx-auto'>
+      <div className='container mx-auto py-2'>
         <Title title={'Danh sách khoa'} />
 
         <div className='flex justify-end my-2'>
@@ -80,15 +94,17 @@ export default function AdminDanhSachKhoa() {
         <div className='pb-[88px]'>
           <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
         </div>
-        <Pagination
-          totalItems={objectMajors.totalItems}
-          totalPages={objectMajors.totalPages}
-          itemPerPage={objectMajors.itemPerPage}
-          currentPage={objectMajors.currentPage}
-          isNextPage={objectMajors.isNextPage}
-          isPreviousPage={objectMajors.isPreviousPage}
-          onPageChange={fetchListKhoa}
-        />
+        {objectMajors.totalPages > 1 && (
+          <Pagination
+            totalItems={objectMajors.totalItems}
+            totalPages={objectMajors.totalPages}
+            itemPerPage={objectMajors.itemPerPage}
+            currentPage={objectMajors.currentPage}
+            isNextPage={objectMajors.isNextPage}
+            isPreviousPage={objectMajors.isPreviousPage}
+            onPageChange={fetchListKhoa}
+          />
+        )}
       </div>
     </>
   )

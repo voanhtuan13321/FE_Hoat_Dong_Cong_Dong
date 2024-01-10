@@ -39,6 +39,13 @@ export default function ItemRowHoatDongCongDongCuaKhoa({ index, data }) {
           ? data.sumScoreHeadTeacherConfirmed
           : data.sumScoreMajorHeadConfirmed}
       </td>
+      <td className='border border-primary text-main p-1 text-center'>
+        {data.sumScoreMajorHeadConfirmed > 0 && (
+          <span className='font-bold text-main text-green-500 my-2'>
+            Đã xác nhận
+          </span>
+        )}
+      </td>
     </tr>
   )
 }

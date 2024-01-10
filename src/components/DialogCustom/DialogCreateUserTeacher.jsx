@@ -38,10 +38,10 @@ export default function DialogCreateUserTeacher({
   const validationSchema = Yup.object({
     firstName: Yup.string()
       .required('Bắt buộc nhập')
-      .matches(REGEX.textOnly, 'Không được chứa số và ký tự đặc biệt'),
+      .matches(REGEX.TEXT_ONLY, 'Không được chứa số và ký tự đặc biệt'),
     lastName: Yup.string()
       .required('Bắt buộc nhập')
-      .matches(REGEX.textOnly, 'Không được chứa số và ký tự đặc biệt'),
+      .matches(REGEX.TEXT_ONLY, 'Không được chứa số và ký tự đặc biệt'),
     dateOfBirth: Yup.date()
       .required('Bắt buộc nhập')
       .max(new Date(), 'Ngày không được lớn hơn ngày hiện tại'),
@@ -50,8 +50,8 @@ export default function DialogCreateUserTeacher({
 
   const onSubmit = async values => {
     try {
-      const dataRequest = { ...values}
-      console.log(dataRequest);
+      const dataRequest = { ...values }
+      console.log(dataRequest)
       const data = await callApiCreateUser(dataRequest)
       toast.success('Thêm mới thành công')
       setShowDialog(false)

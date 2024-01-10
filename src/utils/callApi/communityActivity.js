@@ -55,9 +55,8 @@ export const callApiApproveUserCommunityActivitiesByHeadTeacher = async (
   userId,
   year,
 ) => {
-  const url = `${baseApiCommunityActivity}/ApproveUserCommunityActivitiesByHeadTeacher`
-  const config = { params: { userId, year } }
-  const response = await requestHandler.patch(url, config)
+  const url = `${baseApiCommunityActivity}/ApproveUserCommunityActivitiesByHeadTeacher?userId=${userId}&year=${year}`
+  const response = await requestHandler.patch(url)
   return await response.data
 }
 
@@ -65,9 +64,8 @@ export const callApiApproveClassCommunityActivitiesByHeadTeacher = async (
   classId,
   year,
 ) => {
-  const url = `${baseApiCommunityActivity}/ApproveClassCommunityActivitiesByHeadTeacher`
-  const config = { params: { classId, year } }
-  const response = await requestHandler.patch(url, config)
+  const url = `${baseApiCommunityActivity}/ApproveClassCommunityActivitiesByHeadTeacher?classId=${classId}&year=${year}`
+  const response = await requestHandler.patch(url)
   return await response.data
 }
 

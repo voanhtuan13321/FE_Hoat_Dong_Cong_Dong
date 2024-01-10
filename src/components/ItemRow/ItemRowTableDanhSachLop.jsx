@@ -55,19 +55,19 @@ export default function ItemRowTableDanhSachLop({
       </td>
       <td className='border border-primary text-main p-2 text-left'>
         {determineActivity.status ===
-          COMMUNITY_ACTIVITY_STATUS.headTeacherConfirmed && (
+          COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED && (
           <span className='text-red-500'>Giáo viên đã duyệt</span>
         )}
 
         {determineActivity.status ===
-          COMMUNITY_ACTIVITY_STATUS.majorHeadConfirmed && (
+          COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED && (
           <span className='text-green-500'>Trưởng khoa đã duyệt</span>
         )}
       </td>
       <td className='border border-primary text-main p-2 text-center'>
         {determineActivity.score}
       </td>
-      {checkRoles(getUserRole(), [ROLES.giaoVien, ROLES.truongKhoa]) && (
+      {checkRoles(getUserRole(), [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA]) && (
         <td className='border border-primary text-main p-2'>
           <InputCheckbox
             value={classPresidentId === dt.id}
@@ -76,9 +76,9 @@ export default function ItemRowTableDanhSachLop({
         </td>
       )}
       {checkRoles(getUserRole(), [
-        ROLES.lopTruong,
-        ROLES.giaoVien,
-        ROLES.truongKhoa,
+        ROLES.LOP_TRUONG,
+        ROLES.GIAO_VIEN,
+        ROLES.TRUONG_KHOA,
       ]) && (
         <td className='border border-primary text-main p-2 underline text-primary cursor-pointer'>
           <span onClick={() => setShowDialog(true)}>Xem chi tiết</span>

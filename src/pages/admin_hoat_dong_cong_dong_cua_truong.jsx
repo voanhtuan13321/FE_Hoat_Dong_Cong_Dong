@@ -9,8 +9,12 @@ import ItemRowNoData from '../components/ItemRow/ItemRowNoData'
 import ItemRowHoatDongCongDongCuaTruongAdmin from '../components/ItemRow/ItemRowHoatDongCongDongCuaTruongAdmin'
 
 import {
+  ROLES,
   callApiGetUserCommunityActivitiesSumScoreMajorHeadsConfimed,
+  checkAndHandleLogin,
+  checkPermissionToAccessThePage,
   generateAcademyYearOptions,
+  getUserRole,
   handleError,
 } from '../utils'
 
@@ -31,6 +35,8 @@ export default function AdminHoatDongCongDongCuaTruong() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    checkAndHandleLogin(navigate)
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.ADMIN], navigate)
     fetchCommunityActivities()
   }, [selectedAcademyYear])
 
@@ -70,7 +76,7 @@ export default function AdminHoatDongCongDongCuaTruong() {
     <>
       <div className='container mx-auto'>
         <div className='p-2'>
-          <Title title='Danh sách sinh viên của trường' />
+          <Title title='Hoạt động cộng đồng của trường' />
         </div>
         <div className='p-2'>
           <div className='flex justify-between pb-2'>

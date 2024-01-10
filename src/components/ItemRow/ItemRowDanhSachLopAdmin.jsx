@@ -91,7 +91,7 @@ export default function ItemRowDanhSachLop({
   }
 
   const handleSave = async () => {
-    if (!REGEX.dontSpace.test(name)) {
+    if (!REGEX.DONT_SPACE.test(name)) {
       toast.error('Lớp không được chưa khoảng cách')
       return
     }
@@ -118,6 +118,8 @@ export default function ItemRowDanhSachLop({
   const onClickDeleteItem = async id => {
     const { isDenied } = await Swal.fire({
       title: 'Bạn có chắc muốn xoá không?',
+      text: 'Nếu xoá lớp thì sẽ xoá toàn bộ sinh viên của lớp đó',
+      icon: 'warning',
       showConfirmButton: false,
       showDenyButton: true,
       denyButtonText: 'Xoá',

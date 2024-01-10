@@ -11,10 +11,13 @@ import InputCheckbox from '../Input/InputCheckbox'
 import Button from '../Button'
 
 import {
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD,
+  COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS,
   COMMUNITY_ACTIVITY_STATUS,
   ROLES,
   callApiDeleteCommunityActivity,
   callApiGetCommunityActivityTypesList,
+  callApiGetSettings,
   callApiUpdateCommunityActivity,
   checkIsCurrentYear,
   checkRoles2,
@@ -29,6 +32,7 @@ export default function ItemRowTableTuDanhGia({
 }) {
   const role = useSelector(state => state.role)
 
+  const [setting, setSetting] = useState({})
   const [isEdit, setShowEdit] = useState(false)
   const [rowData, setRowData] = useState(data)
   const [optionCommunityActivityTypes, setOptionCommunityActivityTypes] =
@@ -38,7 +42,8 @@ export default function ItemRowTableTuDanhGia({
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetchCommunityActivityTypies()
+    fetchCommunityActivityTypes()
+    fetchSettings(COMMUNITY_ACTIVITY_APPROVAL_PERIOD)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -46,7 +51,18 @@ export default function ItemRowTableTuDanhGia({
     setRowData(data)
   }, [data])
 
-  const fetchCommunityActivityTypies = async () => {
+  const fetchSettings = async name => {
+    try {
+      const data = await callApiGetSettings(name)
+      setSetting(data)
+      // console.log(data)
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
+
+  const fetchCommunityActivityTypes = async () => {
     try {
       const data = await callApiGetCommunityActivityTypesList()
       // console.log(data)
@@ -146,13 +162,13 @@ export default function ItemRowTableTuDanhGia({
               onChange={onChangeValue}
             />
           </td>
-          {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
+          {!checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && (
             <td className='border border-primary text-center flex gap-1 justify-center'>
               <Button type='' label='lưu' onClick={handleSave} />
               <Button type='outline' label='huỷ' onClick={onClickCancel} />
             </td>
           )}
-          {checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
+          {checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && (
             <td className='border border-primary p-1 text-center'>
               <InputCheckbox />
             </td>
@@ -161,10 +177,10 @@ export default function ItemRowTableTuDanhGia({
       ) : (
         <tr className='text-main'>
           <td className='border border-primary p-1 text-center'>{index + 1}</td>
-          <td className='border border-primary p-1'>
+          <td className='border border-primary p-1 truncate'>
             {rowData.activityTypeName}
           </td>
-          <td className='border border-primary p-1'>{rowData.name}</td>
+          <td className='border border-primary p-1 truncate'>{rowData.name}</td>
           <td className='border border-primary p-1 text-center'>
             {`${selectedCommunityActivityTypes.minScore} - ${selectedCommunityActivityTypes.maxScore}`}
           </td>
@@ -174,11 +190,15 @@ export default function ItemRowTableTuDanhGia({
           <td className='border border-primary p- text-center'>
             {rowData.classPresidentEvaluationScore}
           </td>
-          <td className='border border-primary p-1'>{rowData.evidentLink}</td>
-          {!checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
+          <td className='border border-primary p-1 truncate'>
+            {rowData.evidentLink}
+          </td>
+          {!checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && (
             <td className='border border-primary px-1 text-center flex gap-1'>
               {checkIsCurrentYear(academyYear) &&
-              rowData.status === COMMUNITY_ACTIVITY_STATUS.studentConfirmed ? (
+              setting.status ===
+                COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT &&
+              rowData.status === COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED ? (
                 <>
                   <Button
                     type='edit'
@@ -192,7 +212,7 @@ export default function ItemRowTableTuDanhGia({
               )}
             </td>
           )}
-          {checkRoles2([ROLES.giaoVien, ROLES.truongKhoa], [role]) && (
+          {checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && (
             <td className='border border-primary px-1 text-center'>
               <InputCheckbox />
             </td>
