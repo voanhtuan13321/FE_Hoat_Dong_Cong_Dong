@@ -21,7 +21,7 @@ import {
 } from '../../utils'
 import Swal from 'sweetalert2'
 
-export default function ItemRowTableDetailHoatDong({ index, data, refresh, refreshStudent }) {
+export default function ItemRowTableDetailHoatDong({ index, data, refresh, refreshStudent, academyYear }) {
   const role = useSelector(state => state.role)
 
   const [setting, setSetting] = useState({})
@@ -165,6 +165,7 @@ export default function ItemRowTableDetailHoatDong({ index, data, refresh, refre
             {rowData.status !== COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED && (
               <InputCheckbox
                 disabled={
+                  academyYear !== new Date().getFullYear() ||
                   rowData.status >= COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED ||
                   setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER
                 }
@@ -175,7 +176,10 @@ export default function ItemRowTableDetailHoatDong({ index, data, refresh, refre
           </td>
           <td className='border border-primary px-1 text-center'>
             <InputCheckbox
-              disabled={setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER}
+              disabled={
+                academyYear !== new Date().getFullYear() ||
+                setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER
+              }
               value={rowData.status === COMMUNITY_ACTIVITY_STATUS.REJECTED}
               onClick={() => onClickConfirm(COMMUNITY_ACTIVITY_STATUS.REJECTED)}
             />

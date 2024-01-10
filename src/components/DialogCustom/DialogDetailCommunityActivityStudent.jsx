@@ -29,6 +29,7 @@ export default function DialogDetailCommunityActivityStudent({
   setShowDialog,
   studentName,
   refreshStudent,
+  year,
 }) {
   const role = useSelector(state => state.role)
   const academyYearOptions = generateAcademyYearOptions()
@@ -46,7 +47,7 @@ export default function DialogDetailCommunityActivityStudent({
   useEffect(() => {
     fetchCommunityActivities()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId])
+  }, [userId, year])
 
   const fetchSettings = async name => {
     try {
@@ -62,7 +63,7 @@ export default function DialogDetailCommunityActivityStudent({
   const fetchCommunityActivities = async () => {
     if (userId) {
       try {
-        const data = await callApiGetUserCommunityActivities(userId, selectedAcademyYear.value)
+        const data = await callApiGetUserCommunityActivities(userId, year)
         // console.log(data)
         setCommunityActivities(data)
       } catch (error) {
@@ -103,7 +104,7 @@ export default function DialogDetailCommunityActivityStudent({
             data={data}
             refresh={fetchCommunityActivities}
             refreshStudent={refreshStudent}
-            academyYear={selectedAcademyYear.value}
+            academyYear={year}
           />
         ))
   }

@@ -9,14 +9,7 @@ import React, { useId } from 'react'
  * @param onChange
  * @param disabled
  */
-export default function InputCheckbox({
-  label,
-  name,
-  value,
-  onChange,
-  onClick,
-  disabled,
-}) {
+export default function InputCheckbox({ label, name, value, onChange, onClick, disabled = false }) {
   const id = useId()
 
   return (
@@ -26,16 +19,13 @@ export default function InputCheckbox({
         type='checkbox'
         name={name}
         checked={value}
-        className='w-4 h-4 bg-gray-100 border-normal cursor-pointer '
+        className={`w-4 h-4 bg-gray-100 border-normal ${disabled || 'cursor-pointer'}  `}
         onChange={onChange}
         onClick={onClick}
         disabled={disabled}
       />
       {label && (
-        <label
-          htmlFor={id}
-          className={`ms-2 text-main font-medium text-normal`}
-        >
+        <label htmlFor={id} className={`ms-2 text-main font-medium text-normal`}>
           {label}
         </label>
       )}

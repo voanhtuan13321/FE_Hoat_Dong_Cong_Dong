@@ -17,7 +17,7 @@ import {
   handleError,
 } from '../../utils'
 
-export default function ItemRowTableDanhSachLop({ dt, index, classPresidentId, refreshClass, refreshStudent }) {
+export default function ItemRowTableDanhSachLop({ dt, index, classPresidentId, refreshClass, refreshStudent, year }) {
   const [isShowDialog, setShowDialog] = useState(false)
   const [setting, setSetting] = useState({})
   const navigate = useNavigate()
@@ -88,6 +88,7 @@ export default function ItemRowTableDanhSachLop({ dt, index, classPresidentId, r
               setShowDialog={setShowDialog}
               studentName={`${dt.firstName} ${dt.lastName}`}
               refreshStudent={refreshStudent}
+              year={year}
             />
           </td>
         </>

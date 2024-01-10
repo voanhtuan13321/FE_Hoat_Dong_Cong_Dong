@@ -161,6 +161,7 @@ export default function DanhSachLop() {
             classPresidentId={selectedClasses?.classPresidentId}
             refreshClass={fetchClasses}
             refreshStudent={fetchStudents}
+            year={selectedYear.value}
           />
         ))
   }
@@ -169,6 +170,8 @@ export default function DanhSachLop() {
     const header = checkRoles(getUserRole(), [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA])
       ? [
           { className: 'w-5%', title: 'Chọn lớp trưởng' },
+          { className: 'w-10%', title: 'trạng thái' },
+          { className: 'w-5%', title: 'Tổng điểm' },
           { className: 'w-5%', title: 'Xem chi tiết' },
         ]
       : checkRoles(getUserRole(), [ROLES.LOP_TRUONG])
