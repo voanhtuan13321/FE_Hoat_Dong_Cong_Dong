@@ -21,6 +21,7 @@ export default function ItemRowHoatDongCongDongCuaTruongAdmin({ index, dt }) {
       handleError(error, navigate)
     }
   }
+
   return (
     <tr>
       <td className='border border-primary p-1 text-center text-main'>

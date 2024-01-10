@@ -19,20 +19,15 @@ import {
   checkRoles2,
   handleError,
 } from '../../utils'
+import Swal from 'sweetalert2'
 
-export default function ItemRowTableDetailHoatDong({
-  index,
-  data,
-  refresh,
-  refresh2,
-}) {
+export default function ItemRowTableDetailHoatDong({ index, data, refresh, refreshStudent }) {
   const role = useSelector(state => state.role)
 
   const [setting, setSetting] = useState({})
   const [isShowEdit, setShowEdit] = useState(false)
   const [rowData, setRowData] = useState(data)
-  const [selectedCommunityActivityTypes, setSelectedCommunityActivityTypes] =
-    useState({})
+  const [selectedCommunityActivityTypes, setSelectedCommunityActivityTypes] = useState({})
   const navigate = useNavigate()
 
   // console.log(data)
@@ -76,13 +71,13 @@ export default function ItemRowTableDetailHoatDong({
     setShowEdit(false)
   }
 
-  const onClickFonfirme = async status => {
+  const onClickConfirm = async status => {
     try {
       const dataRequest = { ...rowData, status: status }
       const data = await callApiUpdateCommunityActivity(dataRequest)
       setRowData(data)
       refresh()
-      refresh2()
+      refreshStudent()
       toast.success('cập nhật thành công')
       setShowEdit(false)
     } catch (error) {
@@ -91,22 +86,33 @@ export default function ItemRowTableDetailHoatDong({
     }
   }
 
+  const handleSave = async () => {
+    if (
+      rowData.classPresidentEvaluationScore !== 0 &&
+      (rowData.classPresidentEvaluationScore < selectedCommunityActivityTypes?.minScore ||
+        rowData.classPresidentEvaluationScore > selectedCommunityActivityTypes?.maxScore)
+    ) {
+      Swal.fire('Điểm không hợp lệ', '', 'error')
+      return
+    }
+
+    const newStatus =
+      rowData.classPresidentEvaluationScore === 0
+        ? COMMUNITY_ACTIVITY_STATUS.REJECTED
+        : COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED
+    onClickConfirm(newStatus)
+  }
+
   return (
     <tr className='text-main'>
       <td className='border border-primary p-1 text-center'>{index + 1}</td>
-      <td className='border border-primary p-1 truncate'>
-        {rowData.activityTypeName}
-      </td>
+      <td className='border border-primary p-1 truncate'>{rowData.activityTypeName}</td>
       <td className='border border-primary p-1 truncate'>{rowData.name}</td>
       <td className='border border-primary p-1 text-center'>
-        {`${selectedCommunityActivityTypes?.minScore || ''} - ${
-          selectedCommunityActivityTypes?.maxScore || ''
-        }`}
+        {`${selectedCommunityActivityTypes?.minScore || ''} - ${selectedCommunityActivityTypes?.maxScore || ''}`}
       </td>
-      <td className='border border-primary p-1 text-center'>
-        {rowData.selfEvaluationScore}
-      </td>
-      <td className='border border-primary p-1 text-center'>
+      <td className='border border-primary p-1 text-center'>{rowData.selfEvaluationScore}</td>
+      <td className='border border-primary text-center'>
         {isShowEdit ? (
           <div className='w-[80px]'>
             <InputNumber
@@ -126,11 +132,7 @@ export default function ItemRowTableDetailHoatDong({
       </td>
       <td className='border border-primary p-1 truncate'>
         {REGEX.LINK.test(rowData.evidentLink) ? (
-          <a
-            className='text-blue-500 truncate'
-            target='_blank'
-            href={rowData.evidentLink}
-          >
+          <a className='text-blue-500 truncate' target='_blank' href={rowData.evidentLink}>
             {rowData.evidentLink}
           </a>
         ) : (
@@ -141,27 +143,13 @@ export default function ItemRowTableDetailHoatDong({
         <td className='border border-primary px-1 flex justify-center gap-1'>
           {isShowEdit ? (
             <>
-              <Button
-                label='lưu'
-                onClick={() =>
-                  onClickFonfirme(
-                    COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED,
-                  )
-                }
-              />
+              <Button label='lưu' onClick={handleSave} />
               <Button label='huỷ' type='outline' onClick={onClickCancel} />
             </>
-          ) : rowData.status <
-              COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED &&
-            setting.status ===
-              COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.CLASS_PRESIDENT ? (
+          ) : rowData.status < COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED &&
+            setting.status === COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.CLASS_PRESIDENT ? (
             <Button
-              label={`${
-                rowData.status ===
-                COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED
-                  ? 'sửa'
-                  : 'đánh giá'
-              }`}
+              label={`${rowData.status === COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED ? 'sửa' : 'đánh giá'}`}
               type='edit'
               onClick={() => setShowEdit(true)}
             />
@@ -171,21 +159,27 @@ export default function ItemRowTableDetailHoatDong({
         </td>
       )}
       {checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && (
-        <td className='border border-primary px-1 text-center'>
-          {rowData.status !== COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED && (
+        <>
+          <td className='border border-primary px-1 text-center'>
+            {rowData.status !== COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED && (
+              <InputCheckbox
+                disabled={
+                  rowData.status >= COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED ||
+                  setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER
+                }
+                value={rowData.status >= COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED}
+                onClick={() => onClickConfirm(COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED)}
+              />
+            )}
+          </td>
+          <td className='border border-primary px-1 text-center'>
             <InputCheckbox
-              value={
-                rowData.status >=
-                COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED
-              }
-              onClick={() =>
-                onClickFonfirme(
-                  COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED,
-                )
-              }
+              disabled={setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER}
+              value={rowData.status === COMMUNITY_ACTIVITY_STATUS.REJECTED}
+              onClick={() => onClickConfirm(COMMUNITY_ACTIVITY_STATUS.REJECTED)}
             />
-          )}
-        </td>
+          </td>
+        </>
       )}
     </tr>
   )

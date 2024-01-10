@@ -24,21 +24,14 @@ import {
   handleError,
 } from '../../utils'
 
-export default function ItemRowTableTuDanhGia({
-  index,
-  data,
-  refresh,
-  academyYear,
-}) {
+export default function ItemRowTableTuDanhGia({ index, data, refresh, academyYear }) {
   const role = useSelector(state => state.role)
 
   const [setting, setSetting] = useState({})
   const [isEdit, setShowEdit] = useState(false)
   const [rowData, setRowData] = useState(data)
-  const [optionCommunityActivityTypes, setOptionCommunityActivityTypes] =
-    useState([])
-  const [selectedCommunityActivityTypes, setSelectedCommunityActivityTypes] =
-    useState({})
+  const [optionCommunityActivityTypes, setOptionCommunityActivityTypes] = useState([])
+  const [selectedCommunityActivityTypes, setSelectedCommunityActivityTypes] = useState({})
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -98,6 +91,23 @@ export default function ItemRowTableTuDanhGia({
     }
   }
 
+  const genStatus = () => {
+    switch (rowData.status) {
+      case COMMUNITY_ACTIVITY_STATUS.REJECTED:
+        return <span className='text-red-500'>Bị từ chối</span>
+      case COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED:
+        return <span className=''>Chưa phê duyệt</span>
+      case COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED:
+        return <span className=''>Lớp trưởng phê duyệt</span>
+      case COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED:
+        return <span className=''>Chủ nhiệm phê duyệt</span>
+      case COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED:
+        return <span className='text-green-600'>Trưởng khoa phê duyệt</span>
+      default:
+        return <></>
+    }
+  }
+
   const handleDelete = async () => {
     const { isDenied } = await Swal.fire({
       title: 'Bạn có chắc muốn xoá không?',
@@ -132,16 +142,10 @@ export default function ItemRowTableTuDanhGia({
             />
           </td>
           <td>
-            <InputText
-              name='name'
-              value={rowData.name}
-              onChange={onChangeValue}
-            />
+            <InputText name='name' value={rowData.name} onChange={onChangeValue} />
           </td>
           <td className='border border-primary text-center'>
-            {`${selectedCommunityActivityTypes.minScore || ''} - ${
-              selectedCommunityActivityTypes.maxScore || ''
-            }`}
+            {`${selectedCommunityActivityTypes.minScore || ''} - ${selectedCommunityActivityTypes.maxScore || ''}`}
           </td>
           <td className='border border-primary'>
             <InputNumber
@@ -152,15 +156,9 @@ export default function ItemRowTableTuDanhGia({
               onChange={onChangeValue}
             />
           </td>
-          <td className='border border-primary text-center'>
-            {rowData.classPresidentEvaluationScore}
-          </td>
+          <td className='border border-primary text-center'>{rowData.classPresidentEvaluationScore}</td>
           <td className='border border-primary'>
-            <InputText
-              name='evidentLink'
-              value={rowData.evidentLink}
-              onChange={onChangeValue}
-            />
+            <InputText name='evidentLink' value={rowData.evidentLink} onChange={onChangeValue} />
           </td>
           {!checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && (
             <td className='border border-primary text-center flex gap-1 justify-center'>
@@ -177,46 +175,39 @@ export default function ItemRowTableTuDanhGia({
       ) : (
         <tr className='text-main'>
           <td className='border border-primary p-1 text-center'>{index + 1}</td>
-          <td className='border border-primary p-1 truncate'>
-            {rowData.activityTypeName}
-          </td>
+          <td className='border border-primary p-1 truncate'>{rowData.activityTypeName}</td>
           <td className='border border-primary p-1 truncate'>{rowData.name}</td>
           <td className='border border-primary p-1 text-center'>
             {`${selectedCommunityActivityTypes.minScore} - ${selectedCommunityActivityTypes.maxScore}`}
           </td>
-          <td className='border border-primary p-1 text-center'>
-            {rowData.selfEvaluationScore}
-          </td>
-          <td className='border border-primary p- text-center'>
-            {rowData.classPresidentEvaluationScore}
-          </td>
-          <td className='border border-primary p-1 truncate'>
-            {rowData.evidentLink}
-          </td>
+          <td className='border border-primary p-1 text-center'>{rowData.selfEvaluationScore}</td>
+          <td className='border border-primary p- text-center'>{rowData.classPresidentEvaluationScore}</td>
+          <td className='border border-primary p-1 truncate'>{rowData.evidentLink}</td>
           {!checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && (
             <td className='border border-primary px-1 text-center flex gap-1'>
-              {checkIsCurrentYear(academyYear) &&
-              setting.status ===
-                COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT &&
-              rowData.status === COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED ? (
-                <>
-                  <Button
-                    type='edit'
-                    label='sửa'
-                    onClick={() => setShowEdit(true)}
-                  />
-                  <Button type='delete' label='xoá' onClick={handleDelete} />
-                </>
-              ) : (
-                <span className='p-2 text-white'>fasdf</span>
-              )}
+              <Button
+                disable={
+                  checkIsCurrentYear(academyYear) ||
+                  setting.status === COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT ||
+                  rowData.status === COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED
+                }
+                type='edit'
+                label='sửa'
+                onClick={() => setShowEdit(true)}
+              />
+              <Button
+                disable={
+                  checkIsCurrentYear(academyYear) ||
+                  setting.status === COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT ||
+                  rowData.status === COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED
+                }
+                type='delete'
+                label='xoá'
+                onClick={handleDelete}
+              />
             </td>
           )}
-          {checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && (
-            <td className='border border-primary px-1 text-center'>
-              <InputCheckbox />
-            </td>
-          )}
+          <td className='border border-primary px-1 text-center'>{genStatus()}</td>
         </tr>
       )}
     </>

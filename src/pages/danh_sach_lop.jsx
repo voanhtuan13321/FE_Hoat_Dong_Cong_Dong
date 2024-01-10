@@ -35,9 +35,7 @@ export default function DanhSachLop() {
   const [students, setStudents] = useState([])
   const [classesOptions, setClassesOptions] = useState([])
   const [selectedClasses, setSelectedClasses] = useState({})
-  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
-    academyYearOptions[0],
-  )
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(academyYearOptions[0])
   const yearOptions = generateYearOptions(selectedAcademyYear.value)
   const [selectedYear, setSelectedYear] = useState(yearOptions[0])
   const navigate = useNavigate()
@@ -49,11 +47,7 @@ export default function DanhSachLop() {
       [ROLES.SINH_VIEN, ROLES.LOP_TRUONG, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA],
       navigate,
     )
-    checkPermissionToAccessThePage(
-      getUserRole(),
-      [ROLES.SINH_VIEN, ROLES.GIAO_VIEN],
-      navigate,
-    )
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.SINH_VIEN, ROLES.GIAO_VIEN], navigate)
     fetchSettings(COMMUNITY_ACTIVITY_APPROVAL_PERIOD)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -113,22 +107,13 @@ export default function DanhSachLop() {
 
     const user = await callApiGetUserByUserId(userId)
 
-    const classId = checkRoles(roles, [ROLES.SINH_VIEN])
-      ? user.classId
-      : selectedClasses?.value ?? ''
+    const classId = checkRoles(roles, [ROLES.SINH_VIEN]) ? user.classId : selectedClasses?.value ?? ''
 
     if (classId) {
       try {
-        const data = await callApiGetStudentsListByClassId(
-          classId,
-          selectedYear.value,
-        )
+        const data = await callApiGetStudentsListByClassId(classId, selectedYear.value)
         // console.log('student', data)
-        setStudents(
-          data.sort((stu1, stu2) =>
-            stu1.studentId.localeCompare(stu2.studentId),
-          ),
-        )
+        setStudents(data.sort((stu1, stu2) => stu1.studentId.localeCompare(stu2.studentId)))
       } catch (error) {
         console.error(error)
         handleError(error, navigate)
@@ -154,10 +139,8 @@ export default function DanhSachLop() {
     if (!isConfirmed) return
 
     try {
-      const data = await callApiApproveClassCommunityActivitiesByHeadTeacher(
-        classId,
-        new Date().getFullYear(),
-      )
+      const data = await callApiApproveClassCommunityActivitiesByHeadTeacher(classId, new Date().getFullYear())
+      fetchStudents()
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -165,10 +148,7 @@ export default function DanhSachLop() {
   }
 
   const renderBodyTable = () => {
-    if (
-      checkRoles(getUserRole(), [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA]) &&
-      classesOptions.length === 0
-    )
+    if (checkRoles(getUserRole(), [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA]) && classesOptions.length === 0)
       return [<ItemRowNoData key={-1} colSpan={9} />]
 
     return students.length === 0
@@ -179,23 +159,24 @@ export default function DanhSachLop() {
             dt={dt}
             index={index}
             classPresidentId={selectedClasses?.classPresidentId}
-            refresh={fetchClasses}
-            refresh2={fetchStudents}
+            refreshClass={fetchClasses}
+            refreshStudent={fetchStudents}
           />
         ))
   }
 
   const genHeaders = () => {
-    const header = checkRoles(getUserRole(), [
-      ROLES.GIAO_VIEN,
-      ROLES.TRUONG_KHOA,
-    ])
+    const header = checkRoles(getUserRole(), [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA])
       ? [
           { className: 'w-5%', title: 'Chọn lớp trưởng' },
           { className: 'w-5%', title: 'Xem chi tiết' },
         ]
       : checkRoles(getUserRole(), [ROLES.LOP_TRUONG])
-        ? [{ className: 'w-10%', title: 'Xem chi tiết' }]
+        ? [
+            { className: 'w-10%', title: 'Xem chi tiết' },
+            { className: 'w-10%', title: 'trạng thái' },
+            { className: 'w-5%', title: 'Tổng điểm' },
+          ]
         : []
 
     return [
@@ -204,8 +185,7 @@ export default function DanhSachLop() {
       { className: 'w-10%', title: 'Tên sinh viên' },
       { className: 'w-10%', title: 'Số điện thoại' },
       { className: 'w-15%', title: 'Email' },
-      { className: 'w-10%', title: 'trạng thái' },
-      { className: 'w-5%', title: 'Tổng điểm' },
+
       ...header,
     ]
   }
@@ -228,30 +208,18 @@ export default function DanhSachLop() {
               <span className='font-bold text-primary text-main'>Lớp:</span>
               <div className='w-48 flex items-center'>
                 {classesOptions.length === 0 ? (
-                  <span className='text-main text-red-500'>
-                    Khoá này không có lớp
-                  </span>
+                  <span className='text-main text-red-500'>Khoá này không có lớp</span>
                 ) : (
                   <div className='w-[300px]'>
-                    <InputSelect
-                      options={classesOptions}
-                      value={selectedClasses}
-                      onChange={setSelectedClasses}
-                    />
+                    <InputSelect options={classesOptions} value={selectedClasses} onChange={setSelectedClasses} />
                   </div>
                 )}
               </div>
               {classesOptions.length === 0 || (
                 <>
-                  <span className='font-bold text-primary text-main'>
-                    Năm học:
-                  </span>
+                  <span className='font-bold text-primary text-main'>Năm học:</span>
                   <div className='w-48'>
-                    <InputSelect
-                      options={yearOptions}
-                      value={selectedYear}
-                      onChange={setSelectedYear}
-                    />
+                    <InputSelect options={yearOptions} value={selectedYear} onChange={setSelectedYear} />
                   </div>
                 </>
               )}
@@ -259,17 +227,10 @@ export default function DanhSachLop() {
             <div className=''>
               {selectedYear.value === new Date().getFullYear() && (
                 <>
-                  {setting.status ===
-                  COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER ? (
-                    <Button
-                      label='Xác nhận'
-                      type='primary'
-                      onClick={handleAccept}
-                    />
+                  {setting.status === COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER ? (
+                    <Button label='Xác nhận' type='primary' onClick={handleAccept} />
                   ) : (
-                    <span className='font-bold text-main text-red-text my-2'>
-                      Bạn chưa được phép đánh giá
-                    </span>
+                    <span className='font-bold text-main text-red-text my-2'>Bạn chưa được phép đánh giá</span>
                   )}
                 </>
               )}

@@ -42,9 +42,7 @@ export default function DialogDetailCommunityActivityStudentAdmin({
   const [setting, setSetting] = useState({})
   const [isShowAddNew, setShowAddNew] = useState(false)
   const [communityActivities, setCommunityActivities] = useState([])
-  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
-    academyYearOptions[0],
-  )
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(academyYearOptions[0])
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -54,7 +52,7 @@ export default function DialogDetailCommunityActivityStudentAdmin({
 
   useEffect(() => {
     fetchCommunityActivities()
-  }, [selectedAcademyYear, isShowDialog])
+  }, [selectedAcademyYear, userId])
 
   const fetchSettings = async name => {
     try {
@@ -70,10 +68,7 @@ export default function DialogDetailCommunityActivityStudentAdmin({
   const fetchCommunityActivities = async () => {
     if (userId) {
       try {
-        const data = await callApiGetUserCommunityActivities(
-          userId,
-          selectedAcademyYear.value,
-        )
+        const data = await callApiGetUserCommunityActivities(userId, selectedAcademyYear.value)
         console.log('data', data)
         setCommunityActivities(data)
       } catch (error) {
@@ -112,37 +107,20 @@ export default function DialogDetailCommunityActivityStudentAdmin({
   }
 
   return (
-    <DialogCustom
-      isOpen={isShowDialog}
-      title={`chi tiết hoạt động cộng đồng của sinh viên ${studentName}`}
-    >
+    <DialogCustom isOpen={isShowDialog} title={`chi tiết hoạt động cộng đồng của sinh viên ${studentName}`}>
       <div className='mx-auto w-[1600px]'>
         <div>
           <div className='flex justify-between'>
             <div className='w-5%'>
-              <InputSelect
-                options={academyYearOptions}
-                value={selectedAcademyYear}
-                onChange={setSelectedAcademyYear}
-              />
+              <InputSelect options={academyYearOptions} value={selectedAcademyYear} onChange={setSelectedAcademyYear} />
             </div>
-            {!isShowAddNew && (
-              <Button
-                label='thêm'
-                type='add'
-                onClick={() => setShowAddNew(true)}
-              />
-            )}
+            {!isShowAddNew && <Button label='thêm' type='add' onClick={() => setShowAddNew(true)} />}
           </div>
           <div className='my-2'>
             <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
           </div>
           <div className='flex justify-end'>
-            <Button
-              label='Huỷ'
-              type='outline'
-              onClick={() => setShowDialog(false)}
-            />
+            <Button label='Huỷ' type='outline' onClick={() => setShowDialog(false)} />
           </div>
           <div className='h-[200px]'></div>
         </div>

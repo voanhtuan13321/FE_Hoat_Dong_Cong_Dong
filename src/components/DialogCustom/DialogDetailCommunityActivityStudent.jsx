@@ -28,24 +28,25 @@ export default function DialogDetailCommunityActivityStudent({
   isShowDialog,
   setShowDialog,
   studentName,
-  refresh,
-  refresh2,
+  refreshStudent,
 }) {
   const role = useSelector(state => state.role)
   const academyYearOptions = generateAcademyYearOptions()
 
   const [setting, setSetting] = useState({})
   const [communityActivities, setCommunityActivities] = useState([])
-  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
-    academyYearOptions[0],
-  )
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(academyYearOptions[0])
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetchCommunityActivities()
     fetchSettings(COMMUNITY_ACTIVITY_APPROVAL_PERIOD)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    fetchCommunityActivities()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
 
   const fetchSettings = async name => {
     try {
@@ -61,10 +62,7 @@ export default function DialogDetailCommunityActivityStudent({
   const fetchCommunityActivities = async () => {
     if (userId) {
       try {
-        const data = await callApiGetUserCommunityActivities(
-          userId,
-          selectedAcademyYear.value,
-        )
+        const data = await callApiGetUserCommunityActivities(userId, selectedAcademyYear.value)
         // console.log(data)
         setCommunityActivities(data)
       } catch (error) {
@@ -85,11 +83,11 @@ export default function DialogDetailCommunityActivityStudent({
       { className: '', title: 'link minh chứng' },
     ]
 
-    const additionalHeader = checkRoles2(
-      [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA],
-      [role],
-    )
-      ? [{ className: 'w-5%', title: 'xác nhận' }]
+    const additionalHeader = checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role])
+      ? [
+          { className: 'w-5%', title: 'xác nhận' },
+          { className: 'w-5%', title: 'từ chối' },
+        ]
       : [{ className: 'w-10%', title: '' }]
 
     return [...baseHeader, ...additionalHeader]
@@ -104,7 +102,7 @@ export default function DialogDetailCommunityActivityStudent({
             index={index}
             data={data}
             refresh={fetchCommunityActivities}
-            refresh2={refresh2}
+            refreshStudent={refreshStudent}
             academyYear={selectedAcademyYear.value}
           />
         ))
@@ -121,12 +119,8 @@ export default function DialogDetailCommunityActivityStudent({
 
     if (isConfirmed) {
       try {
-        const data = await callApiApproveUserCommunityActivitiesByHeadTeacher(
-          userId,
-          new Date().getFullYear(),
-        )
-        refresh()
-        refresh2()
+        const data = await callApiApproveUserCommunityActivitiesByHeadTeacher(userId, new Date().getFullYear())
+        fetchCommunityActivities()
       } catch (error) {
         console.error(error)
         handleError(error, navigate)
@@ -139,27 +133,18 @@ export default function DialogDetailCommunityActivityStudent({
 
     if (
       (checkRoles(userRole, [ROLES.GIAO_VIEN]) &&
-        setting.status !==
-          COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER) ||
+        setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER) ||
       (checkRoles(userRole, [ROLES.LOP_TRUONG]) &&
-        setting.status !==
-          COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.CLASS_PRESIDENT)
+        setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.CLASS_PRESIDENT)
     ) {
-      return (
-        <span className='font-bold text-main text-red-text my-2'>
-          Bạn chưa được phép đánh giá
-        </span>
-      )
+      return <span className='font-bold text-main text-red-text my-2'>Bạn chưa được phép đánh giá</span>
     }
 
     return ''
   }
 
   return (
-    <DialogCustom
-      isOpen={isShowDialog}
-      title={`chi tiết hoạt động cộng đồng của sinh viên ${studentName}`}
-    >
+    <DialogCustom isOpen={isShowDialog} title={`chi tiết hoạt động cộng đồng của sinh viên ${studentName}`}>
       <div className='mx-auto w-[1600px]'>
         <div>
           <div className='my-2'>
@@ -168,14 +153,9 @@ export default function DialogDetailCommunityActivityStudent({
         </div>
         <div className='col-span-2 mt-4 flex justify-end gap-2'>
           {genCanhBao()}
-          <Button
-            label='Huỷ'
-            type='outline'
-            onClick={() => setShowDialog(false)}
-          />
+          <Button label='Huỷ' type='outline' onClick={() => setShowDialog(false)} />
           {checkRoles(getUserRole(), [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA]) &&
-            setting.status ===
-              COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER && (
+            setting.status === COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER && (
               <Button label='xác nhận toàn bộ' onClick={handleAcceptAll} />
             )}
         </div>

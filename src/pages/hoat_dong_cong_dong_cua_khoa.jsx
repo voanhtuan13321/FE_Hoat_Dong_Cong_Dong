@@ -14,17 +14,20 @@ import {
   COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS,
   ROLES,
   callApiApproveMajorCommunityActivitiesByMajorHead,
+  callApiGetClassById,
   callApiGetMajorsListByMajorHeadId,
   callApiGetSettings,
   callApiGetUserCommunityActivitiesSumScoreHeadTeachersConfirmed,
   checkAndHandleLogin,
   checkPermissionToAccessThePage,
   checkRoles2,
+  exportFileExcel,
   generateAcademyYearOptions,
   getUserId,
   getUserRole,
   handleError,
 } from '../utils'
+import Swal from 'sweetalert2'
 
 const HEADER_TABE = [
   { className: 'w-5%', title: 'stt' },
@@ -109,7 +112,15 @@ export default function HoatDongCongDongCuaKhoa() {
   }
 
   const handleAccept = async () => {
-    if (selectMajor?.value) {
+    const { isConfirmed } = await Swal.fire({
+      title: 'Bạn có chắc muốn xác nhận không?',
+      icon: 'question',
+      confirmButtonText: 'Xác nhận',
+      showCancelButton: true,
+      cancelButtonText: 'Huỷ',
+    })
+
+    if (isConfirmed && selectMajor?.value) {
       try {
         console.log(selectMajor.value)
         const data = await callApiApproveMajorCommunityActivitiesByMajorHead(
@@ -122,6 +133,42 @@ export default function HoatDongCongDongCuaKhoa() {
         handleError(error, navigate)
       }
     }
+  }
+
+  const fetchClassName = async classId => {
+    try {
+      const { name } = await callApiGetClassById(classId)
+      return name
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
+
+  const handleExportFileExcell = async () => {
+    if (communityActivities.length === 0) {
+      Swal.fire('Danh sách rỗng', '', 'info')
+      return
+    }
+
+    const fileName = `hoat-dong-cong-dong-cua-khoa-${selectMajor.name}-${selectedAcademyYear.value}`
+
+    // Sử dụng Promise.all để đợi tất cả các promise hoàn thành
+    const result = await Promise.all(
+      communityActivities.map(async (item, index) => ({
+        STT: index + 1,
+        'MÃ SINH VIÊN': item.studentId,
+        'HỌ VÀ TÊN': `${item.firstName} ${item.lastName}`,
+        LỚP: await fetchClassName(item.classId),
+        ĐIỂM:
+          item.sumScoreHeadTeacherConfirmed > 0
+            ? item.sumScoreHeadTeacherConfirmed
+            : item.sumScoreMajorHeadConfirmed,
+        'TRẠNG THÁI': item.sumScoreMajorHeadConfirmed > 0 ? 'Đã xác nhận' : '',
+      })),
+    )
+
+    exportFileExcel(result, fileName)
   }
 
   const checkAcceptedAll = () =>
@@ -180,7 +227,7 @@ export default function HoatDongCongDongCuaKhoa() {
                 )}
               </>
             )}
-          {communityActivities?.length > 0 && <Button label='Xuất file' />}
+          <Button label='Xuất file' onClick={handleExportFileExcell} />
         </div>
       </div>
     </div>

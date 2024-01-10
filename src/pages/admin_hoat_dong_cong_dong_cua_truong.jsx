@@ -10,13 +10,16 @@ import ItemRowHoatDongCongDongCuaTruongAdmin from '../components/ItemRow/ItemRow
 
 import {
   ROLES,
+  callApiGetClassById,
   callApiGetUserCommunityActivitiesSumScoreMajorHeadsConfimed,
   checkAndHandleLogin,
   checkPermissionToAccessThePage,
+  exportFileExcel,
   generateAcademyYearOptions,
   getUserRole,
   handleError,
 } from '../utils'
+import Swal from 'sweetalert2'
 
 const HEADER_TABLE = [
   { className: 'w-5%', title: 'STT' },
@@ -60,6 +63,38 @@ export default function AdminHoatDongCongDongCuaTruong() {
     }
   }
 
+  const fetchClassName = async classId => {
+    try {
+      const { name } = await callApiGetClassById(classId)
+      return name
+    } catch (error) {
+      console.error(error)
+      handleError(error, navigate)
+    }
+  }
+
+  const handleExportFileExcell = async () => {
+    if (communityActivities.length === 0) {
+      Swal.fire('Danh sách rỗng', '', 'info')
+      return
+    }
+
+    const fileName = `hoat-dong-cong-dong-cua-truong-${selectedAcademyYear.value}`
+
+    // Sử dụng Promise.all để đợi tất cả các promise hoàn thành
+    const result = await Promise.all(
+      communityActivities.map(async (item, index) => ({
+        STT: index + 1,
+        'MÃ SINH VIÊN': item.studentId,
+        'HỌ VÀ TÊN': `${item.firstName} ${item.lastName}`,
+        LỚP: await fetchClassName(item.classId),
+        ĐIỂM: item.sumScoreMajorHeadConfirmed,
+      })),
+    )
+
+    exportFileExcel(result, fileName)
+  }
+
   const renderBodyTable = () => {
     return communityActivities?.length === 0
       ? [<ItemRowNoData key={-1} colSpan={15} />]
@@ -87,7 +122,7 @@ export default function AdminHoatDongCongDongCuaTruong() {
                 onChange={setSelectedAcademyYear}
               />
             </div>
-            <Button label={'Xuất file'} />
+            <Button label='Xuất file' onClick={handleExportFileExcell} />
           </div>
           <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
         </div>

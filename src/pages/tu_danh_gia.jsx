@@ -37,18 +37,12 @@ export default function TuDanhGia() {
   const [isShowAddNew, setShowAddNew] = useState(false)
   const [communityActivities, setCommunityActivities] = useState([])
   const [academicYearOptions, setAcademicYearOption] = useState([])
-  const [selectedAcademyYear, setSelectedAcademyYear] = useState(
-    academyYearOptions[0],
-  )
+  const [selectedAcademyYear, setSelectedAcademyYear] = useState(academyYearOptions[0])
   const navigate = useNavigate()
 
   useEffect(() => {
     checkAndHandleLogin(navigate)
-    checkPermissionToAccessThePage(
-      getUserRole(),
-      [ROLES.SINH_VIEN, ROLES.LOP_TRUONG],
-      navigate,
-    )
+    checkPermissionToAccessThePage(getUserRole(), [ROLES.SINH_VIEN, ROLES.LOP_TRUONG], navigate)
     fetchCommunityActivities()
     fetchInfoUser()
     fetchSettings(COMMUNITY_ACTIVITY_APPROVAL_PERIOD)
@@ -69,10 +63,7 @@ export default function TuDanhGia() {
     const userId = getUserId()
     if (userId) {
       try {
-        const data = await callApiGetUserCommunityActivities(
-          userId,
-          selectedAcademyYear.value,
-        )
+        const data = await callApiGetUserCommunityActivities(userId, selectedAcademyYear.value)
         // console.log(data)
         setCommunityActivities(data)
       } catch (error) {
@@ -119,10 +110,10 @@ export default function TuDanhGia() {
       { className: 'w-5%', title: 'điểm ban cán sự đánh giá' },
       { className: '', title: 'link minh chứng' },
     ]
-    if (checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role])) {
-      return [...header, { className: 'w-5%', title: 'xác nhận' }]
-    }
-    return [...header, { className: 'w-5%', title: '' }]
+    // if (checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role])) {
+    //   return [...header, { className: 'w-5%', title: 'xác nhận' }]
+    // }
+    return [...header, { className: 'w-5%', title: '' }, { className: 'w-10%', title: 'trạng thái' }]
   }
 
   const renderBodyTable = () => {
@@ -141,11 +132,7 @@ export default function TuDanhGia() {
     isShowAddNew &&
       (arrJsx = [
         ...arrJsx,
-        <ItemRowTableTuDanhGiaAdd
-          key={-2}
-          setShowAddNew={setShowAddNew}
-          refresh={fetchCommunityActivities}
-        />,
+        <ItemRowTableTuDanhGiaAdd key={-2} setShowAddNew={setShowAddNew} refresh={fetchCommunityActivities} />,
       ])
     return arrJsx
   }
@@ -155,15 +142,9 @@ export default function TuDanhGia() {
       <Title title='tự đánh giá' />
       <div className='mt-3'>
         <div className='flex items-center gap-2 '>
-          <span className='font-bold text-primary text-main'>
-            Năm đánh giá:
-          </span>
+          <span className='font-bold text-primary text-main'>Năm đánh giá:</span>
           <div className='w-48'>
-            <InputSelect
-              options={academicYearOptions}
-              value={selectedAcademyYear}
-              onChange={setSelectedAcademyYear}
-            />
+            <InputSelect options={academicYearOptions} value={selectedAcademyYear} onChange={setSelectedAcademyYear} />
           </div>
         </div>
       </div>
@@ -173,20 +154,11 @@ export default function TuDanhGia() {
           <div>
             {checkIsCurrentYear(selectedAcademyYear.value) && (
               <>
-                {setting.status ===
-                COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT ? (
+                {setting.status === COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.STUDENT ? (
                   <>
-                    {!checkRoles2(
-                      [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA],
-                      [role],
-                    ) &&
-                      !isShowAddNew && (
-                        <Button
-                          label='thêm'
-                          type='add'
-                          onClick={() => setShowAddNew(true)}
-                        />
-                      )}
+                    {!checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && !isShowAddNew && (
+                      <Button label='thêm' type='add' onClick={() => setShowAddNew(true)} />
+                    )}
                   </>
                 ) : (
                   <span className='font-bold text-main text-red-text my-2'>
