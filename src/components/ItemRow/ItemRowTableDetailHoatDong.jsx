@@ -146,15 +146,16 @@ export default function ItemRowTableDetailHoatDong({ index, data, refresh, refre
               <Button label='lưu' onClick={handleSave} />
               <Button label='huỷ' type='outline' onClick={onClickCancel} />
             </>
-          ) : rowData.status < COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED &&
-            setting.status === COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.CLASS_PRESIDENT ? (
+          ) : (
             <Button
+              disable={
+                rowData.status >= COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED ||
+                setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.CLASS_PRESIDENT
+              }
               label={`${rowData.status === COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED ? 'sửa' : 'đánh giá'}`}
               type='edit'
               onClick={() => setShowEdit(true)}
             />
-          ) : (
-            <span className='p-2 text-white'>dà</span>
           )}
         </td>
       )}

@@ -113,7 +113,7 @@ export default function TuDanhGia() {
     // if (checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role])) {
     //   return [...header, { className: 'w-5%', title: 'xác nhận' }]
     // }
-    return [...header, { className: 'w-5%', title: '' }, { className: 'w-10%', title: 'trạng thái' }]
+    return [...header, { className: 'w-10%', title: 'trạng thái' }, { className: 'w-5%', title: '' }]
   }
 
   const renderBodyTable = () => {

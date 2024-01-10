@@ -183,6 +183,7 @@ export default function ItemRowTableTuDanhGia({ index, data, refresh, academyYea
           <td className='border border-primary p-1 text-center'>{rowData.selfEvaluationScore}</td>
           <td className='border border-primary p- text-center'>{rowData.classPresidentEvaluationScore}</td>
           <td className='border border-primary p-1 truncate'>{rowData.evidentLink}</td>
+          <td className='border border-primary px-1 text-center'>{genStatus()}</td>
           {!checkRoles2([ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA], [role]) && (
             <td className='border border-primary px-1 text-center flex gap-1'>
               <Button
@@ -207,7 +208,6 @@ export default function ItemRowTableTuDanhGia({ index, data, refresh, academyYea
               />
             </td>
           )}
-          <td className='border border-primary px-1 text-center'>{genStatus()}</td>
         </tr>
       )}
     </>
