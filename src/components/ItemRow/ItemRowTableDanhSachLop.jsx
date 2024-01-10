@@ -8,6 +8,7 @@ import {
   COMMUNITY_ACTIVITY_APPROVAL_PERIOD,
   COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS,
   COMMUNITY_ACTIVITY_STATUS,
+  COMMUNITY_ACTIVITY_STATUS_MESSAGE,
   ROLES,
   callApiGetSettings,
   callApiUpdateClassPresident,
@@ -17,7 +18,15 @@ import {
   handleError,
 } from '../../utils'
 
-export default function ItemRowTableDanhSachLop({ dt, index, classPresidentId, refreshClass, refreshStudent, year }) {
+export default function ItemRowTableDanhSachLop({
+  dt,
+  index,
+  classPresidentId,
+  refreshClass,
+  refreshStudent,
+  year,
+  students,
+}) {
   const [isShowDialog, setShowDialog] = useState(false)
   const [setting, setSetting] = useState({})
   const navigate = useNavigate()
@@ -72,11 +81,11 @@ export default function ItemRowTableDanhSachLop({ dt, index, classPresidentId, r
         <>
           <td className='border border-primary text-main p-2 text-left'>
             {determineActivity.status === COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED && (
-              <span className='text-red-500'>Giáo viên đã duyệt</span>
+              <span className=''>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.HEAD_TEACHER_CONFIRMED}</span>
             )}
 
             {determineActivity.status === COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED && (
-              <span className='text-green-500'>Trưởng khoa đã duyệt</span>
+              <span className='text-green-500'>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.MAJOR_HEAD_CONFIRMED}</span>
             )}
           </td>
           <td className='border border-primary text-main p-2 text-center'>{determineActivity.score}</td>
@@ -89,6 +98,7 @@ export default function ItemRowTableDanhSachLop({ dt, index, classPresidentId, r
               studentName={`${dt.firstName} ${dt.lastName}`}
               refreshStudent={refreshStudent}
               year={year}
+              students={students}
             />
           </td>
         </>

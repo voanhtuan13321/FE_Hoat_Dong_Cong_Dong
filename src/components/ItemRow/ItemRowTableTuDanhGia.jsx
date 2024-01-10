@@ -14,6 +14,7 @@ import {
   COMMUNITY_ACTIVITY_APPROVAL_PERIOD,
   COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS,
   COMMUNITY_ACTIVITY_STATUS,
+  COMMUNITY_ACTIVITY_STATUS_MESSAGE,
   ROLES,
   callApiDeleteCommunityActivity,
   callApiGetCommunityActivityTypesList,
@@ -94,15 +95,15 @@ export default function ItemRowTableTuDanhGia({ index, data, refresh, academyYea
   const genStatus = () => {
     switch (rowData.status) {
       case COMMUNITY_ACTIVITY_STATUS.REJECTED:
-        return <span className='text-red-500'>Bị từ chối</span>
+        return <span className='text-red-500'>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.REJECTED}</span>
       case COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED:
-        return <span className=''>Chưa phê duyệt</span>
+        return <span className=''>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.STUDENT_CONFIRMED}</span>
       case COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED:
-        return <span className=''>Lớp trưởng phê duyệt</span>
+        return <span className=''>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.CLASS_PRESIDENT_CONFIRMED}</span>
       case COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED:
-        return <span className=''>Chủ nhiệm phê duyệt</span>
+        return <span className=''>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.HEAD_TEACHER_CONFIRMED}</span>
       case COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED:
-        return <span className='text-green-600'>Trưởng khoa phê duyệt</span>
+        return <span className='text-green-600'>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.MAJOR_HEAD_CONFIRMED}</span>
       default:
         return <></>
     }

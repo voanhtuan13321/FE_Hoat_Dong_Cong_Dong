@@ -30,9 +30,11 @@ export default function DialogDetailCommunityActivityStudent({
   studentName,
   refreshStudent,
   year,
+  students,
 }) {
   const role = useSelector(state => state.role)
   const academyYearOptions = generateAcademyYearOptions()
+  console.log('render')
 
   const [setting, setSetting] = useState({})
   const [communityActivities, setCommunityActivities] = useState([])
@@ -47,7 +49,7 @@ export default function DialogDetailCommunityActivityStudent({
   useEffect(() => {
     fetchCommunityActivities()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, year])
+  }, [userId, year, students])
 
   const fetchSettings = async name => {
     try {

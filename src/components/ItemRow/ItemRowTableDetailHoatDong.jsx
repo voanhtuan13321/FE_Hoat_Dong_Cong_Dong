@@ -178,6 +178,7 @@ export default function ItemRowTableDetailHoatDong({ index, data, refresh, refre
             <InputCheckbox
               disabled={
                 academyYear !== new Date().getFullYear() ||
+                rowData.status >= COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED ||
                 setting.status !== COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER
               }
               value={rowData.status === COMMUNITY_ACTIVITY_STATUS.REJECTED}

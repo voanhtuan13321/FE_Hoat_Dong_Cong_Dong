@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   COMMUNITY_ACTIVITY_STATUS,
+  COMMUNITY_ACTIVITY_STATUS_MESSAGE,
   REGEX,
   callApiGetCommunityActivityTypesList,
   handleError,
@@ -9,8 +10,7 @@ import {
 
 export default function ItemRowTableDetailHoatDongAdmin({ index, data }) {
   const [rowData, setRowData] = useState(data)
-  const [selectedCommunityActivityTypes, setSelectedCommunityActivityTypes] =
-    useState({})
+  const [selectedCommunityActivityTypes, setSelectedCommunityActivityTypes] = useState({})
   const navigate = useNavigate()
 
   // console.log(data)
@@ -40,15 +40,15 @@ export default function ItemRowTableDetailHoatDongAdmin({ index, data }) {
   const genStatus = () => {
     switch (rowData.status) {
       case COMMUNITY_ACTIVITY_STATUS.REJECTED:
-        return <span className='text-red-500'>Bị từ chối</span>
+        return <span className='text-red-500'>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.REJECTED}</span>
       case COMMUNITY_ACTIVITY_STATUS.STUDENT_CONFIRMED:
-        return <span className=''>Chưa phê duyệt</span>
+        return <span className=''>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.STUDENT_CONFIRMED}</span>
       case COMMUNITY_ACTIVITY_STATUS.CLASS_PRESIDENT_CONFIRMED:
-        return <span className=''>Lớp trưởng phê duyệt</span>
+        return <span className=''>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.CLASS_PRESIDENT_CONFIRMED}</span>
       case COMMUNITY_ACTIVITY_STATUS.HEAD_TEACHER_CONFIRMED:
-        return <span className=''>Chủ nhiệm phê duyệt</span>
+        return <span className=''>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.HEAD_TEACHER_CONFIRMED}</span>
       case COMMUNITY_ACTIVITY_STATUS.MAJOR_HEAD_CONFIRMED:
-        return <span className='text-green-600'>Trưởng khoa phê duyệt</span>
+        return <span className='text-green-600'>{COMMUNITY_ACTIVITY_STATUS_MESSAGE.MAJOR_HEAD_CONFIRMED}</span>
       default:
         return <></>
     }
@@ -57,37 +57,23 @@ export default function ItemRowTableDetailHoatDongAdmin({ index, data }) {
   return (
     <tr className='text-main'>
       <td className='border border-primary p-1 text-center'>{index + 1}</td>
-      <td className='border border-primary p-1 truncate'>
-        {rowData.activityTypeName}
-      </td>
+      <td className='border border-primary p-1 truncate'>{rowData.activityTypeName}</td>
       <td className='border border-primary p-1 truncate'>{rowData.name}</td>
       <td className='border border-primary p-1 text-center'>
-        {`${selectedCommunityActivityTypes?.minScore || ''} - ${
-          selectedCommunityActivityTypes?.maxScore || ''
-        }`}
+        {`${selectedCommunityActivityTypes?.minScore || ''} - ${selectedCommunityActivityTypes?.maxScore || ''}`}
       </td>
-      <td className='border border-primary p-1 text-center'>
-        {rowData.selfEvaluationScore}
-      </td>
-      <td className='border border-primary p-1 text-center'>
-        {rowData.classPresidentEvaluationScore}
-      </td>
+      <td className='border border-primary p-1 text-center'>{rowData.selfEvaluationScore}</td>
+      <td className='border border-primary p-1 text-center'>{rowData.classPresidentEvaluationScore}</td>
       <td className='border border-primary p-1 truncate'>
         {REGEX.LINK.test(rowData.evidentLink) ? (
-          <a
-            className='text-blue-500 truncate'
-            target='_blank'
-            href={rowData.evidentLink}
-          >
+          <a className='text-blue-500 truncate' target='_blank' href={rowData.evidentLink}>
             {rowData.evidentLink}
           </a>
         ) : (
           rowData.evidentLink
         )}
       </td>
-      <td className='border border-primary text-center p-1 truncate'>
-        {genStatus()}
-      </td>
+      <td className='border border-primary text-center p-1 truncate'>{genStatus()}</td>
     </tr>
   )
 }

@@ -21,8 +21,7 @@ import { localStorages } from './localStorage'
 import AdminThoiGianXetDuyet from '../pages/admin_thoi_gian_xet_duyet'
 
 export const ITEM_PER_PAGE = 10
-export const KEY_ROLE_TOKEN =
-  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+export const KEY_ROLE_TOKEN = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
 
 export const ROLES = {
   ANONYMOUS: 1,
@@ -41,8 +40,7 @@ export const COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS = {
   MAJOR_HEAD: 4,
 }
 
-export const COMMUNITY_ACTIVITY_APPROVAL_PERIOD =
-  'CommunityActivityApprovalPeriod'
+export const COMMUNITY_ACTIVITY_APPROVAL_PERIOD = 'CommunityActivityApprovalPeriod'
 
 export const REGEX = {
   TEXT_ONLY: /^[a-zA-ZÀ-Ỹà-ỹ ]+$/,
@@ -69,19 +67,20 @@ export const STATUS_USER = {
   ACCOUNT_UNLOCK: 0,
 }
 
+export const COMMUNITY_ACTIVITY_STATUS_MESSAGE = {
+  REJECTED: 'Bị từ chối',
+  STUDENT_CONFIRMED: 'Chưa phê duyệt',
+  CLASS_PRESIDENT_CONFIRMED: 'Lớp trưởng đã duyệt',
+  HEAD_TEACHER_CONFIRMED: 'Chủ nhiệm đã duyệt',
+  MAJOR_HEAD_CONFIRMED: 'Trưởng khoa đã duyệt',
+}
+
 export const routers = [
   {
     path: '/',
     label: 'trang chủ',
     element: <Home />,
-    roles: [
-      ROLES.ANONYMOUS,
-      ROLES.SINH_VIEN,
-      ROLES.LOP_TRUONG,
-      ROLES.GIAO_VIEN,
-      ROLES.TRUONG_KHOA,
-      ROLES.ADMIN,
-    ],
+    roles: [ROLES.ANONYMOUS, ROLES.SINH_VIEN, ROLES.LOP_TRUONG, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.ADMIN],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -99,12 +98,7 @@ export const routers = [
     path: '/thong-tin-ca-nhan',
     label: 'thông tin cá nhân',
     element: <ThongTinCaNhan />,
-    roles: [
-      ROLES.SINH_VIEN,
-      ROLES.LOP_TRUONG,
-      ROLES.GIAO_VIEN,
-      ROLES.TRUONG_KHOA,
-    ],
+    roles: [ROLES.SINH_VIEN, ROLES.LOP_TRUONG, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -122,12 +116,7 @@ export const routers = [
     path: '/danh-sach-lop',
     label: 'danh sách lớp',
     element: <DanhSachLop />,
-    roles: [
-      ROLES.SINH_VIEN,
-      ROLES.LOP_TRUONG,
-      ROLES.GIAO_VIEN,
-      ROLES.TRUONG_KHOA,
-    ],
+    roles: [ROLES.SINH_VIEN, ROLES.LOP_TRUONG, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA],
     onClick: function (navigator) {
       navigator(this.path)
     },
@@ -224,13 +213,7 @@ export const routers = [
   },
   {
     label: 'đăng xuất',
-    roles: [
-      ROLES.SINH_VIEN,
-      ROLES.LOP_TRUONG,
-      ROLES.GIAO_VIEN,
-      ROLES.TRUONG_KHOA,
-      ROLES.ADMIN,
-    ],
+    roles: [ROLES.SINH_VIEN, ROLES.LOP_TRUONG, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.ADMIN],
     onClick: function (navigator, dispatch) {
       // handle logout here
       dispatch(setRole([ROLES.ANONYMOUS]))

@@ -162,6 +162,7 @@ export default function DanhSachLop() {
             refreshClass={fetchClasses}
             refreshStudent={fetchStudents}
             year={selectedYear.value}
+            students={students}
           />
         ))
   }
@@ -231,7 +232,7 @@ export default function DanhSachLop() {
               {selectedYear.value === new Date().getFullYear() && (
                 <>
                   {setting.status === COMMUNITY_ACTIVITY_APPROVAL_PERIOD_STATUS.HEAD_TEACHER ? (
-                    <Button label='Xác nhận' type='primary' onClick={handleAccept} />
+                    <Button label='Xác nhận toàn bộ' type='primary' onClick={handleAccept} />
                   ) : (
                     <span className='font-bold text-main text-red-text my-2'>Bạn chưa được phép đánh giá</span>
                   )}
