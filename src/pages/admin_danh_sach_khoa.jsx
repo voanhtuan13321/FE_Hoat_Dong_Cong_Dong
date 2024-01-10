@@ -77,7 +77,9 @@ export default function AdminDanhSachKhoa() {
             />
           )}
         </div>
-        <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
+        <div className='pb-[88px]'>
+          <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
+        </div>
         <Pagination
           totalItems={objectMajors.totalItems}
           totalPages={objectMajors.totalPages}

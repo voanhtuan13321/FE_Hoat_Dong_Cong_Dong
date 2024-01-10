@@ -149,7 +149,7 @@ export default function AdminDanhSachLop() {
           )}
         </div>
       </div>
-      <div className='my-2'>
+      <div className='my-2 pb-[88px]'>
         <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
       </div>
       {objectClasses.totalPages > 1 && (

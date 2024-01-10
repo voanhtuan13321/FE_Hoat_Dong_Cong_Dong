@@ -42,7 +42,7 @@ export default function Home() {
 
   return (
     <>
-      <div className='container mx-auto'>
+      <div className='container mx-auto pb-[88px]'>
         <Title title='Thông báo' />
         {renderBody()}
       </div>

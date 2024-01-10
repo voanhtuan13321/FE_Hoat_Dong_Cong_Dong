@@ -82,7 +82,7 @@ export default function AdminDanhSachHoatDongCongDong() {
   return (
     <div className='container p-2 justify-center m-auto'>
       <Title title={'Danh sách các hoạt động cộng đồng'} />
-      <div className='py-2'>
+      <div className='py-2 pb-[88px]'>
         <div className='text-end py-2'>
           {!addButtonDisabled && (
             <Button type={'add'} label={'Thêm'} onClick={handleAddRow} />

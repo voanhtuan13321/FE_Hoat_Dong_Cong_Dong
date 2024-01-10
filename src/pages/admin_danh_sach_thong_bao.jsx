@@ -89,7 +89,7 @@ export default function AdminDanhSachThongBao() {
             />
           )}
         </div>
-        <div>
+        <div className='pb-[88px]'>
           <Table header={HEADER_TABLE}>{renderBodyTable()}</Table>
         </div>
         {objectAnnouncements.totalPages > 1 && (

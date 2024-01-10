@@ -37,6 +37,7 @@ export default function AdminDanhSachSinhVien() {
   const [selectedMajor, setSelectedMajor] = useState({})
   const [selectedClasse, setSelectedClasse] = useState({})
   const [isShowDialog, setShowDialog] = useState(false)
+  const [isFetchStudent, setFetchStudent] = useState(false)
 
   const navigate = useNavigate()
 
@@ -80,7 +81,13 @@ export default function AdminDanhSachSinhVien() {
       // console.log(selectedMajor)
       setClassesOptions(result)
       setSelectedClasse(result[0])
-      result.length === 0 && setStudents([])
+      if (result.length === 0) {
+        console.log('fetchClasses')
+        setFetchStudent(false)
+        setStudents([])
+      } else {
+        setFetchStudent(true)
+      }
     } catch (error) {
       console.error(error)
       handleError(error, navigate)
@@ -90,7 +97,8 @@ export default function AdminDanhSachSinhVien() {
   const fetchStudents = async () => {
     const classId = selectedClasse?.id
 
-    if (classId) {
+    if (classId && isFetchStudent) {
+      console.log('fetchStudents')
       try {
         const data = await callApiGetStudentsListByClassId(classId)
         console.log(data)
@@ -104,6 +112,7 @@ export default function AdminDanhSachSinhVien() {
         handleError(error, navigate)
       }
     } else {
+      console.log(classId)
       setStudents([])
     }
   }
@@ -118,7 +127,7 @@ export default function AdminDanhSachSinhVien() {
 
   const renderBodyTable = () => {
     return students?.length === 0
-      ? [<ItemRowNoData key={-1} colSpan={6} />]
+      ? [<ItemRowNoData key={-1} colSpan={60} />]
       : students?.map((data, index) => (
           <ItemRowDanhSachSinhVienAdmin
             key={index}
