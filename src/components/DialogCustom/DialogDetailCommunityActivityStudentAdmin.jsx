@@ -100,6 +100,7 @@ export default function DialogDetailCommunityActivityStudentAdmin({
           userId={userId}
           setShowAddNew={setShowAddNew}
           refresh={fetchCommunityActivities}
+          year={selectedAcademyYear.value}
         />,
       ])
 
