@@ -48,6 +48,10 @@ export default function TuDanhGia() {
     fetchSettings(COMMUNITY_ACTIVITY_APPROVAL_PERIOD)
   }, [])
 
+  useEffect(() => {
+    fetchCommunityActivities()
+  }, [selectedAcademyYear])
+
   const fetchSettings = async name => {
     try {
       const data = await callApiGetSettings(name)
@@ -64,7 +68,7 @@ export default function TuDanhGia() {
     if (userId) {
       try {
         const data = await callApiGetUserCommunityActivities(userId, selectedAcademyYear.value)
-        // console.log(data)
+        console.log(data)
         setCommunityActivities(data)
       } catch (error) {
         console.error(error)

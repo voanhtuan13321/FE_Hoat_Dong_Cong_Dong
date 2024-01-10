@@ -130,6 +130,7 @@ export default function AdminDanhSachSinhVien() {
             index={index}
             classPresidentId={selectedClass?.classPresidentId}
             refresh={fetchStudents}
+            refreshClasses={fetchClasses}
           />
         ))
   }

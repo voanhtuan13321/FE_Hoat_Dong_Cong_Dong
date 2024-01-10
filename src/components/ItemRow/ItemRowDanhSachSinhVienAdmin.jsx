@@ -20,6 +20,7 @@ export default function ItemRowDanhSachSinhVienAdmin({
   index,
   classPresidentId,
   refresh,
+  refreshClasses
 }) {
   const [user, setUser] = useState(data)
   const [isShowDialog, setShowDialog] = useState(false)
@@ -75,6 +76,7 @@ export default function ItemRowDanhSachSinhVienAdmin({
       const data = await callApiUpdateClassPresident(dataRequest)
       // console.log(data)
       refresh()
+      refreshClasses()
     } catch (error) {
       console.error(error)
       handleError(error, navigate)

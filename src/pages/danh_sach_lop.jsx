@@ -171,15 +171,15 @@ export default function DanhSachLop() {
     const header = checkRoles(getUserRole(), [ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA])
       ? [
           { className: 'w-5%', title: 'Chọn lớp trưởng' },
-          { className: 'w-10%', title: 'trạng thái' },
+          { className: 'w-10%', title: 'Trạng thái' },
           { className: 'w-5%', title: 'Tổng điểm' },
           { className: 'w-5%', title: 'Xem chi tiết' },
         ]
       : checkRoles(getUserRole(), [ROLES.LOP_TRUONG])
         ? [
-            { className: 'w-10%', title: 'Xem chi tiết' },
-            { className: 'w-10%', title: 'trạng thái' },
+            { className: 'w-10%', title: 'Trạng thái' },
             { className: 'w-5%', title: 'Tổng điểm' },
+            { className: 'w-10%', title: 'Xem chi tiết' },
           ]
         : []
 
@@ -189,7 +189,6 @@ export default function DanhSachLop() {
       { className: 'w-10%', title: 'Tên sinh viên' },
       { className: 'w-10%', title: 'Số điện thoại' },
       { className: 'w-15%', title: 'Email' },
-
       ...header,
     ]
   }
